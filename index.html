@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-68MX4wNVvdMJWCvIG5asgVlVxlRH1b5dX1VYJpV5NjQ='; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ClOeVxWb7hp6q3gn9CQD2aTeINTSq+SDWdN+7ncsy2I='; style-src 'unsafe-inline'; img-src data:; connect-src https://api.github.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
@@ -15,13 +15,17 @@
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --display: "Bahnschrift", "DIN Alternate", "DIN 1451 Std", "Avenir Next Condensed", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
-  --bg: #e7ecef; --surface: #fafbfc; --surface-2: #eff3f5; --ink: #14202b; --muted: #566574;
-  --line: #d3dbe1; --line-2: #e3e9ed;
+  /* Nebel, Papier, Tinte, Petrol, Textmarker, Stempelrot */
+  --bg: #e7ecef; --grid: rgba(20, 32, 43, .05); --surface: #fafbfc; --surface-2: #eff3f5; --ink: #14202b; --muted: #566574;
+  --line: #d3dbe1; --line-2: #e3e9ed; --rule: #14202b;
   --accent: #0a6c74; --accent-ink: #ffffff; --accent-soft: #d4eaec;
   --mark: #f4dc3e; --mark-ink: #2b2500;
   --neg: #c0271b; --neg-soft: #fbe4e0; --pos: #1a7a45; --pos-soft: #dcf0e4; --warn: #8a5a00; --warn-soft: #f8ecc8;
   --rail: #101a24; --rail-ink: #e6ecf1; --rail-muted: #8d9dab; --rail-line: #223140;
   --hero: #12202c; --h-ink: #e8eef3; --h-muted: #8fa2b2; --h-line: #2a3b4a; --h-accent: #4cc3cb; --h-neg: #ff8478;
+  --c1: #0a6c74; --c2: #4b5fd6; --c3: #d9573a; --c4: #c99410; --c5: #2f8f5b; --c6: #8a58c9;
+  --shadow-pop: 0 28px 70px -18px rgba(8, 16, 24, .55);
+  --ease: cubic-bezier(.22, .8, .2, 1);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
@@ -33,6 +37,7 @@
     --neg: #ff7b6e; --neg-soft: #3a1d19; --pos: #5fd08a; --pos-soft: #14301f; --warn: #e7bd5c; --warn-soft: #33270d;
     --rail: #091017; --rail-ink: #e6ecf1; --rail-muted: #8d9dab; --rail-line: #1c2935;
     --hero: #0f1a23; --h-ink: #e8eef3; --h-muted: #8fa2b2; --h-line: #263644; --h-accent: #4cc3cb; --h-neg: #ff8478;
+    --grid: rgba(230, 236, 241, .035); --rule: #3b5368; --c1: #4cc3cb; --c2: #8e9cff; --c3: #ff8f73; --c4: #e8c14e; --c5: #5fd08a; --c6: #b78cf0;
     color-scheme: dark;
   }
 }
@@ -44,17 +49,23 @@
     --neg: #ff7b6e; --neg-soft: #3a1d19; --pos: #5fd08a; --pos-soft: #14301f; --warn: #e7bd5c; --warn-soft: #33270d;
     --rail: #091017; --rail-ink: #e6ecf1; --rail-muted: #8d9dab; --rail-line: #1c2935;
     --hero: #0f1a23; --h-ink: #e8eef3; --h-muted: #8fa2b2; --h-line: #263644; --h-accent: #4cc3cb; --h-neg: #ff8478;
+    --grid: rgba(230, 236, 241, .035); --rule: #3b5368; --c1: #4cc3cb; --c2: #8e9cff; --c3: #ff8f73; --c4: #e8c14e; --c5: #5fd08a; --c6: #b78cf0;
     color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0; background-color: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
 [hidden] { display: none !important; }
 button, input, select, textarea { font: inherit; color: inherit; }
 h1, h2, h3 { font-family: var(--display); margin: 0; }
 p { margin: 0; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+::selection { background: var(--mark); color: var(--mark-ink); }
 .money { font-variant-numeric: tabular-nums; }
 .pos { color: var(--pos); }
 .neg { color: var(--neg); }
@@ -62,79 +73,125 @@ p { margin: 0; }
 .fine { font-size: 12.5px; }
 
 /* ---------- Gerüst ---------- */
-.shell { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100vh; }
-.rail { background: var(--rail); color: var(--rail-ink); position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 22px 14px 16px; }
-.brand { display: flex; align-items: center; gap: 10px; font: 700 20px var(--display); letter-spacing: .01em; padding: 0 8px 24px; color: inherit; }
-.logo { width: 30px; height: 30px; flex: none; }
+.shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
+.rail { background: var(--rail); color: var(--rail-ink); position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 22px 14px 16px; overflow-y: auto; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 21px var(--display); letter-spacing: .01em; padding: 0 8px 18px; color: inherit; }
+.logo { width: 32px; height: 32px; flex: none; }
+.cta { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin: 0 0 18px; padding: 11px 14px; border: 0; border-radius: 8px; background: var(--mark); color: var(--mark-ink); font-weight: 700; font-size: 14.5px; cursor: pointer; transition: transform .15s var(--ease), box-shadow .15s var(--ease); }
+.cta svg { width: 18px; height: 18px; }
+.cta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(244, 220, 62, .55); }
+.cta:active { transform: translateY(0) scale(.98); }
 .nav { display: grid; gap: 2px; }
-.nav button, .rail-btn { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 0; background: none; color: var(--rail-muted); font-weight: 600; font-size: 15px; border-radius: 6px; cursor: pointer; text-align: left; width: 100%; }
+.nav button, .rail-btn { position: relative; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 0; background: none; color: var(--rail-muted); font-weight: 600; font-size: 15px; border-radius: 7px; cursor: pointer; text-align: left; width: 100%; transition: color .15s, background .15s, transform .15s var(--ease); }
+.nav button.grp { margin-top: 12px; }
 .nav button:hover, .rail-btn:hover { color: var(--rail-ink); background: rgba(255, 255, 255, .06); }
-.nav button[aria-current="page"] { color: var(--rail-ink); background: rgba(255, 255, 255, .09); box-shadow: inset 3px 0 0 var(--mark); }
+.nav button:hover .ic { transform: translateX(2px); }
+.ic { width: 20px; height: 20px; flex: none; transition: transform .2s var(--ease); }
+.nav button[aria-current="page"] { color: var(--rail-ink); background: rgba(255, 255, 255, .09); }
+.nav button[aria-current="page"]::before { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: var(--mark); animation: bar-in .3s var(--ease); transform-origin: center; }
+@keyframes bar-in { from { transform: scaleY(0); } }
 .rail-foot { margin-top: auto; display: grid; gap: 2px; border-top: 1px solid var(--rail-line); padding-top: 12px; }
 .rail-btn { font-size: 14px; }
 .rail-btn[aria-pressed="true"], .rail-btn[aria-current="page"] { color: var(--mark); }
 .rail-btn.mob { display: none; }
-.ic { width: 20px; height: 20px; flex: none; }
-.main { padding: 30px clamp(16px, 3vw, 40px) 80px; max-width: 1180px; width: 100%; outline: none; }
+.main { padding: 32px clamp(16px, 3vw, 44px) 90px; max-width: 1240px; width: 100%; outline: none; }
+.main.anim { animation: view-in .22s ease-out; }
+@keyframes view-in { from { opacity: 0; } }
 
-.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-h1 { font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.005em; }
-.sub { margin-top: 6px; color: var(--muted); max-width: 66ch; }
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+h1 { font-size: 36px; line-height: 1.05; font-weight: 700; letter-spacing: -.012em; overflow-wrap: break-word; hyphens: auto; }
+.page-head > div { min-width: 0; }
+.sub { margin-top: 8px; color: var(--muted); max-width: 66ch; }
 .actions, .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .row-actions { margin-top: 14px; }
 
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; margin-bottom: 18px; }
-.panel-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; }
-.panel-h h2 { font-size: 18px; font-weight: 650; }
-.cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; margin-bottom: 18px; }
+/* Blätter: dunkle Kopflinie wie bei einem Bankformular */
+.panel { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--rule); border-radius: 5px; padding: 18px 20px 20px; margin-bottom: 20px; }
+.panel-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.panel-h h2 { font-size: 18px; font-weight: 650; letter-spacing: .002em; }
+.cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 22px; align-items: start; margin-bottom: 20px; }
 .cols.even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .cols.wide-l { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+.cols.home { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); }
 .cols .panel, .stack .panel { margin-bottom: 0; }
-.stack { display: grid; gap: 18px; }
+.stack { display: grid; gap: 22px; align-content: start; }
 .empty { color: var(--muted); max-width: 62ch; margin: 4px 0 6px; }
 
+/* Seitenspalte der Übersicht: ein Blatt mit Abschnitten statt vieler Boxen */
+.side { gap: 0; background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--rule); border-radius: 5px; }
+.side .panel { background: transparent; border: 0; border-top: 1px solid var(--line-2); border-radius: 0; padding: 18px 20px; }
+.side .panel:first-child { border-top: 0; }
+
+/* Zusammenfassungsleiste: wenige Kennzahlen in einer Zeile */
+.strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--surface); border: 1px solid var(--line); border-radius: 5px; margin-bottom: 22px; overflow: hidden; }
+.strip.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.kpi { display: grid; gap: 3px; align-content: start; text-align: left; padding: 15px 18px 16px; border: 0; border-left: 1px solid var(--line-2); background: transparent; color: inherit; font: inherit; position: relative; }
+.kpi:first-child { border-left: 0; }
+button.kpi { cursor: pointer; transition: background .15s; }
+button.kpi:hover { background: var(--surface-2); }
+button.kpi::after { content: ""; position: absolute; left: 18px; right: 18px; bottom: 0; height: 2px; background: var(--mark); transform: scaleX(0); transform-origin: left; transition: transform .25s var(--ease); }
+button.kpi:hover::after { transform: scaleX(1); }
+.k-l { color: var(--muted); font-size: 13px; }
+.k-v { font: 700 25px/1.1 var(--display); letter-spacing: -.005em; font-variant-numeric: tabular-nums; }
+.k-s { color: var(--muted); font-size: 12.5px; }
+
 /* ---------- Bedienelemente ---------- */
-.btn { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 14px; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; line-height: 1.2; }
-.btn:hover { background: var(--surface-2); }
+.btn { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 14px; border-radius: 7px; font-weight: 600; font-size: 14px; cursor: pointer; line-height: 1.2; transition: background .15s, border-color .15s, transform .12s var(--ease), box-shadow .15s; }
+.btn:hover { background: var(--surface-2); border-color: color-mix(in srgb, var(--ink) 25%, var(--line)); }
+.btn:active { transform: scale(.97); }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.btn.primary:hover { filter: brightness(1.1); background: var(--accent); }
+.btn.primary:hover { background: var(--accent); filter: brightness(1.12); box-shadow: 0 8px 18px -8px color-mix(in srgb, var(--accent) 75%, transparent); transform: translateY(-1px); }
+.btn.primary:active { transform: scale(.97); }
 .btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
 .btn.ghost:hover { color: var(--ink); background: var(--surface-2); }
 .btn.danger { background: var(--neg); border-color: var(--neg); color: #fff; }
 .btn.sm { padding: 5px 10px; font-size: 13px; }
 .btn.block { width: 100%; padding: 12px; }
-.btn:disabled { opacity: .55; cursor: default; }
-.link { appearance: none; background: none; border: 0; padding: 0; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
-.chip-btn { border: 1px solid var(--line); background: transparent; color: inherit; border-radius: 999px; padding: 5px 13px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn:disabled { opacity: .55; cursor: default; transform: none; }
+.link { appearance: none; background: none; border: 0; padding: 0; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+.link:hover { text-decoration-thickness: 2.5px; }
+.chip-btn { border: 1px solid var(--line); background: transparent; color: inherit; border-radius: 999px; padding: 5px 13px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s, color .15s, border-color .15s, transform .12s var(--ease); }
+.chip-btn:hover { border-color: var(--muted); }
+.chip-btn:active { transform: scale(.96); }
 .chip-btn.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .seg { display: flex; gap: 6px; flex-wrap: wrap; }
 
-.tag { display: inline-block; font-size: 12px; line-height: 1.55; padding: 0 7px; border-radius: 4px; background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); margin-left: 6px; vertical-align: 1px; white-space: nowrap; font-weight: 500; }
+.tag { display: inline-block; font-size: 12px; line-height: 1.55; padding: 0 7px; border-radius: 3px; background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); margin-left: 6px; vertical-align: 1px; white-space: nowrap; font-weight: 500; }
 .tag.ok { background: var(--pos-soft); border-color: transparent; color: var(--pos); font-weight: 600; }
 .tag.warnt { background: var(--warn-soft); border-color: transparent; color: var(--warn); font-weight: 600; }
 .tag.acc { background: var(--accent-soft); border-color: transparent; color: var(--accent); font-weight: 600; }
+/* Textmarker: Fristen werden beim Aufbau der Seite angestrichen */
 .mark { display: inline-block; background: var(--mark); color: var(--mark-ink); font-weight: 650; font-size: 12.5px; line-height: 1.5; padding: 0 7px; border-radius: 2px; transform: rotate(-.7deg); margin-left: 6px; }
+.anim .mark { background: linear-gradient(var(--mark), var(--mark)) no-repeat left center / 0% 100%; animation: sweep .55s var(--ease) .35s forwards; }
+@keyframes sweep { to { background-size: 100% 100%; } }
+/* Stempel: überfällig schlägt ein */
 .stamp { display: inline-block; font: 700 12px/1.35 var(--display); letter-spacing: .06em; color: var(--neg); border: 2px solid var(--neg); border-radius: 3px; padding: 0 6px; transform: rotate(-2.5deg); margin-left: 6px; }
+.anim .stamp { animation: slam .5s var(--ease) .45s both; }
+@keyframes slam { 0% { opacity: 0; transform: rotate(-12deg) scale(2.1); } 55% { opacity: 1; transform: rotate(-2.5deg) scale(.92); } 100% { transform: rotate(-2.5deg) scale(1); } }
 .item-s .mark, .rank .mark, .preview .mark { margin-left: 0; }
 
-/* ---------- Hero ---------- */
-.hero { background: var(--hero); color: var(--h-ink); border: 1px solid var(--h-line); border-radius: 10px; padding: 22px 24px 16px; margin-bottom: 18px; }
-.hero-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 22px; flex-wrap: wrap; margin-bottom: 12px; }
+/* ---------- Kontokurve (Kopfbereich) ---------- */
+.hero { position: relative; overflow: hidden; background-color: var(--hero); color: var(--h-ink); border: 1px solid var(--h-line); border-radius: 16px; padding: 26px 28px 20px; margin-bottom: 22px;
+  background-image: linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px); background-size: 32px 32px; box-shadow: 0 30px 60px -36px rgba(8, 16, 24, .6); }
+.hero > * { position: relative; z-index: 1; }
+.hero::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity .35s; background: radial-gradient(380px circle at var(--mx, 70%) var(--my, 0%), rgba(76, 195, 203, .13), transparent 62%); }
+.hero:hover::before { opacity: 1; }
+.hero-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 14px; }
 .hero-bal { display: grid; gap: 4px; }
 .hero-lbl { color: var(--h-muted); font-size: 14px; }
-.hero-num { font: 700 clamp(40px, 7vw, 60px)/1 var(--display); letter-spacing: -.01em; }
+.hero-num { font: 700 clamp(44px, 7.4vw, 68px)/1 var(--display); letter-spacing: -.015em; font-variant-numeric: tabular-nums; }
 .hero-num.neg { color: var(--h-neg); }
 .hero-meta { color: var(--h-muted); font-size: 13.5px; }
 .hero .link { color: var(--h-accent); margin-left: 6px; }
-.verdict { max-width: 44ch; }
-.v-main { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 16px; font-weight: 600; }
+.verdict { max-width: 46ch; }
+.v-main { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 17px; font-weight: 600; line-height: 1.35; }
 .v-main > * { margin: 0; }
 .v-sub { margin-top: 6px; color: var(--h-muted); font-size: 13.5px; }
-.range { display: flex; gap: 6px; margin: 4px 0 6px; flex-wrap: wrap; }
+.range { display: flex; gap: 6px; margin: 4px 0 4px; flex-wrap: wrap; }
 .hero .chip-btn { border-color: var(--h-line); color: var(--h-muted); }
-.hero .chip-btn:hover { color: var(--h-ink); }
+.hero .chip-btn:hover { color: var(--h-ink); border-color: var(--h-muted); }
 .hero .chip-btn.on { background: var(--h-ink); color: var(--hero); border-color: var(--h-ink); }
-.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 12.5px; color: var(--muted); }
 .hero .legend { color: var(--h-muted); }
 .lg { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
 .lg.inv { background: var(--mark); }
@@ -143,19 +200,40 @@ h1 { font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.005e
 .lg.ref { background: var(--muted); }
 .lg.buf { height: 0; width: 16px; border-radius: 0; border-top: 2px dashed var(--mark); vertical-align: 3px; }
 
+/* Frist-Leiste: Fälligkeiten der nächsten 30 Tage als Marker auf einer Zeitachse */
+.ribbon { position: relative; margin-top: 8px; border-top: 1px solid var(--h-line); padding-top: 14px; }
+.rb-t { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; color: var(--h-muted); margin-bottom: 10px; }
+.rb-t b { color: var(--h-ink); font: 650 15px var(--display); }
+.rb-track { position: relative; }
+.rb-axis { position: absolute; left: 0; right: 0; bottom: 18px; height: 1px; background: var(--h-line); }
+.rb-tick { position: absolute; bottom: 12px; width: 1px; height: 13px; background: var(--h-line); }
+.rb-lbl { position: absolute; bottom: -2px; font-size: 11px; color: var(--h-muted); transform: translateX(-50%); white-space: nowrap; }
+.rb-lbl.first { transform: none; }
+.rb-chip { position: absolute; display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px; border: 0; border-radius: 3px; font-size: 12.5px; font-weight: 650; white-space: nowrap; cursor: default; color: var(--h-ink); background: rgba(255, 255, 255, .07); transition: transform .15s var(--ease), box-shadow .15s; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.rb-chip:hover { transform: translateY(-2px); box-shadow: 0 8px 18px -8px rgba(0, 0, 0, .6); }
+.rb-chip.inv { background: linear-gradient(var(--mark), var(--mark)) no-repeat left center / 100% 100%; color: var(--mark-ink); }
+.anim .rb-chip.inv { animation: rb-sweep .6s var(--ease) both; animation-delay: calc(.55s + var(--k, 0) * 110ms); }
+@keyframes rb-sweep { from { background-size: 0% 100%; color: var(--h-ink); } 55% { color: var(--h-ink); } to { background-size: 100% 100%; color: var(--mark-ink); } }
+.rb-chip.pre { background: color-mix(in srgb, var(--h-accent) 24%, transparent); color: var(--h-accent); }
+.rb-chip.inc { background: color-mix(in srgb, #5fd08a 20%, transparent); color: #7fe0a4; }
+.rb-chip.dot { width: 12px; padding: 0; height: 12px; border-radius: 50%; }
+.rb-empty { color: var(--h-muted); font-size: 13.5px; padding: 4px 0 10px; }
+
 /* ---------- Diagramm ---------- */
 .chart { position: relative; --c-line: var(--line-2); --c-ax: var(--muted); --c-main: var(--accent); --c-neg: var(--neg); --c-dot: var(--surface); }
 .hero .chart { --c-line: var(--h-line); --c-ax: var(--h-muted); --c-main: var(--h-accent); --c-neg: var(--h-neg); --c-dot: var(--hero); }
-.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y; overflow: visible; }
 .gl { stroke: var(--c-line); stroke-width: 1; }
 .gz { stroke: var(--c-ax); opacity: .55; }
 .ax { font: 11px var(--sans); fill: var(--c-ax); }
-.ln { fill: none; stroke-width: 2.3; stroke-linejoin: round; }
+.ln { fill: none; stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
 .ln.pri { stroke: var(--c-main); }
+.hero .ln.pri { filter: drop-shadow(0 0 5px color-mix(in srgb, var(--h-accent) 50%, transparent)); }
 .ln.neg { stroke: var(--c-neg); }
 .ln.ref { stroke: var(--c-ax); stroke-width: 1.8; }
 .ln.dash { stroke-dasharray: 5 4; }
-.area.pos { fill: var(--c-main); opacity: .16; }
+.gs0 { stop-color: var(--c-main); stop-opacity: .34; }
+.gs1 { stop-color: var(--c-main); stop-opacity: 0; }
 .area.neg { fill: var(--c-neg); opacity: .28; }
 .buf { stroke: var(--mark); stroke-width: 1.3; stroke-dasharray: 3 4; opacity: .9; }
 .mk { stroke: var(--c-dot); stroke-width: 1.6; }
@@ -165,22 +243,52 @@ h1 { font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.005e
 .dot { fill: var(--c-main); stroke: var(--c-dot); stroke-width: 2; }
 .dot.ref { fill: var(--c-ax); }
 .hit { fill: transparent; }
-.tip { position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 11px; font-size: 12.5px; box-shadow: 0 10px 30px rgba(0, 0, 0, .28); min-width: 176px; max-width: 280px; z-index: 3; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 11px; font-size: 12.5px; box-shadow: 0 14px 34px -8px rgba(0, 0, 0, .4); min-width: 176px; max-width: 280px; z-index: 3; animation: tip-in .12s ease-out; }
+@keyframes tip-in { from { opacity: 0; transform: translateY(3px); } }
 .tip .tr { display: grid; grid-template-columns: 14px 1fr auto; gap: 6px; align-items: center; margin-top: 3px; }
 .tip .sw { width: 10px; height: 3px; background: var(--accent); border-radius: 2px; }
 .tip .sw.ref { background: var(--muted); }
 .tip .te { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); color: var(--muted); }
+/* Der Kontostand zeichnet sich beim Öffnen der Seite */
+.anim .chart .ln.pri, .anim .chart .ln.neg { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.15s cubic-bezier(.5, 0, .2, 1) .12s forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.anim .chart .area { animation: fade-in .9s ease-out .55s both; }
+@keyframes fade-in { from { opacity: 0; } }
+.anim .chart .mk { transform-box: fill-box; transform-origin: center; animation: pop .45s var(--ease) both; animation-delay: calc(.75s + var(--k, 0) * 35ms); }
+@keyframes pop { from { opacity: 0; transform: scale(0); } 60% { transform: scale(1.35); } }
 
 /* ---------- Listen ---------- */
-.evs, .items, .plan, .rank, .notes, .bars, .qp { list-style: none; margin: 0; padding: 0; }
-.ev { display: grid; grid-template-columns: 86px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line-2); }
+.evs, .items, .plan, .rank, .notes, .bars, .qp, .jrs { list-style: none; margin: 0; padding: 0; }
+.ev { --ec: transparent; display: grid; grid-template-columns: 86px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line-2); }
 .ev:first-child { border-top: 0; }
 .ev-d { color: var(--muted); font-size: 13px; white-space: nowrap; }
 .ev-n b { font-weight: 600; }
 .ev-a { font-weight: 650; font-variant-numeric: tabular-nums; }
 .ev.prepay .ev-n b { color: var(--accent); }
 
-.item { display: flex; justify-content: space-between; gap: 18px; padding: 15px 0; border-top: 1px solid var(--line-2); }
+/* Zeitachse „Als Nächstes“: nach Tagen gruppiert, Farbe links zeigt die Art */
+.tl { position: relative; }
+.tl-day { position: relative; padding: 0 0 18px 26px; }
+.tl-day::before { content: ""; position: absolute; left: 6px; top: 22px; bottom: -2px; width: 2px; background: var(--line); }
+.tl-day:last-child { padding-bottom: 0; }
+.tl-day:last-child::before { display: none; }
+.tl-day::after { content: ""; position: absolute; left: 0; top: 5px; width: 14px; height: 14px; border-radius: 50%; background: var(--surface); border: 2px solid var(--muted); }
+.tl-day.today::after { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); }
+.tl-day.late::after { border-color: var(--neg); background: var(--neg-soft); }
+.tl-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 2px; }
+.tl-h b { font: 650 16px var(--display); }
+.tl-h span { color: var(--muted); font-size: 13px; }
+.tl-sum { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); }
+.tl .ev { grid-template-columns: minmax(0, 1fr) auto; padding: 8px 0 8px 12px; border-top: 0; box-shadow: inset 3px 0 0 var(--ec); border-radius: 0 4px 4px 0; transition: background .15s; margin-top: 3px; }
+.tl .ev:hover { background: var(--surface-2); }
+.tl .ev.income, .tl .ev.oma_in { --ec: var(--pos); }
+.tl .ev.invoice { --ec: var(--mark); }
+.tl .ev.rate { --ec: var(--ink); }
+.tl .ev.prepay { --ec: var(--accent); }
+.tl .ev.oma_out { --ec: var(--c2); }
+.tl .ev.expense { --ec: var(--line); }
+
+.item { display: flex; justify-content: space-between; gap: 18px; padding: 16px 0; border-top: 1px solid var(--line-2); }
 .item:first-child { border-top: 0; }
 .item.is-over { box-shadow: inset 3px 0 0 var(--neg); padding-left: 14px; }
 .item.compact { padding: 11px 0; }
@@ -190,7 +298,7 @@ h1 { font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.005e
 .item-s { margin-top: 4px; }
 .item-n { margin-top: 5px; color: var(--muted); font-size: 13.5px; max-width: 64ch; }
 .item-side { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex: none; }
-.item-amt { font: 700 22px/1.1 var(--display); font-variant-numeric: tabular-nums; text-align: right; }
+.item-amt { font: 700 23px/1.1 var(--display); font-variant-numeric: tabular-nums; text-align: right; }
 .item-amt small { display: block; font: 500 12px var(--sans); color: var(--muted); margin-top: 2px; }
 .item-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: 340px; }
 .quiet .item { padding: 10px 0; }
@@ -207,14 +315,14 @@ h1 { font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.005e
 .fold.open-flat summary { color: var(--ink); font: 650 18px var(--display); }
 
 .notes { display: grid; gap: 10px; }
-.note { display: grid; gap: 2px; padding: 10px 12px; border-radius: 6px; border-left: 4px solid var(--line); background: var(--surface-2); }
+.note { display: grid; gap: 2px; padding: 10px 12px; border-radius: 4px; border-left: 4px solid var(--line); background: var(--surface-2); }
 .note.bad { border-color: var(--neg); background: var(--neg-soft); }
 .note.warn { border-color: var(--mark); background: var(--warn-soft); }
 .note.info { border-color: var(--accent); }
 .note b { font-weight: 650; }
 .note span { font-size: 14px; }
 .note .link { justify-self: start; font-size: 13px; margin-top: 2px; }
-.calm { padding: 12px 14px; border-radius: 6px; background: var(--pos-soft); }
+.calm { padding: 12px 14px; border-radius: 4px; background: var(--pos-soft); }
 
 .kv { margin: 0; display: grid; }
 .kv > div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line-2); }
@@ -222,16 +330,17 @@ h1 { font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.005e
 .kv dt { color: var(--muted); }
 .kv dd { margin: 0; font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; }
 .kv .sum { border-top: 2px solid var(--ink); }
-.bars { display: grid; gap: 9px; margin-top: 16px; }
+.bars { display: grid; gap: 10px; margin-top: 16px; }
 .bars li { display: grid; grid-template-columns: 112px 1fr auto; gap: 10px; align-items: center; font-size: 13.5px; }
 .b-t { height: 8px; background: var(--surface-2); border-radius: 2px; overflow: hidden; }
-.b-t i { display: block; height: 100%; background: var(--accent); }
+.b-t i { display: block; height: 100%; background: var(--bc, var(--accent)); border-radius: 2px; }
+.anim .b-t i, .anim .bar i, .anim .term i { animation: grow .75s var(--ease) .25s both; transform-origin: left; }
+@keyframes grow { from { transform: scaleX(0); } }
 .b-v { font-variant-numeric: tabular-nums; }
+.b-l { display: flex; align-items: center; gap: 7px; }
+.b-l::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--bc, var(--accent)); flex: none; }
 
 .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px; }
-.cmp-c { border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; }
-.cmp-c.best { border-color: var(--accent); box-shadow: inset 0 3px 0 var(--accent); }
-.cmp-c h3 { font-size: 15px; font-weight: 650; margin-bottom: 4px; }
 .saving { margin: 4px 0 16px; }
 
 .pl { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 12px; padding: 13px 0; border-top: 1px solid var(--line-2); }
@@ -250,24 +359,29 @@ h1 { font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.005e
 .rules { display: grid; gap: 10px; padding-left: 20px; max-width: 70ch; margin: 0 0 12px; }
 .steps { margin: 0 0 12px; padding-left: 22px; display: grid; gap: 8px; max-width: 66ch; }
 .start { max-width: 760px; }
-.start h2 { margin-bottom: 10px; font-size: 20px; }
+.start h2 { margin-bottom: 10px; font-size: 21px; }
 
 .tbl-wrap { overflow-x: auto; }
 .tbl { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
 .tbl th, .tbl td { padding: 8px 10px; text-align: right; border-top: 1px solid var(--line-2); white-space: nowrap; }
 .tbl thead th { color: var(--muted); font-weight: 600; border-top: 0; font-size: 12.5px; }
 .tbl tbody th { text-align: left; font-weight: 600; }
+.tbl tbody tr { transition: background .12s; }
+.tbl tbody tr:hover { background: var(--surface-2); }
 .tbl thead th:first-child { text-align: left; }
-.danger-zone { border-color: color-mix(in srgb, var(--neg) 35%, var(--line)); }
+.danger-zone { border-top-color: var(--neg); }
 
 /* ---------- Dialog und Formulare ---------- */
 #dlg { border: 0; padding: 0; background: transparent; color: var(--ink); width: min(560px, calc(100vw - 20px)); max-width: none; max-height: none; margin: auto; }
 #dlg:has(.wide) { width: min(720px, calc(100vw - 20px)); }
-#dlg::backdrop { background: rgba(8, 14, 20, .6); }
-.dlg-form { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; box-shadow: 0 24px 60px -12px rgba(0, 0, 0, .5); max-height: calc(100vh - 28px); overflow: auto; }
+#dlg::backdrop { background: rgba(8, 14, 20, .55); backdrop-filter: blur(4px); animation: fade-in .2s ease-out; }
+#dlg[open] .dlg-form { animation: dlg-in .28s var(--ease); }
+@keyframes dlg-in { from { opacity: 0; transform: translateY(14px) scale(.965); } }
+.dlg-form { background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--rule); border-radius: 12px; padding: 22px 24px; box-shadow: var(--shadow-pop); max-height: calc(100vh - 28px); overflow: auto; }
 .dlg-form header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 10px; }
-.dlg-form h2 { font-size: 21px; font-weight: 700; }
-.x { border: 0; background: none; font-size: 28px; line-height: 1; color: var(--muted); cursor: pointer; padding: 0 6px; }
+.dlg-form h2 { font-size: 22px; font-weight: 700; }
+.x { border: 0; background: none; font-size: 28px; line-height: 1; color: var(--muted); cursor: pointer; padding: 0 6px; border-radius: 6px; transition: color .15s, transform .2s var(--ease); }
+.x:hover { color: var(--ink); transform: rotate(90deg); }
 .dlg-form footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
 .lead { color: var(--muted); margin: 0 0 14px; max-width: 64ch; }
 .lead p + p { margin-top: 8px; }
@@ -278,8 +392,9 @@ h1 { font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.005e
 .f small, .chk small { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
 .f small:empty { display: none; }
 input[type=text], input[type=password], input[type=number], input[type=date], select, textarea {
-  width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font-size: 15px; min-height: 40px; }
-input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: 2px solid color-mix(in srgb, var(--accent) 30%, transparent); outline-offset: 0; }
+  width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 7px; background: var(--bg); color: var(--ink); font-size: 15px; min-height: 40px; transition: border-color .15s, box-shadow .15s, background .15s; }
+input:hover, select:hover, textarea:hover { border-color: color-mix(in srgb, var(--ink) 28%, var(--line)); }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); outline: 0; background: var(--surface); }
 textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; line-height: 1.55; }
 .affix { position: relative; }
 .affix input { padding-right: 32px; text-align: right; }
@@ -288,8 +403,9 @@ textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, C
 .chk input { margin: 3px 0 0; width: 18px; height: 18px; accent-color: var(--accent); }
 .chk small { grid-column: 2; }
 .chk.full { grid-column: 1 / -1; }
-.preview:not(:empty) { margin-top: 14px; padding: 10px 12px; background: var(--surface-2); border-radius: 6px; font-size: 14px; }
-.err { color: var(--neg); font-weight: 600; margin-top: 10px; }
+.preview:not(:empty) { margin-top: 14px; padding: 10px 12px; background: var(--surface-2); border-radius: 6px; font-size: 14px; animation: fade-in .2s ease-out; }
+.err { color: var(--neg); font-weight: 600; margin-top: 10px; animation: shake .35s var(--ease); }
+@keyframes shake { 20% { transform: translateX(-5px); } 45% { transform: translateX(4px); } 70% { transform: translateX(-2px); } }
 .err:empty { display: none; }
 .code { background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; font-size: 13px; line-height: 1.8; margin: 8px 0; }
 .qp { display: grid; gap: 5px; font-size: 13.5px; }
@@ -297,49 +413,81 @@ textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, C
 .qp .ok b { color: var(--accent); }
 
 /* ---------- Sperrbildschirm ---------- */
-.lock { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--bg); }
-.lock-card { width: min(440px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 30px 28px; }
-.brand.big { padding: 0 0 20px; font-size: 24px; }
-.lock-card h1 { font-size: 26px; margin-bottom: 8px; }
+.lock { position: relative; min-height: 100vh; display: grid; place-items: center; padding: 24px; overflow: hidden; }
+.lock::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .9;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 400' preserveAspectRatio='none'%3E%3Cpath d='M0 300 C120 300 140 180 260 190 S400 300 520 250 S700 90 820 130 S1000 220 1200 60' fill='none' stroke='%230a6c74' stroke-width='3' stroke-opacity='.35'/%3E%3C/svg%3E") center 62% / 100% 55% no-repeat; }
+.lock-card { position: relative; width: min(440px, 100%); background: var(--surface); border: 1px solid var(--line); border-top: 3px solid var(--rule); border-radius: 8px; padding: 32px 30px; box-shadow: var(--shadow-pop); animation: dlg-in .5s var(--ease); }
+.brand.big { padding: 0 0 20px; font-size: 25px; }
+.lock-card h1 { font-size: 28px; margin-bottom: 8px; }
 .lock-card .lead { margin-bottom: 18px; }
 .lock form { display: grid; gap: 14px; }
-.lock-foot { margin-top: 20px; text-align: center; font-size: 14px; }
+.lock-foot { margin-top: 20px; text-align: center; font-size: 14px; display: grid; gap: 6px; }
 .meter { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-.meter i { height: 5px; background: var(--line); border-radius: 2px; }
+.meter i { height: 5px; background: var(--line); border-radius: 2px; transition: background .25s; }
 .meter small { grid-column: 1 / -1; color: var(--muted); font-size: 12.5px; margin-top: 3px; }
 .meter[data-n="1"] i:nth-child(-n+1) { background: var(--neg); }
 .meter[data-n="2"] i:nth-child(-n+2) { background: var(--mark); }
 .meter[data-n="3"] i:nth-child(-n+3) { background: var(--accent); }
 .meter[data-n="4"] i { background: var(--pos); }
+.lock .logo .l-line { stroke-dasharray: 1; stroke-dashoffset: 0; animation: draw 1s cubic-bezier(.5, 0, .2, 1) .25s backwards; }
+.lock .logo .l-bar { transform-box: fill-box; transform-origin: left; animation: grow .6s var(--ease) .9s backwards; }
 
-#toasts { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); display: grid; gap: 8px; z-index: 100; width: min(460px, calc(100vw - 24px)); pointer-events: none; }
-.toast { background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 6px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, .3); animation: tin .18s ease-out; }
-.toast.bad { background: var(--neg); color: #fff; }
-@keyframes tin { from { opacity: 0; transform: translateY(6px); } }
+/* ---------- Hinweise (Toasts), Effekte ---------- */
+#toasts { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); display: grid; gap: 8px; z-index: 100; width: min(460px, calc(100vw - 24px)); pointer-events: none; }
+.toast { background: var(--ink); color: var(--bg); padding: 11px 15px; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 16px 40px -10px rgba(0, 0, 0, .45); animation: toast-in .4s var(--ease); border-left: 4px solid var(--mark); }
+.toast.out { animation: toast-out .25s ease-in forwards; }
+.toast.bad { background: var(--neg); color: #fff; border-left-color: #fff; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(18px) scale(.96); } }
+@keyframes toast-out { to { opacity: 0; transform: translateY(8px); } }
 
-.privacy .money, .privacy .hero-num { filter: blur(8px); user-select: none; }
-.privacy .chart, .privacy .b-t { filter: blur(6px); }
+#fx { position: fixed; inset: 0; pointer-events: none; z-index: 200; overflow: hidden; }
+.cf { position: absolute; top: 38%; width: 9px; height: 14px; border-radius: 2px; opacity: 0; animation: cf 1.6s cubic-bezier(.15, .6, .3, 1) forwards; animation-delay: var(--dl, 0s); }
+@keyframes cf { 0% { opacity: 1; transform: translate(0, 0) rotate(0); } 70% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); } }
+
+.privacy .money, .privacy .hero-num, .privacy .k-v { filter: blur(8px); user-select: none; }
+.privacy .chart, .privacy .b-t, .privacy .ribbon { filter: blur(6px); }
+
+/* ---------- Synchronisation ---------- */
+code { font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+.syncstat { display: flex; align-items: flex-start; gap: 10px; margin: 6px 0 4px; font-size: 14px; }
+.sd { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); flex: none; margin-top: 6px; opacity: .7; }
+.sd.ok { background: var(--pos); opacity: 1; }
+.sd.busy { background: var(--mark); opacity: 1; animation: pulse 1s ease-in-out infinite; }
+.sd.bad { background: var(--neg); opacity: 1; }
+@keyframes pulse { 50% { transform: scale(1.5); opacity: .55; } }
+.syncchip { font-size: 13px; }
+.syncchip .sd { margin-top: 0; }
+.syncchip .sd.ok { background: var(--h-accent, #4cc3cb); }
 
 /* ---------- Budgets ---------- */
-.item.bud { display: block; }
+.item.bud, .item.oma { display: block; }
 .bar { height: 9px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 5px; overflow: hidden; margin: 10px 0 4px; }
 .bar i { display: block; height: 100%; background: var(--accent); }
 .bar.warn i, .b-t.warn i { background: var(--mark); }
 .bar.over i, .b-t.over i { background: var(--neg); }
-.bud-sum { font: 700 clamp(22px, 3vw, 28px)/1.15 var(--display); margin: 0 0 4px; }
+.bud-sum { font: 700 clamp(24px, 3vw, 30px)/1.15 var(--display); margin: 0 0 4px; }
+.bud-dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--bc, var(--accent)); margin-right: 8px; }
+.ringwrap { display: flex; align-items: center; gap: 18px; margin-bottom: 8px; }
+.ring { width: 112px; height: 112px; flex: none; }
+.ring .r-bg { fill: none; stroke: var(--surface-2); stroke-width: 11; }
+.ring .r-fg { fill: none; stroke: var(--accent); stroke-width: 11; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; stroke-dasharray: var(--len) 999; }
+.ring.warn .r-fg { stroke: var(--mark); }
+.ring.over .r-fg { stroke: var(--neg); }
+.anim .ring .r-fg { animation: ring 1s var(--ease) .2s backwards; }
+@keyframes ring { from { stroke-dasharray: 0 999; } }
+.ring text { font: 700 22px var(--display); fill: var(--ink); text-anchor: middle; dominant-baseline: central; }
 
 /* ---------- Vorschau-Modus ---------- */
-.pv-bar { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--mark); color: var(--mark-ink); padding: 9px 14px; border-radius: 6px; margin-bottom: 18px; font-size: 14px; }
+.pv-bar { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--mark); color: var(--mark-ink); padding: 9px 14px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; }
 .pv-bar .link { color: var(--mark-ink); }
 
-/* ---------- Oma und Historie ---------- */
-.saldo { font: 700 clamp(24px, 3.4vw, 30px)/1.15 var(--display); margin: 0 0 12px; }
+/* ---------- Oma, Historie ---------- */
+.saldo { font: 700 clamp(24px, 3.4vw, 32px)/1.15 var(--display); margin: 0 0 12px; }
 .saldo.pos { color: var(--pos); }
 .saldo.owe { color: var(--warn); }
 .subh { font: 650 14px var(--display); color: var(--muted); margin: 14px 0 4px; }
 .subh:first-of-type { margin-top: 0; }
 .tbl-note { margin-top: 10px; }
-.item.oma, .item.bud { display: block; }
 .oma-h { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
 .item-btns.start { justify-content: flex-start; margin-top: 12px; max-width: none; }
 .legs { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 7px; }
@@ -350,41 +498,64 @@ textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, C
 .l-s { color: var(--muted); }
 .leg.late .l-s { color: var(--neg); font-weight: 600; }
 .leg.done .l-s { color: var(--pos); }
-.banner { display: flex; gap: 12px; padding: 12px 14px; border-radius: 6px; background: var(--warn-soft); border-left: 4px solid var(--mark); margin-bottom: 18px; }
+.banner { display: flex; gap: 12px; padding: 12px 14px; border-radius: 4px; background: var(--warn-soft); border-left: 4px solid var(--mark); margin-bottom: 20px; }
 .banner.flat { margin-bottom: 14px; }
 .ctl { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
 .inl { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13.5px; }
 .ctl select { width: auto; min-width: 170px; }
-.jrs { list-style: none; margin: 0; padding: 0; }
-.jr { display: grid; grid-template-columns: 86px minmax(0, 1fr) auto auto; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line-2); align-items: start; }
-.jr:first-child { border-top: 0; }
-.jr-d { color: var(--muted); font-size: 13px; padding-top: 2px; white-space: nowrap; }
+.jday { margin: 18px 0 0; }
+.jday:first-child { margin-top: 0; }
+.jday-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 0 0 6px; border-bottom: 2px solid var(--line); }
+.jday-h b { font: 650 15px var(--display); }
+.jday-h span { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.jr { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line-2); align-items: start; transition: background .12s; }
+.jday .jr:first-of-type { border-top: 0; }
+.jr:hover { background: color-mix(in srgb, var(--surface-2) 70%, transparent); }
 .jr-t { font-weight: 650; }
 .jr-meta { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
 .jr-a { font: 700 17px var(--display); font-variant-numeric: tabular-nums; padding-top: 1px; }
 .jr-b { display: flex; gap: 6px; }
 .jr.void .jr-t, .jr.void .jr-a { text-decoration: line-through; color: var(--muted); }
 
+/* ---------- Schnell-Erfassung auf dem Handy ---------- */
+.fab { display: none; }
+
 /* ---------- Mobil ---------- */
+@media (max-width: 1100px) {
+  .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .strip .kpi:nth-child(3) { border-left: 0; }
+  .strip .kpi:nth-child(n+3) { border-top: 1px solid var(--line-2); }
+  .strip.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .strip.three .kpi:nth-child(3) { border-left: 1px solid var(--line-2); }
+  .strip.three .kpi:nth-child(n+3) { border-top: 0; }
+}
 @media (max-width: 980px) {
-  .cols, .cols.even, .cols.wide-l { grid-template-columns: minmax(0, 1fr); }
+  .cols, .cols.even, .cols.wide-l, .cols.home { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 860px) {
   .shell { grid-template-columns: minmax(0, 1fr); }
-  .rail { position: static; height: auto; flex-direction: row; align-items: center; padding: 10px 14px; }
+  .rail { position: sticky; z-index: 30; height: auto; flex-direction: row; align-items: center; padding: 10px 14px; overflow: visible; background: color-mix(in srgb, var(--rail) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
   .brand { padding: 0; font-size: 18px; }
-  .logo { width: 26px; height: 26px; }
+  .logo { width: 28px; height: 28px; }
+  .cta { display: none; }
   .rail-foot { margin: 0 0 0 auto; border: 0; padding: 0; display: flex; }
   .rail-btn { padding: 8px; width: auto; }
   .rail-btn span { display: none; }
   .rail-btn.mob { display: flex; }
+  .syncchip { display: none; }
   .nav .desk { display: none; }
-  .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0; background: var(--rail); border-top: 1px solid var(--rail-line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); }
-  .nav button { flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; padding: 6px 2px; font-size: 10.5px; line-height: 1.15; text-align: center; box-shadow: none !important; }
+  .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0; background: color-mix(in srgb, var(--rail) 90%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--rail-line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); }
+  .nav button { flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; padding: 6px 2px; font-size: 10.5px; line-height: 1.15; text-align: center; }
+  .nav button.grp { margin-top: 0; }
   .nav button[aria-current="page"] { background: none; color: var(--mark); }
-  .main { padding: 18px 14px 100px; }
-  #toasts { bottom: 84px; }
-  h1 { font-size: 26px; }
+  .nav button[aria-current="page"]::before { left: 28%; right: 28%; top: 0; bottom: auto; width: auto; height: 3px; border-radius: 0 0 3px 3px; }
+  .main { padding: 18px 14px 108px; }
+  #toasts { bottom: 90px; }
+  h1 { font-size: 29px; }
+  .fab { display: grid; place-items: center; position: fixed; right: 16px; bottom: calc(86px + env(safe-area-inset-bottom)); z-index: 35; width: 56px; height: 56px; border: 0; border-radius: 50%; background: var(--mark); color: var(--mark-ink); box-shadow: 0 14px 30px -8px rgba(0, 0, 0, .55); cursor: pointer; transition: transform .15s var(--ease); }
+  .fab svg { width: 26px; height: 26px; }
+  .fab:active { transform: scale(.92); }
+  .hero { border-radius: 14px; }
 }
 @media (max-width: 640px) {
   .item { flex-direction: column; gap: 10px; }
@@ -393,21 +564,26 @@ textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, C
   .item-btns { justify-content: flex-start; max-width: none; }
   .cmp { grid-template-columns: 1fr; }
   .ev { grid-template-columns: 74px minmax(0, 1fr) auto; }
+  .tl .ev { grid-template-columns: minmax(0, 1fr) auto; }
   .jr { grid-template-columns: minmax(0, 1fr) auto; }
-  .jr-d { grid-column: 1 / -1; padding: 0; }
   .jr-b { grid-column: 1 / -1; }
   .pl { grid-template-columns: minmax(0, 1fr) auto; }
   .pl-d { grid-column: 1 / -1; padding: 0; }
-  .hero { padding: 18px 16px 12px; }
+  .hero { padding: 20px 16px 14px; }
   .panel { padding: 16px 14px; }
+  .side .panel { padding: 16px 14px; }
+  .kpi { padding: 13px 14px; }
+  .k-v { font-size: 21px; }
 }
 @media (max-width: 520px) {
   .fgrid { grid-template-columns: 1fr; }
   .f.half { grid-column: 1 / -1; }
-  .dlg-form { padding: 16px 16px; }
-  .bars li { grid-template-columns: 90px 1fr auto; }
+  .dlg-form { padding: 18px 16px; }
+  .bars li { grid-template-columns: 96px 1fr auto; }
+  .ringwrap { flex-direction: column; align-items: flex-start; }
 }
 @media (max-width: 400px) {
+  h1 { font-size: 25px; }
   .rail { padding: 10px 10px; }
   .brand { gap: 8px; font-size: 17px; }
   .rail-foot { gap: 0; }
@@ -417,7 +593,7 @@ textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, C
   .brand span { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 
 </style>
@@ -1047,6 +1223,110 @@ if (typeof module !== 'undefined') {
 }
 
 /* =====================================================================
+   SYNC-MERGE – Zusammenführen zweier Geräte-Stände (reine Funktionen)
+   Drei-Wege-Merge: gemeinsame Basis (letzter Sync), lokaler und entfernter Stand.
+   Einträge werden über ihre ID abgeglichen, Felder einzeln zusammengeführt.
+   ===================================================================== */
+const SYNC_LIST_KEYS = ['recurring', 'oneoffs', 'invoices', 'installments', 'journal', 'oma', 'budgets'];
+/* Listen innerhalb eines Eintrags, die vereinigt statt überschrieben werden (z. B. Buchungen eines Oma-Vorgangs) */
+const SYNC_UNION_FIELDS = { bk: 'jid' };
+const mround = x => Math.round(x * 100) / 100;
+
+function deepEq(a, b) {
+  if (a === b) return true;
+  if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  if (Array.isArray(a)) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (!deepEq(a[i], b[i])) return false;
+    return true;
+  }
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  for (const k of keys) if (!deepEq(a[k], b[k])) return false;
+  return true;
+}
+
+const cloneJSON = x => JSON.parse(JSON.stringify(x));
+function stripSync(state) { const c = cloneJSON(state); delete c.sync; return c; }
+
+function mergeValue(key, b, l, r, stats) {
+  if (deepEq(l, r)) return l;
+  if (deepEq(b, l)) return r;     // nur entfernt geändert
+  if (deepEq(b, r)) return l;     // nur lokal geändert
+  if (SYNC_UNION_FIELDS[key] && Array.isArray(l) && Array.isArray(r)) {
+    const idk = SYNC_UNION_FIELDS[key], seen = new Set(), out = [];
+    for (const x of [...l, ...r]) { const id = x && x[idk]; if (id !== undefined && seen.has(id)) continue; if (id !== undefined) seen.add(id); out.push(x); }
+    return out;
+  }
+  stats.conflicts++;
+  return l;                       // beide haben unterschiedlich geändert: lokale Änderung behalten
+}
+
+function mergeItem(b, l, r, stats) {
+  const out = {};
+  const keys = new Set([...Object.keys(b || {}), ...Object.keys(l), ...Object.keys(r)]);
+  for (const k of keys) {
+    const v = mergeValue(k, b ? b[k] : undefined, l[k], r[k], stats);
+    if (v !== undefined) out[k] = v;
+  }
+  return out;
+}
+
+function mergeLists(B, L, R, stats) {
+  const bm = new Map(B.map(x => [x.id, x])), lm = new Map(L.map(x => [x.id, x])), rm = new Map(R.map(x => [x.id, x]));
+  const out = [], done = new Set();
+  for (const it of [...R, ...L]) {   // Reihenfolge des Repositorys gilt, lokal neue Einträge folgen
+    const id = it.id;
+    if (done.has(id)) continue;
+    done.add(id);
+    const b = bm.get(id), l = lm.get(id), r = rm.get(id);
+    if (l && r) out.push(deepEq(l, r) ? l : mergeItem(b, l, r, stats));
+    else if (l) { if (!(b && deepEq(b, l))) out.push(l); }   // fehlt entfernt: gelöscht, außer lokal wurde er geändert oder ist neu
+    else if (r) { if (!(b && deepEq(b, r))) out.push(r); }   // fehlt lokal: gelöscht, außer entfernt wurde er geändert oder ist neu
+  }
+  return out;
+}
+
+function mergeSettings(b, l, r, stats) {
+  b = b || {};
+  const out = {};
+  const keys = new Set([...Object.keys(b), ...Object.keys(l), ...Object.keys(r)]);
+  for (const k of keys) {
+    let v;
+    if (k === 'balance' && typeof l[k] === 'number' && typeof r[k] === 'number' && typeof b[k] === 'number' && !deepEq(l[k], r[k]) && !deepEq(b[k], l[k]) && !deepEq(b[k], r[k])) {
+      v = mround(l[k] + r[k] - b[k]);                     // beide Geräte haben gebucht: Änderungen addieren sich
+    } else if ((k === 'balanceDate' || k === 'lastBackup') && l[k] && r[k]) {
+      v = l[k] >= r[k] ? l[k] : r[k];                     // jeweils der neuere Stand
+    } else v = mergeValue(k, b[k], l[k], r[k], stats);
+    if (v !== undefined) out[k] = v;
+  }
+  return out;
+}
+
+/* Gleicher Inhalt? Die Reihenfolge der Einträge in den Listen spielt keine Rolle. */
+function sameState(a, b) {
+  if (!deepEq(a.settings, b.settings)) return false;
+  for (const k of SYNC_LIST_KEYS) {
+    const x = a[k] || [], y = b[k] || [];
+    if (x.length !== y.length) return false;
+    const ym = new Map(y.map(i => [i.id, i]));
+    for (const it of x) { const o = ym.get(it.id); if (!o || !deepEq(it, o)) return false; }
+  }
+  return true;
+}
+
+/* base darf null sein (kein gemeinsamer Stand bekannt): dann zählt alles als neu auf beiden Seiten */
+function merge3State(base, local, remote) {
+  const stats = { conflicts: 0 };
+  const out = { version: local.version || remote.version || 1 };
+  out.settings = mergeSettings(base && base.settings, local.settings || {}, remote.settings || {}, stats);
+  for (const k of SYNC_LIST_KEYS) out[k] = mergeLists((base && base[k]) || [], local[k] || [], remote[k] || [], stats);
+  return { merged: out, conflicts: stats.conflicts };
+}
+
+if (typeof module !== 'undefined') module.exports = { deepEq, sameState, stripSync, merge3State, cloneJSON };
+
+/* =====================================================================
    APP-KERN – Tresor (AES-256-GCM, PBKDF2), Zustand, Dialoge, Formulare
    ===================================================================== */
 const $ = (s, r = document) => r.querySelector(s);
@@ -1123,6 +1403,7 @@ function normalizeState(s) {
     recurring: arr(s.recurring), oneoffs: arr(s.oneoffs),
     invoices: arr(s.invoices), installments: arr(s.installments),
     journal: arr(s.journal), oma: arr(s.oma), budgets: arr(s.budgets),
+    sync: s.sync && typeof s.sync === 'object' ? s.sync : null,   // Geräte-Einstellung: wird nie synchronisiert oder exportiert
   };
 }
 
@@ -1154,6 +1435,7 @@ async function unlockVault(pw) {
 function lockVault() {
   if (App.preview) { toast('Im Vorschau-Modus gibt es keine Sperre.'); return; }
   clearTimeout(App.idle);
+  Sync.stop();
   App.state = null; App.key = null; App.plan = null;
   Modal.close();
   render();
@@ -1163,7 +1445,7 @@ function getPlan() {
   if (!App.plan) App.plan = buildPlan(App.state, todayISO());
   return App.plan;
 }
-function commit() { App.plan = null; persist(); render(); }
+function commit() { App.plan = null; persist(); render(); Sync.schedule(); }
 
 function passwordStrength(pw) {
   let pts = 0;
@@ -1185,7 +1467,7 @@ function toast(msg, kind) {
   el.className = 'toast ' + (kind || '');
   el.textContent = msg;
   host.appendChild(el);
-  setTimeout(() => el.remove(), kind === 'bad' ? 6000 : 3500);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 260); }, kind === 'bad' ? 6000 : 3500);
 }
 
 /* ---------- Dialog ---------- */
@@ -1379,7 +1661,7 @@ function drawLineChart(host, cfg) {
   const pathOf = vals => { let p = ''; for (let i = 0; i < n; i++) p += (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(vals[i]).toFixed(1); return p; };
   let body = '';
   const areaBase = Math.min(Math.max(y0, m.t), H - m.b);
-  const defs = `<defs><clipPath id="${uidc}p"><rect x="0" y="0" width="${W}" height="${Math.max(0, y0).toFixed(1)}"/></clipPath>` +
+  const defs = `<defs><linearGradient id="${uidc}g" x1="0" y1="0" x2="0" y2="1"><stop class="gs0" offset="0"/><stop class="gs1" offset="1"/></linearGradient><clipPath id="${uidc}p"><rect x="0" y="0" width="${W}" height="${Math.max(0, y0).toFixed(1)}"/></clipPath>` +
     `<clipPath id="${uidc}n"><rect x="0" y="${y0.toFixed(1)}" width="${W}" height="${H}"/></clipPath></defs>`;
 
   if (cfg.buffer != null) {
@@ -1389,15 +1671,15 @@ function drawLineChart(host, cfg) {
     const p = pathOf(s.values);
     if (s.area) {
       const ap = `${p}L${x(n - 1).toFixed(1)},${areaBase.toFixed(1)}L${x(0).toFixed(1)},${areaBase.toFixed(1)}Z`;
-      body += `<path class="area pos" d="${ap}" clip-path="url(#${uidc}p)"/><path class="area neg" d="${ap}" clip-path="url(#${uidc}n)"/>`;
-      body += `<path class="ln ${s.cls}" d="${p}" clip-path="url(#${uidc}p)"/><path class="ln neg" d="${p}" clip-path="url(#${uidc}n)"/>`;
+      body += `<path class="area pos" fill="url(#${uidc}g)" d="${ap}" clip-path="url(#${uidc}p)"/><path class="area neg" d="${ap}" clip-path="url(#${uidc}n)"/>`;
+      body += `<path class="ln ${s.cls}" pathLength="1" d="${p}" clip-path="url(#${uidc}p)"/><path class="ln neg" pathLength="1" d="${p}" clip-path="url(#${uidc}n)"/>`;
     } else {
-      body += `<path class="ln ${s.cls}${s.dash ? ' dash' : ''}" d="${p}"/>`;
+      body += `<path class="ln ${s.cls}${s.dash ? ' dash' : ''}" ${s.dash ? '' : 'pathLength="1"'} d="${p}"/>`;
     }
   }
-  for (const mk of cfg.markers || []) {
+  for (const [idx, mk] of (cfg.markers || []).entries()) {
     const v = cfg.series[0].values[mk.i];
-    body += `<circle class="mk ${mk.cls}" cx="${x(mk.i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4.5"><title>${esc(mk.title || '')}</title></circle>`;
+    body += `<circle class="mk ${mk.cls}" style="--k:${Math.min(idx, 40)}" cx="${x(mk.i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4.5"><title>${esc(mk.title || '')}</title></circle>`;
   }
   const cursor = `<line class="cur" x1="0" x2="0" y1="${m.t}" y2="${H - m.b}" visibility="hidden"/>` +
     cfg.series.map((s, k) => `<circle class="dot ${s.cls}" data-k="${k}" r="4" visibility="hidden"/>`).join('');
@@ -1429,6 +1711,7 @@ function drawLineChart(host, cfg) {
 
 function drawCharts() {
   const P = getPlan();
+  $$('[data-ribbon]').forEach(h => drawRibbon(h, P));
   $$('[data-chart]').forEach(host => {
     const kind = host.dataset.chart;
     if (kind === 'balance') {
@@ -1471,7 +1754,16 @@ function eventRows(P, days) {
   const list = P.opt.log.filter(e => e.i <= days && e.amount !== 0 && e.type !== 'flex')
     .sort((a, b) => a.t - b.t || TYPE_ORDER[a.type] - TYPE_ORDER[b.type]);
   if (!list.length) return '<p class="empty">In diesem Zeitraum stehen keine Buchungen an.</p>';
-  return `<ul class="evs">${list.map(e => `<li class="ev ${e.type}"><span class="ev-d">${esc(fmtWd(P.dateAt(e.i)))}</span><span class="ev-n"><b>${esc(e.name)}</b>${e.provider ? `<span class="tag plat">${esc(e.provider)}</span>` : ''} ${tagFor(e)}</span><span class="ev-a ${e.amount > 0 ? 'pos' : ''}">${money(e.amount)}</span></li>`).join('')}</ul>`;
+  const groups = new Map();
+  for (const e of list) { if (!groups.has(e.t)) groups.set(e.t, []); groups.get(e.t).push(e); }
+  const row = e => `<li class="ev ${e.type}"><span class="ev-n"><b>${esc(e.name)}</b>${e.provider ? `<span class="tag plat">${esc(e.provider)}</span>` : ''} ${tagFor(e)}</span><span class="ev-a ${e.amount > 0 ? 'pos' : ''}">${money(e.amount)}</span></li>`;
+  return `<div class="tl">${[...groups.entries()].map(([t, evs]) => {
+    const diff = t - P.ctx.d0, date = fromDayNum(t);
+    const label = diff === 0 ? 'Heute' : diff === 1 ? 'Morgen' : fmtWd(date);
+    const sub = diff <= 1 ? fmtWd(date) : relDays(date, P.today);
+    const sum = evs.reduce((a, e) => a + e.amount, 0);
+    return `<section class="tl-day ${diff === 0 ? 'today' : ''} ${evs.some(e => e.overdue) ? 'late' : ''}"><div class="tl-h"><div><b>${esc(label)}</b> <span>${esc(sub)}</span></div><span class="tl-sum money">${esc(fmtEUR(sum))}</span></div><ul class="evs">${evs.map(row).join('')}</ul></section>`;
+  }).join('')}</div>`;
 }
 
 function backupReminder() {
@@ -1487,31 +1779,41 @@ function backupReminder() {
 function warningList(P) {
   const ws = [...P.warnings];
   const br = backupReminder(); if (br) ws.push(br);
+  const sw = syncWarning(); if (sw) ws.push(sw);
   if (!ws.length) return '<p class="calm"><b>Alles im grünen Bereich.</b> Keine Frist in Gefahr, kein Engpass in Sicht.</p>';
   const order = { bad: 0, warn: 1, info: 2 };
   ws.sort((a, b) => order[a.level] - order[b.level]);
   return `<ul class="notes">${ws.map(w => `<li class="note ${w.level}"><b>${esc(w.title)}</b><span>${esc(w.text)}</span>${w.tab ? `<button class="link" data-act="nav" data-tab="${w.tab}">Öffnen</button>` : ''}</li>`).join('')}</ul>`;
 }
 
+function min30(P) {
+  const o = P.opt, lim = Math.min(30, P.ctx.n - 1), arr = P.reserveMax > 0.005 ? o.own : o.days;
+  let v = Infinity, i = 0;
+  for (let k = 0; k <= lim; k++) if (arr[k] < v) { v = arr[k]; i = k; }
+  return { v, i };
+}
+
 function verdictHTML(P) {
   const o = P.opt, sum = o.sum, set = P.ctx.settings;
-  const lim = Math.min(30, P.ctx.n - 1);
-  const arr = P.reserveMax > 0.005 ? o.own : o.days;
-  let m30 = Infinity, m30i = 0;
-  for (let i = 0; i <= lim; i++) if (arr[i] < m30) { m30 = arr[i]; m30i = i; }
   let main;
   if (sum.firstNeg >= 0) main = `<span class="stamp">Engpass</span><span>Am ${esc(fmtDate(P.dateAt(sum.firstNeg)))} fehlen ${money(-o.days[sum.firstNeg])}.</span>`;
   else if (sum.firstBuf >= 0) main = `<span class="mark">Knapp</span><span>Ab ${esc(fmtDate(P.dateAt(sum.firstBuf)))} liegt der Kontostand unter dem Puffer von ${money(set.buffer)}.</span>`;
   else main = `<span class="tag ok">Gedeckt</span><span>Alle Zahlungen der nächsten ${set.horizonMonths} Monate sind abgesichert.</span>`;
-  return `<div class="verdict"><p class="v-main">${main}</p><p class="v-sub">Tiefster Stand ${P.reserveMax > 0.005 ? 'deines eigenen Geldes ' : ''}in den nächsten 30 Tagen: ${money(m30)} am ${esc(fmtDate(P.dateAt(m30i)))}.</p></div>`;
+  return `<div class="verdict"><p class="v-main">${main}</p></div>`;
 }
 
 function categoryBars(P) {
   const cats = Object.entries(P.stats.byCat).sort((a, b) => b[1] - a[1]);
   if (!cats.length) return '<p class="empty">Noch keine Fixkosten erfasst.</p>';
   const max = cats[0][1];
-  return `<ul class="bars">${cats.map(([c, v]) => `<li><span class="b-l">${esc(c)}</span><span class="b-t"><i style="width:${Math.max(3, (v / max) * 100).toFixed(1)}%"></i></span><span class="b-v">${money(v)}</span></li>`).join('')}</ul>`;
+  return `<ul class="bars">${cats.map(([c, v], k) => `<li style="--bc:var(--c${(k % 6) + 1})"><span class="b-l">${esc(c)}</span><span class="b-t"><i style="width:${Math.max(3, (v / max) * 100).toFixed(1)}%"></i></span><span class="b-v">${money(v)}</span></li>`).join('')}</ul>`;
 }
+
+const fabHTML = () => `<button class="fab" data-act="addExpense" aria-label="Ausgabe erfassen">${icon('plus')}</button>`;
+const kpi = (label, value, sub, o = {}) => {
+  const inner = `<span class="k-l">${esc(label)}</span><span class="k-v money ${o.cls || ''}">${esc(value)}</span><span class="k-s">${esc(sub || '')}</span>`;
+  return o.tab ? `<button class="kpi" data-act="nav" data-tab="${o.tab}">${inner}</button>` : `<div class="kpi">${inner}</div>`;
+};
 
 function viewHome() {
   const P = getPlan(), st = App.state, s = P.ctx.settings;
@@ -1524,7 +1826,7 @@ function viewHome() {
     <div class="hero-top">
       <div class="hero-bal">
         <span class="hero-lbl">Kontostand heute</span>
-        <span class="hero-num money ${s.balance < 0 ? 'neg' : ''}">${esc(fmtEUR(s.balance))}</span>
+        <span class="hero-num money ${s.balance < 0 ? 'neg' : ''}" data-v="${s.balance}">${esc(fmtEUR(s.balance))}</span>
         <span class="hero-meta">${s.balanceDate ? `Stand ${esc(fmtDate(s.balanceDate))}` : 'Noch nicht eingetragen'} <button class="link inv" data-act="setBalance">Aktualisieren</button></span>
         ${P.omaHeld > 0.005 ? `<span class="hero-meta">Davon gehören Oma ${money(P.omaHeld)}. Die Strategie rührt das Geld nicht an.</span>` : ''}
       </div>
@@ -1532,7 +1834,8 @@ function viewHome() {
     </div>
     ${empty ? '' : `<div class="range" role="group" aria-label="Zeitraum">${[3, 6, 12, 24].filter(m => m <= s.horizonMonths).map(m => `<button class="chip-btn ${App.range === m ? 'on' : ''}" data-act="range" data-m="${m}">${m} Monate</button>`).join('')}</div>
     <div class="chart" data-chart="balance"></div>
-    <p class="legend"><span><i class="lg inv"></i>Rechnung wird bezahlt</span><span><i class="lg pre"></i>Sondertilgung</span><span><i class="lg buf"></i>Sicherheitspuffer</span>${P.reserveMax > 0.005 ? '<span><i class="lg ref"></i>Eigenes Geld (ohne Omas Anteil)</span>' : ''}</p>`}
+    <p class="legend"><span><i class="lg inv"></i>Rechnung wird bezahlt</span><span><i class="lg pre"></i>Sondertilgung</span><span><i class="lg buf"></i>Sicherheitspuffer</span>${P.reserveMax > 0.005 ? '<span><i class="lg ref"></i>Eigenes Geld (ohne Omas Anteil)</span>' : ''}</p>
+    <div class="ribbon" data-ribbon></div>`}
   </section>`;
 
   if (empty) {
@@ -1548,20 +1851,22 @@ function viewHome() {
     </section>`;
   }
 
-  const debtSummary = `<dl class="kv">
-    <div><dt>Offene Rechnungen</dt><dd>${money(st.invoices.filter(i => !i.paid).reduce((a, i) => a + i.amount, 0))}</dd></div>
-    <div><dt>Restschuld Ratenkäufe</dt><dd>${money(st.installments.reduce((a, i) => a + Math.max(0, i.balance), 0))}</dd></div>
-    <div><dt>Raten pro Monat</dt><dd>${money(stats.rates)}</dd></div>
-    <div><dt>Zinsen bis zum Ende</dt><dd>${money(P.opt.interest)}</dd></div>
-  </dl>`;
+  const m = min30(P);
+  const free = (P.opt.own[0] != null ? P.opt.own[0] : s.balance) - s.buffer;
+  const kpis = `<div class="strip">
+    ${kpi('Frei über dem Puffer', fmtEUR(free), `Puffer ${fmtEUR(s.buffer)}`, { tab: 'plan', cls: free < 0 ? 'neg' : '' })}
+    ${kpi('Tiefster Stand in 30 Tagen', fmtEUR(m.v), `am ${fmtDate(P.dateAt(m.i))}${P.reserveMax > 0.005 ? ', ohne Omas Geld' : ''}`, { cls: m.v < 0 ? 'neg' : '' })}
+    ${kpi('Offene Schulden', fmtEUR(P.totalDebt), `Zinsen bis zum Ende ${fmtEUR(P.opt.interest)}`, { tab: 'debts' })}
+    ${kpi('Übrig pro Monat', fmtEUR(surplus), 'nach Fixkosten, Budgets und Raten', { tab: 'flows', cls: surplus < 0 ? 'neg' : 'pos' })}
+  </div>`;
 
-  return `<header class="page-head"><div><h1>Übersicht</h1><p class="sub">${esc(dateStr)}</p></div><div class="actions"><button class="btn primary" data-act="addExpense">Ausgabe erfassen</button></div></header>
+  return `<header class="page-head"><div><h1>Übersicht</h1><p class="sub">${esc(dateStr)}</p></div></header>
   ${hero}
-  <div class="cols">
+  ${kpis}
+  <div class="cols home">
     <section class="panel"><div class="panel-h"><h2>Als Nächstes</h2><span class="muted">21 Tage</span></div>${eventRows(P, 21)}</section>
-    <div class="stack">
+    <div class="stack side">
       <section class="panel"><div class="panel-h"><h2>Hinweise</h2></div>${warningList(P)}</section>
-      <section class="panel"><div class="panel-h"><h2>Schulden</h2><button class="link" data-act="nav" data-tab="plan">Zur Strategie</button></div>${debtSummary}</section>
       ${budgetHomePanel()}
       ${omaHomePanel()}
       <section class="panel"><div class="panel-h"><h2>Monatlich im Schnitt</h2></div>
@@ -1569,7 +1874,7 @@ function viewHome() {
         ${categoryBars(P)}
       </section>
     </div>
-  </div>`;
+  </div>${fabHTML()}`;
 }
 
 function invoiceCard(inv, P) {
@@ -1622,8 +1927,17 @@ function viewDebts() {
   const paid = st.invoices.filter(i => i.paid).sort((a, b) => (b.paidDate || '').localeCompare(a.paidDate || ''));
   const inst = st.installments.filter(i => i.balance > 0.005).sort((a, b) => a.nextDue.localeCompare(b.nextDue));
   const done = st.installments.filter(i => !(i.balance > 0.005));
+  const nextItems = [...open.map(i => ({ d: i.due, n: i.name })), ...inst.map(i => ({ d: i.nextDue, n: i.name }))].filter(x => validISO(x.d)).sort((a, b) => a.d.localeCompare(b.d));
+  const nx = nextItems[0];
+  const strip = `<div class="strip">
+    ${kpi('Offene Rechnungen', fmtEUR(open.reduce((a, i) => a + i.amount, 0)), `${open.length} ${open.length === 1 ? 'Rechnung' : 'Rechnungen'}`)}
+    ${kpi('Restschuld Raten', fmtEUR(inst.reduce((a, i) => a + i.balance, 0)), `${inst.length} ${inst.length === 1 ? 'Ratenzahlung' : 'Ratenzahlungen'}`)}
+    ${kpi('Raten pro Monat', fmtEUR(P.stats.rates), `Zinsen bis zum Ende ${fmtEUR(P.opt.interest)}`)}
+    ${kpi('Nächste Frist', nx ? relDays(nx.d, P.today) : 'keine', nx ? `${nx.n} am ${fmtDate(nx.d)}` : 'Nichts offen', { tab: 'plan' })}
+  </div>`;
   return `<header class="page-head"><div><h1>Rechnungen &amp; Raten</h1><p class="sub">Kauf auf Rechnung (PayPal, Klarna, Händler) und Ratenzahlungen mit allen Fristen.</p></div>
     <div class="actions"><button class="btn" data-act="quick">Schnell-Erfassung</button><button class="btn" data-act="addInvoice">Rechnung</button><button class="btn primary" data-act="addInstallment">Ratenzahlung</button></div></header>
+  ${strip}
   <section class="panel"><div class="panel-h"><h2>Kauf auf Rechnung</h2><span class="muted">${open.length ? `${money(open.reduce((a, i) => a + i.amount, 0))} offen` : ''}</span></div>
     ${open.length ? `<ul class="items">${open.map(i => invoiceCard(i, P)).join('')}</ul>` : '<p class="empty">Keine offenen Rechnungen. Mit „Rechnung“ trägst du PayPal-, Klarna- oder Händlerrechnungen samt Zahlungsziel ein.</p>'}
     ${paid.length ? `<details class="fold"><summary>Bezahlt (${paid.length})</summary><ul class="items quiet">${paid.map(i => `<li class="item"><div class="item-main"><div class="item-t"><b>${esc(i.name)}</b>${i.provider ? `<span class="tag">${esc(i.provider)}</span>` : ''}</div><div class="item-s">bezahlt am ${esc(fmtDate(i.paidDate))}</div></div><div class="item-side"><div class="item-amt">${money(i.amount)}</div><div class="item-btns"><button class="btn sm ghost" data-act="delInvoice" data-id="${esc(i.id)}">Löschen</button></div></div></li>`).join('')}</ul></details>` : ''}
@@ -1648,11 +1962,13 @@ function viewPlan() {
   if (!debts.length) return head + '<section class="panel"><p class="empty">Keine offenen Rechnungen oder Raten. Sobald du welche erfasst, entsteht hier dein Zahlungsplan.</p><div class="row-actions"><button class="btn primary" data-act="nav" data-tab="debts">Rechnungen &amp; Raten erfassen</button></div></section>';
 
   const fmtFree = (r) => r.sum.debtFree >= 0 ? fmtDate(P.dateAt(r.sum.debtFree)) : `nach ${P.ctx.settings.horizonMonths} Monaten`;
-  const compare = `<section class="panel"><div class="panel-h"><h2>Vergleich</h2></div>
-    <div class="cmp">
-      <div class="cmp-c"><h3>Nur Pflichtzahlungen</h3><dl class="kv"><div><dt>Zinsen bis zum Ende</dt><dd>${money(P.base.interest)}</dd></div><div><dt>Schuldenfrei</dt><dd>${esc(fmtFree(P.base))}</dd></div></dl></div>
-      <div class="cmp-c best"><h3>Mit Strategie</h3><dl class="kv"><div><dt>Zinsen bis zum Ende</dt><dd>${money(P.opt.interest)}</dd></div><div><dt>Schuldenfrei</dt><dd>${esc(fmtFree(P.opt))}</dd></div></dl></div>
-    </div>
+  const strip = `<div class="strip">
+    ${kpi('Zinsen nur mit Pflichtraten', fmtEUR(P.base.interest), `schuldenfrei ${fmtFree(P.base)}`)}
+    ${kpi('Zinsen mit Strategie', fmtEUR(P.opt.interest), `schuldenfrei ${fmtFree(P.opt)}`)}
+    ${kpi('Zinsersparnis', fmtEUR(P.savings), P.savings > 0.5 ? 'durch Sondertilgungen' : 'aktuell nichts zu sparen', { cls: P.savings > 0.5 ? 'pos' : '' })}
+    ${kpi('Offene Schulden', fmtEUR(P.totalDebt), 'Rechnungen und Raten')}
+  </div>`;
+  const chartPanel = `<section class="panel"><div class="panel-h"><h2>Schuldenverlauf</h2></div>
     <p class="saving">${P.savings > 0.5 ? `Ersparnis durch Sondertilgungen: <b>${money(P.savings)}</b> Zinsen.` : 'Keine Zinsersparnis möglich: entweder sind alle Raten zinsfrei oder es gibt aktuell keinen freien Spielraum.'}</p>
     <div class="chart" data-chart="debt"></div>
     <p class="legend"><span><i class="lg ref"></i>Nur Pflichtzahlungen</span><span><i class="lg pri"></i>Mit Strategie</span></p>
@@ -1695,12 +2011,15 @@ function viewPlan() {
   const table = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Monat</th><th>Einnahmen</th><th>Fixkosten</th>${showFlex ? '<th>Flexibel</th>' : ''}<th>Raten</th><th>Rechnungen</th><th>Sondertilgung</th>${showOma ? '<th>Oma (netto)</th>' : ''}<th>Kontostand Ende</th><th>Schulden Ende</th></tr></thead><tbody>${months.map(m => `<tr><th>${esc(fmtMonthKey(m.key))}</th><td>${m.inc ? money(m.inc) : '–'}</td><td>${m.exp ? money(m.exp) : '–'}</td>${showFlex ? `<td>${m.flex > 0.005 ? money(m.flex) : '–'}</td>` : ''}<td>${m.rate ? money(m.rate) : '–'}</td><td>${m.inv ? money(m.inv) : '–'}</td><td>${m.prepay ? money(m.prepay) : '–'}</td>${showOma ? `<td>${Math.abs(m.oma) > 0.005 ? money(m.oma) : '–'}</td>` : ''}<td class="${m.end < 0 ? 'neg' : ''}">${money(m.end)}</td><td>${m.debt > 0.005 ? money(m.debt) : '–'}</td></tr>`).join('')}</tbody></table></div>`;
 
   const s = P.ctx.settings;
-  return head + compare + `
-  <section class="panel"><div class="panel-h"><h2>Zahlungsplan</h2><span class="muted">nächste 60 Tage</span></div>${stepsHTML}</section>
-  <div class="cols even">
-    <section class="panel"><div class="panel-h"><h2>Rechnungen nach Frist</h2></div>${invHTML}</section>
-    <section class="panel"><div class="panel-h"><h2>Raten nach Zinssatz</h2></div>${instHTML}</section>
+  return head + strip + `
+  <div class="cols">
+    <section class="panel"><div class="panel-h"><h2>Zahlungsplan</h2><span class="muted">nächste 60 Tage</span></div>${stepsHTML}</section>
+    <div class="stack">
+      <section class="panel"><div class="panel-h"><h2>Rechnungen nach Frist</h2></div>${invHTML}</section>
+      <section class="panel"><div class="panel-h"><h2>Raten nach Zinssatz</h2></div>${instHTML}</section>
+    </div>
   </div>
+  ${chartPanel}
   <section class="panel"><div class="panel-h"><h2>Monatsübersicht</h2></div>${table}</section>
   <section class="panel"><details class="fold open-flat"><summary>So rechnet die Strategie</summary>
     <ol class="rules">
@@ -1729,11 +2048,24 @@ function viewFlows() {
   const sortR = (a, b) => a.name.localeCompare(b.name, 'de');
   const one = [...st.oneoffs].sort((a, b) => a.date.localeCompare(b.date));
   const sum = (arr) => arr.reduce((a, r) => a + r.amount * (INTERVALS[r.interval] || INTERVALS.monthly).factor, 0);
+  const stFlow = monthlyStats(st), net = sum(inc) - sum(exp) - stFlow.flex - stFlow.rates;
+  const strip = `<div class="strip three">
+    ${kpi('Einnahmen pro Monat', fmtEUR(sum(inc)), `${inc.length} ${inc.length === 1 ? 'Eintrag' : 'Einträge'}`, { cls: 'pos' })}
+    ${kpi('Fixkosten pro Monat', fmtEUR(sum(exp)), `${exp.length} ${exp.length === 1 ? 'Eintrag' : 'Einträge'}`)}
+    ${kpi('Bleibt pro Monat', fmtEUR(net), 'nach Budgets und Raten', { cls: net < 0 ? 'neg' : 'pos' })}
+  </div>`;
   return `<header class="page-head"><div><h1>Daueraufträge &amp; Buchungen</h1><p class="sub">Alles, was regelmäßig oder einmalig auf dein Konto zukommt oder davon abgeht. Variable Kosten wie Lebensmittel trägst du als Durchschnitt ein.</p></div>
     <div class="actions"><button class="btn" data-act="addOneoff">Einmalbuchung</button><button class="btn primary" data-act="addRecurring">Dauerauftrag oder Einnahme</button></div></header>
+  ${strip}
+  <div class="cols even">
+    <div class="stack">
   <section class="panel"><div class="panel-h"><h2>Einnahmen</h2><span class="muted">${inc.length ? `${money(sum(inc))} pro Monat` : ''}</span></div>${inc.length ? `<ul class="items">${inc.sort(sortR).map(recurringRow).join('')}</ul>` : '<p class="empty">Noch keine Einnahmen. Trage dein Gehalt mit dem nächsten Zahltag ein.</p>'}</section>
+  <section class="panel"><div class="panel-h"><h2>Einmalige Buchungen</h2></div>${one.length ? `<ul class="items">${one.map(o => `<li class="item compact"><div class="item-main"><div class="item-t"><b>${esc(o.name)}</b>${o.category ? `<span class="tag">${esc(o.category)}</span>` : ''}${o.date < today ? '<span class="tag">vergangen, nicht eingerechnet</span>' : ''}</div><div class="item-s">${esc(fmtDate(o.date))}</div></div><div class="item-side"><div class="item-amt ${o.type === 'income' ? 'pos' : ''}">${money(o.type === 'income' ? o.amount : -o.amount)}</div><div class="item-btns"><button class="btn sm" data-act="editOneoff" data-id="${esc(o.id)}">Bearbeiten</button><button class="btn sm ghost" data-act="delOneoff" data-id="${esc(o.id)}">Löschen</button></div></div></li>`).join('')}</ul>` : '<p class="empty">Keine einmaligen Buchungen, zum Beispiel Steuerrückerstattung, Reparatur oder Urlaub.</p>'}</section>
+    </div>
+    <div class="stack">
   <section class="panel"><div class="panel-h"><h2>Ausgaben</h2><span class="muted">${exp.length ? `${money(sum(exp))} pro Monat` : ''}</span></div>${exp.length ? `<ul class="items">${exp.sort(sortR).map(recurringRow).join('')}</ul>` : '<p class="empty">Noch keine Ausgaben. Miete, Strom, Versicherungen, Abos und Lebenshaltung gehören hierher.</p>'}</section>
-  <section class="panel"><div class="panel-h"><h2>Einmalige Buchungen</h2></div>${one.length ? `<ul class="items">${one.map(o => `<li class="item compact"><div class="item-main"><div class="item-t"><b>${esc(o.name)}</b>${o.category ? `<span class="tag">${esc(o.category)}</span>` : ''}${o.date < today ? '<span class="tag">vergangen, nicht eingerechnet</span>' : ''}</div><div class="item-s">${esc(fmtDate(o.date))}</div></div><div class="item-side"><div class="item-amt ${o.type === 'income' ? 'pos' : ''}">${money(o.type === 'income' ? o.amount : -o.amount)}</div><div class="item-btns"><button class="btn sm" data-act="editOneoff" data-id="${esc(o.id)}">Bearbeiten</button><button class="btn sm ghost" data-act="delOneoff" data-id="${esc(o.id)}">Löschen</button></div></div></li>`).join('')}</ul>` : '<p class="empty">Keine einmaligen Buchungen, zum Beispiel Steuerrückerstattung, Reparatur oder Urlaub.</p>'}</section>`;
+    </div>
+  </div>`;
 }
 
 function viewSettings() {
@@ -1749,13 +2081,17 @@ function viewSettings() {
   const previewPanel = `<section class="panel"><div class="panel-h"><h2>Vorschau-Modus</h2></div>
     <p class="lead">Hier gibt es keinen Tresor, kein Passwort und keine Speicherung. Alles liegt nur im Arbeitsspeicher und ist beim Neuladen weg. Backup, Passwortwechsel und Löschen stehen in der echten App zur Verfügung.</p>
     <div class="row-actions"><button class="btn" data-act="pvReset">Beispieldaten zurücksetzen</button><button class="btn" data-act="clearEntries">Alle Einträge löschen</button></div></section>`;
-  return `<header class="page-head"><div><h1>Einstellungen</h1><p class="sub">Planung, Darstellung und Sicherheit.</p></div></header>
-  <section class="panel"><div class="panel-h"><h2>Planung</h2></div>
-    <form id="settingsForm" class="inline-form" novalidate><div class="fgrid">${fields.map(f => fieldHTML(f, s[f.key])).join('')}</div>
-    <p class="err" id="serr" role="alert"></p><div class="row-actions"><button class="btn primary" type="submit">Einstellungen speichern</button></div></form></section>
-  <section class="panel"><div class="panel-h"><h2>Darstellung</h2></div>
-    <div class="seg" role="group" aria-label="Farbschema">${[['auto', 'Automatisch'], ['light', 'Hell'], ['dark', 'Dunkel']].map(([v, l]) => `<button class="chip-btn ${theme === v ? 'on' : ''}" data-act="theme" data-v="${v}">${l}</button>`).join('')}</div></section>
-  ${App.preview ? previewPanel : secure}`;
+  return `<header class="page-head"><div><h1>Einstellungen</h1><p class="sub">Planung, Darstellung, Synchronisation und Sicherheit.</p></div></header>
+  <div class="cols even">
+    <div class="stack">
+      <section class="panel"><div class="panel-h"><h2>Planung</h2></div>
+        <form id="settingsForm" class="inline-form" novalidate><div class="fgrid">${fields.map(f => fieldHTML(f, s[f.key])).join('')}</div>
+        <p class="err" id="serr" role="alert"></p><div class="row-actions"><button class="btn primary" type="submit">Einstellungen speichern</button></div></form></section>
+      <section class="panel"><div class="panel-h"><h2>Darstellung</h2></div>
+        <div class="seg" role="group" aria-label="Farbschema">${[['auto', 'Automatisch'], ['light', 'Hell'], ['dark', 'Dunkel']].map(([v, l]) => `<button class="chip-btn ${theme === v ? 'on' : ''}" data-act="theme" data-v="${v}">${l}</button>`).join('')}</div></section>
+    </div>
+    <div class="stack">${App.preview ? previewPanel : syncPanel() + secure}</div>
+  </div>`;
 }
 
 const Views = { home: viewHome, plan: viewPlan, debts: viewDebts, flows: viewFlows, settings: viewSettings };
@@ -1774,12 +2110,15 @@ const ICONS = {
   oma: '<path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/>',
   journal: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   budgets: '<path d="M12 3v9h9"/><path d="M20.5 15A9 9 0 1111 3.5"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  sync: '<path d="M20 12a8 8 0 01-13.7 5.7M4 12a8 8 0 0113.7-5.7"/><path d="M18 3v4h-4M6 21v-4h4"/>',
 };
 const icon = n => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
-const LOGO = '<svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--accent)"/><path d="M7 19l5-5 4 4 8-9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="7" y="23" width="18" height="3.2" rx="1" fill="#f4dc3e"/></svg>';
+const LOGO = '<svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--accent)"/><path class="l-line" pathLength="1" d="M7 19l5-5 4 4 8-9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><rect class="l-bar" x="7" y="23" width="18" height="3.2" rx="1" fill="#f4dc3e"/></svg>';
 
 const NAV = [['home', 'Übersicht'], ['plan', 'Strategie'], ['debts', 'Rechnungen & Raten'], ['budgets', 'Budgets'], ['oma', 'Oma'], ['journal', 'Historie'], ['flows', 'Daueraufträge'], ['settings', 'Einstellungen']];
 const DESK_ONLY = ['journal', 'flows', 'settings'];
+const GROUP_START = ['debts', 'journal', 'settings'];
 const AfterRender = { settings: () => bindSettings() };
 
 function fatalScreen(title, text, withPreview) {
@@ -1793,6 +2132,7 @@ function startPreview() {
   App.preview = true; App.key = null; App.salt = null; App.plan = null;
   App.state = normalizeState(demoData());
   App.tab = 'home';
+  App.animateNext = true;
   render();
 }
 const previewBar = () => '<div class="pv-bar" role="status"><span><b>Vorschau</b> mit Beispieldaten. Kein Passwort, es wird nichts gespeichert. Änderungen sind beim Neuladen weg.</span><button class="link" data-act="pvReset">Zurücksetzen</button></div>';
@@ -1814,7 +2154,7 @@ function renderLock() {
       <p class="err" id="lockErr" role="alert"></p>
       <button class="btn primary block" type="submit" id="lockBtn">${has ? 'Entsperren' : 'Tresor anlegen'}</button>
     </form>
-    <div class="lock-foot"><button class="link" data-act="importBackup">Backup einer anderen Installation laden</button></div>
+    <div class="lock-foot"><div><button class="link" data-act="syncLoad">Tresor aus GitHub laden (zweites Gerät)</button></div><div><button class="link" data-act="importBackup">Backup-Datei laden</button></div></div>
   </div></main>`;
 
   const form = $('#lockForm');
@@ -1842,7 +2182,9 @@ function renderLock() {
       if (has) await unlockVault(pw); else await createVault(pw);
       App.tab = 'home';
       armIdle();
+      App.animateNext = true;
       render();
+      Sync.start();
     } catch (ex) {
       err.textContent = ex.message || 'Das hat nicht geklappt.';
       btn.disabled = false; btn.textContent = has ? 'Entsperren' : 'Tresor anlegen';
@@ -1857,9 +2199,11 @@ function mountShell() {
   app.innerHTML = `<div class="shell">
     <aside class="rail">
       <div class="brand">${LOGO}<span>Kassensturz</span></div>
-      <nav class="nav" aria-label="Hauptnavigation">${NAV.map(([k, l]) => `<button class="${DESK_ONLY.includes(k) ? 'desk' : ''}" data-act="nav" data-tab="${k}">${icon(k)}<span>${l}</span></button>`).join('')}</nav>
+      <button class="cta" data-act="addExpense">${icon('plus')}<span>Ausgabe erfassen</span></button>
+      <nav class="nav" aria-label="Hauptnavigation">${NAV.map(([k, l]) => `<button class="${DESK_ONLY.includes(k) ? 'desk' : ''} ${GROUP_START.includes(k) ? 'grp' : ''}" data-act="nav" data-tab="${k}">${icon(k)}<span>${l}</span></button>`).join('')}</nav>
       <div class="rail-foot">
         ${DESK_ONLY.map(k => `<button class="rail-btn mob" data-act="nav" data-tab="${k}" aria-label="${NAV.find(n => n[0] === k)[1]}" title="${NAV.find(n => n[0] === k)[1]}">${icon(k)}</button>`).join('')}
+        <button class="rail-btn syncchip" id="syncChip" data-act="syncNow" title="Jetzt synchronisieren" hidden><i class="sd"></i><span class="sync-t"></span></button>
         <button class="rail-btn" data-act="privacy" aria-pressed="false" title="Beträge ausblenden">${icon('eye')}<span>Beträge ausblenden</span></button>
         ${App.preview ? '' : `<button class="rail-btn" data-act="lock" title="Tresor sperren">${icon('lock')}<span>Sperren</span></button>`}
       </div>
@@ -1873,11 +2217,14 @@ function render() {
   if (!App.state) { renderLock(); return; }
   if (app.dataset.mode !== 'app' || !$('#view')) mountShell();
   const y = window.scrollY;
+  const animate = !!App.animateNext; App.animateNext = false;
+  $('#view').classList.toggle('anim', animate);
   $('#view').innerHTML = (App.preview ? previewBar() : '') + Views[App.tab]();
   $$('.rail [data-act=nav]').forEach(b => b.setAttribute('aria-current', b.dataset.tab === App.tab ? 'page' : 'false'));
   app.classList.toggle('privacy', App.privacy);
   const pb = $('[data-act=privacy]'); if (pb) pb.setAttribute('aria-pressed', String(App.privacy));
   drawCharts();
+  Fx.after(animate);
   const hook = AfterRender[App.tab]; if (hook) hook();
   window.scrollTo(0, y);
 }
@@ -2157,8 +2504,7 @@ function chooseFile(cb) {
 async function exportBackup() {
   App.state.settings.lastBackup = todayISO();
   await persist();
-  const rec = Store.get();
-  if (!rec) { toast('Es gibt nichts zu exportieren.', 'bad'); return; }
+  const rec = JSON.stringify(await sealRecord(stripSync(App.state), App.key, App.salt, App.iter));   // ohne Sync-Token
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([rec], { type: 'application/json' }));
   a.download = `kassensturz-backup-${todayISO()}.json`;
@@ -2180,7 +2526,7 @@ function importBackup(file) {
         const r = await openRecord(rec, x.pw);
         Object.assign(App, { state: r.state, key: r.key, salt: r.salt, iter: r.iter, plan: null, tab: 'home' });
         Store.set(JSON.stringify(rec));
-        armIdle(); render(); toast('Backup importiert');
+        armIdle(); render(); Sync.start(); toast('Backup importiert');
       },
     });
   }).catch(() => toast('Die Datei konnte nicht gelesen werden.', 'bad'));
@@ -2227,10 +2573,13 @@ function changePasswordForm() {
       if (x.pw !== x.pw2) return 'Die neuen Passwörter stimmen nicht überein.';
       await saveChain;
       try { await openRecord(JSON.parse(Store.get()), x.old); } catch (e) { return 'Das aktuelle Passwort stimmt nicht.'; }
+      if (Sync.enabled() && !(await Sync.run('pre'))) return 'Gleiche zuerst ab (Internetverbindung nötig), damit keine Änderungen vom anderen Gerät verloren gehen.';
       const salt = crypto.getRandomValues(new Uint8Array(16));
       App.key = await deriveKey(x.pw, salt, KDF_ITER); App.salt = salt; App.iter = KDF_ITER;
+      if (App.state.sync) App.state.sync.pwChanged = true;
       await persist();
-      toast('Passwort geändert. Alte Backups gelten weiter mit dem alten Passwort.');
+      if (Sync.enabled()) Sync.run('manual');
+      toast('Passwort geändert. Alte Backups gelten weiter mit dem alten Passwort.' + (Sync.enabled() ? ' Auf dem anderen Gerät wirst du beim nächsten Abgleich nach dem neuen Passwort gefragt.' : ''));
     },
   });
 }
@@ -2242,7 +2591,7 @@ function wipeForm() {
     fields: [{ key: 'ok', label: 'Bestätigung', type: 'text' }],
     onSubmit: x => {
       if (x.ok !== 'LÖSCHEN') return 'Bitte tippe LÖSCHEN, um fortzufahren.';
-      Store.remove(); clearTimeout(App.idle);
+      Store.remove(); clearTimeout(App.idle); Sync.stop();
       App.state = null; App.key = null; App.plan = null;
       render(); toast('Tresor gelöscht');
     },
@@ -2251,7 +2600,7 @@ function wipeForm() {
 
 /* ---------- Aktionen ---------- */
 const Actions = {
-  nav(d) { App.tab = d.tab; render(); window.scrollTo(0, 0); const v = $('#view'); if (v) v.focus({ preventScroll: true }); },
+  nav(d) { App.tab = d.tab; App.animateNext = true; render(); window.scrollTo(0, 0); const v = $('#view'); if (v) v.focus({ preventScroll: true }); },
   range(d) { App.range = Number(d.m); render(); },
   privacy() { App.privacy = !App.privacy; render(); },
   lock() { lockVault(); },
@@ -2307,6 +2656,7 @@ const Actions = {
     journalToday({ kind: 'rate', title: `Rate: ${it.name}`, amount: -amt, ref: { type: 'installment', id: it.id, dBalance: round2(oldBalance - it.balance), prevNextDue }, balanceAdj: !!r.checked });
     if (r.checked) setBalance(App.state.settings.balance - amt);
     commit(); toast((it.balance <= 0.005 ? 'Abbezahlt. Glückwunsch!' : 'Rate gebucht.') + startHint());
+    if (it.balance <= 0.005) Fx.confetti();
   },
   prepayInstallment(d) {
     const it = byId(App.state.installments, d.id); if (!it) return;
@@ -2324,6 +2674,7 @@ const Actions = {
         journalToday({ kind: 'prepay', title: `Sondertilgung: ${it.name}`, amount: -x.amount, ref: { type: 'installment', id: it.id, dBalance: round2(x.amount) }, balanceAdj: !!x.adjust });
         if (x.adjust) setBalance(App.state.settings.balance - x.amount);
         commit(); toast('Sondertilgung gebucht.' + startHint());
+        if (it.balance <= 0.005) Fx.confetti();
       },
     });
   },
@@ -2361,8 +2712,10 @@ function boot() {
     const now = Date.now();
     if (App.state && now - App.lastActivity > 1000) { App.lastActivity = now; armIdle(); }
   }, { passive: true }));
+  Sync.install();
+  Fx.install();
   let rt;
-  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (App.state && $('[data-chart]')) drawCharts(); }, 150); });
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (App.state && ($('[data-chart]') || $('[data-ribbon]'))) { const v = $('#view'); if (v) v.classList.remove('anim'); drawCharts(); } }, 150); });
 
   if (PREVIEW_BUILD) { startPreview(); return; }
   const cryptoOk = !!(window.crypto && crypto.subtle);
@@ -2540,12 +2893,20 @@ function monthKeys(st, today) {
 
 function journalRow(j) {
   return `<li class="jr ${j.void ? 'void' : ''}">
-    <span class="jr-d">${esc(fmtWd(j.date))}</span>
     <div class="jr-m"><b class="jr-t">${esc(j.title)}</b> <span class="tag">${esc(JOURNAL_KINDS[j.kind] || j.kind)}</span>${(j.kind === 'expense' || j.kind === 'income') && j.cat ? `<span class="tag">${esc(j.cat)}</span>` : ''}${j.provider ? `<span class="tag plat">${esc(j.provider)}</span>` : ''}${j.area === 'oma' ? '<span class="tag acc">Oma</span>' : ''}${j.cash ? '' : '<span class="tag">nicht über Konto</span>'}${j.void ? '<span class="stamp">Storno</span>' : ''}
       ${j.note ? `<div class="jr-meta">${esc(j.note)}</div>` : ''}
       <div class="jr-meta">Erfasst ${esc(fmtStamp(j.createdAt))}${j.void ? `. Storniert ${esc(fmtStamp(j.voidAt))}: ${esc(j.voidReason || 'ohne Begründung')}` : ''}</div></div>
     <span class="jr-a ${j.amount > 0 ? 'pos' : ''}">${money(j.amount)}</span>
     <div class="jr-b">${j.void ? '' : `<button class="btn sm ghost" data-act="jNote" data-id="${esc(j.id)}">Notiz</button><button class="btn sm" data-act="jVoid" data-id="${esc(j.id)}">Stornieren</button>`}</div></li>`;
+}
+
+function groupJournal(lines) {
+  const days = new Map();
+  for (const j of lines) { if (!days.has(j.date)) days.set(j.date, []); days.get(j.date).push(j); }
+  return [...days.entries()].map(([date, js]) => {
+    const net = js.filter(j => !j.void && j.cash).reduce((a, j) => a + j.amount, 0);
+    return `<div class="jday"><div class="jday-h"><b>${esc(fmtWd(date))}</b><span>${esc(fmtEUR(net))}</span></div><ul class="jrs">${js.map(journalRow).join('')}</ul></div>`;
+  }).join('');
 }
 
 function viewJournal() {
@@ -2580,7 +2941,7 @@ function viewJournal() {
     ${summary}
     <p class="fine muted tbl-note">${live.length} ${live.length === 1 ? 'Buchung' : 'Buchungen'} in diesem Monat${voids ? `, ${voids} storniert` : ''}.</p>
   </section>
-  <section class="panel"><div class="panel-h"><h2>Buchungen</h2></div>${lines.length ? `<ul class="jrs">${lines.map(journalRow).join('')}</ul>` : '<p class="empty">In diesem Monat gibt es keine Buchungen.</p>'}</section>`;
+  <section class="panel"><div class="panel-h"><h2>Buchungen</h2></div>${lines.length ? groupJournal(lines) : '<p class="empty">In diesem Monat gibt es keine Buchungen.</p>'}</section>`;
 }
 
 Object.assign(Views, { oma: viewOma, journal: viewJournal });
@@ -2796,20 +3157,20 @@ function budgetHomePanel() {
   const shown = [...rows].sort((a, b) => b.amt - a.amt).slice(0, 5);
   return `<section class="panel"><div class="panel-h"><h2>Flexible Ausgaben</h2><button class="link" data-act="nav" data-tab="budgets">Alle Budgets</button></div>
     <p class="bud-sum">${money(Math.max(0, tot - spent))} <span class="muted" style="font:500 14px var(--sans)">noch übrig von ${esc(fmtEUR(tot))}</span></p>
-    <ul class="bars" style="margin-top:12px">${shown.map(r => `<li><span class="b-l">${esc(r.b.name)}</span><span class="b-t ${barClass(r.spent, r.amt)}"><i style="width:${barPct(r.spent, r.amt)}%"></i></span><span class="b-v">${money(r.left)}</span></li>`).join('')}</ul>
+    <ul class="bars" style="margin-top:12px">${shown.map(r => `<li style="--bc:var(--c${(rows.indexOf(r) % 6) + 1})"><span class="b-l">${esc(r.b.name)}</span><span class="b-t ${barClass(r.spent, r.amt)}"><i style="width:${barPct(r.spent, r.amt)}%"></i></span><span class="b-v">${money(r.left)}</span></li>`).join('')}</ul>
     <div class="row-actions"><button class="btn sm primary" data-act="addExpense">Ausgabe erfassen</button></div></section>`;
 }
 
 /* ---------- Ansicht: Budgets ---------- */
-function budgetCard(r, daysLeft) {
+function budgetCard(r, daysLeft, idx) {
   const { b, amt, spent, left } = r;
   const over = left < -0.005, tracking = isTracking();
   const perDay = left > 0 && daysLeft > 0 ? left / daysLeft : 0;
   const note = !tracking
     ? `Budget ${fmtEUR(amt)} pro Monat. Bis zum Erfassungsstart rechnet die Prognose mit dem anteiligen Betrag.`
     : `Ausgegeben ${fmtEUR(spent)} von ${fmtEUR(amt)}${over ? `, Budget um ${fmtEUR(-left)} überzogen.` : `. Noch ${daysLeft} ${daysLeft === 1 ? 'Tag' : 'Tage'}: ca. ${fmtEUR(perDay)} pro Tag.`}`;
-  return `<li class="item bud">
-    <div class="oma-h"><div class="item-t"><b>${esc(b.name)}</b><span class="tag">${esc(fmtEUR(amt))} pro Monat</span></div>
+  return `<li class="item bud" style="--bc:var(--c${(idx % 6) + 1})">
+    <div class="oma-h"><div class="item-t"><span class="bud-dot"></span><b>${esc(b.name)}</b><span class="tag">${esc(fmtEUR(amt))} pro Monat</span></div>
       <div class="item-amt ${over ? 'neg' : ''}">${money(left)}<small>${over ? 'überzogen' : 'noch übrig'}</small></div></div>
     <div class="bar ${barClass(spent, amt)}"><i style="width:${barPct(spent, amt)}%"></i></div>
     <div class="item-n">${esc(note)}</div>
@@ -2842,8 +3203,8 @@ function viewBudgets() {
     .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)).slice(0, 8);
 
   const summary = `<section class="panel"><div class="panel-h"><h2>${esc(monthLabel(mk))}</h2></div>
-    <p class="bud-sum">${money(Math.max(0, tot - spent))}</p><p class="muted">${tot - spent < -0.005 ? `Gesamtbudget um ${esc(fmtEUR(spent - tot))} überzogen.` : `noch übrig von ${esc(fmtEUR(tot))}${daysLeft > 0 && tracking ? `, ca. ${esc(fmtEUR(Math.max(0, tot - spent) / daysLeft))} pro Tag` : ''}`}</p>
-    <div class="bar ${barClass(spent, tot)}"><i style="width:${barPct(spent, tot)}%"></i></div>
+    <div class="ringwrap"><svg class="ring ${barClass(spent, tot)}" viewBox="0 0 112 112" aria-hidden="true"><circle class="r-bg" cx="56" cy="56" r="44"/><circle class="r-fg" cx="56" cy="56" r="44" style="--len:${(2 * Math.PI * 44 * Math.min(1, tot > 0 ? spent / tot : 0)).toFixed(1)}"/><text x="56" y="56">${Math.round(Math.min(1, tot > 0 ? spent / tot : 0) * 100)} %</text></svg>
+      <div><p class="bud-sum">${money(Math.max(0, tot - spent))}</p><p class="muted">${tot - spent < -0.005 ? `Gesamtbudget um ${esc(fmtEUR(spent - tot))} überzogen.` : `noch übrig von ${esc(fmtEUR(tot))}${daysLeft > 0 && tracking ? `, ca. ${esc(fmtEUR(Math.max(0, tot - spent) / daysLeft))} pro Tag` : ''}`}</p></div></div>
     <dl class="kv"><div><dt>Ausgegeben</dt><dd>${money(spent)}</dd></div><div><dt>Budget gesamt</dt><dd>${money(tot)}</dd></div>${noBud > 0.005 ? `<div><dt>Weitere Ausgaben</dt><dd>${money(noBud)}</dd></div>` : ''}</dl></section>`;
 
   const recentHTML = recent.length ? `<ul class="evs">${recent.map(j => `<li class="ev"><span class="ev-d">${esc(fmtWd(j.date))}</span><span class="ev-n"><b>${esc(j.title)}</b>${j.cat ? `<span class="tag">${esc(j.cat)}</span>` : ''}${j.provider ? `<span class="tag plat">${esc(j.provider)}</span>` : ''}</span><span class="ev-a">${money(j.amount)}</span></li>`).join('')}</ul>` : `<p class="empty">${tracking ? 'Noch keine Ausgaben erfasst.' : 'Ausgaben lassen sich ab dem Erfassungsstart erfassen.'}</p>`;
@@ -2856,9 +3217,9 @@ function viewBudgets() {
   }).join('')}</tbody></table></div><p class="fine muted tbl-note">Verglichen wird mit dem Budget, das in dem jeweiligen Monat galt. Positive Differenz: Geld gespart (im laufenden Monat: noch übrig), negative: überzogen. Weitere Ausgaben sind Buchungen ohne Budget-Kategorie, zum Beispiel Fixkosten.</p></section>` : '';
 
   return head + banner + `<div class="cols wide-l">
-    <section class="panel"><div class="panel-h"><h2>Budgets</h2><span class="muted">noch ${daysLeft} ${daysLeft === 1 ? 'Tag' : 'Tage'} im Monat</span></div><ul class="items">${rows.map(r => budgetCard(r, daysLeft)).join('')}</ul></section>
+    <section class="panel"><div class="panel-h"><h2>Budgets</h2><span class="muted">noch ${daysLeft} ${daysLeft === 1 ? 'Tag' : 'Tage'} im Monat</span></div><ul class="items">${rows.map((r, k) => budgetCard(r, daysLeft, k)).join('')}</ul></section>
     <div class="stack">${summary}<section class="panel"><div class="panel-h"><h2>Letzte Ausgaben</h2><button class="link" data-act="nav" data-tab="journal">Historie</button></div>${recentHTML}</section></div>
-  </div>${hist}`;
+  </div>${hist}${fabHTML()}`;
 }
 Object.assign(Views, { budgets: viewBudgets });
 
@@ -2923,6 +3284,510 @@ Object.assign(Actions, {
     const b = byId(App.state.budgets, d.id); if (!b) return;
     const r = await askConfirm({ title: `Budget „${b.name}“ löschen?`, text: 'Bereits erfasste Ausgaben bleiben in der Historie. Die Prognose rechnet danach nicht mehr mit diesem Budget.', ok: 'Löschen', danger: true });
     if (r.ok) { App.state.budgets = App.state.budgets.filter(x => x.id !== d.id); commit(); toast('Gelöscht'); }
+  },
+});
+
+/* =====================================================================
+   EFFEKTE – sparsam und mit Bedeutung
+   Zählwerk beim Öffnen, Frist-Leiste, Lichtkegel im Kopfbereich, Konfetti.
+   Alles ist bei „Bewegung reduzieren“ ausgeschaltet.
+   ===================================================================== */
+const Fx = {
+  raf: 0,
+  ok() {
+    try { return typeof requestAnimationFrame === 'function' && typeof matchMedia === 'function' && !matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
+  },
+  install() {
+    document.addEventListener('pointermove', e => {
+      if (e.pointerType === 'touch' || this.raf || !this.ok()) return;
+      const h = e.target.closest ? e.target.closest('.hero') : null;
+      if (!h) return;
+      this.raf = requestAnimationFrame(() => {
+        const r = h.getBoundingClientRect();
+        h.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        h.style.setProperty('--my', (e.clientY - r.top) + 'px');
+        this.raf = 0;
+      });
+    }, { passive: true });
+  },
+  /* nach jedem Aufbau der Seite; animate = nur beim Seitenwechsel */
+  after(animate) {
+    if (!animate) return;
+    /* Nach der Eingangssequenz wird die Animationsklasse entfernt, damit Größenwechsel oder Neuaufbau nichts erneut abspielen */
+    clearTimeout(this.animT);
+    this.animT = setTimeout(() => { const v = $('#view'); if (v) v.classList.remove('anim'); }, 3000);
+    if (!this.ok()) return;
+    const n = $('.hero-num');
+    if (n && n.dataset.v !== undefined) this.countUp(n, parseFloat(n.dataset.v), 850);
+  },
+  countUp(el, to, ms) {
+    if (!Number.isFinite(to)) return;
+    const t0 = performance.now(), ease = x => 1 - Math.pow(1 - x, 3);
+    const step = now => {
+      const k = Math.min(1, (now - t0) / ms);
+      el.textContent = fmtEUR(to * ease(k));
+      if (k < 1 && el.isConnected) requestAnimationFrame(step); else el.textContent = fmtEUR(to);
+    };
+    requestAnimationFrame(step);
+  },
+  confetti() {
+    if (!this.ok()) return;
+    let host = document.getElementById('fx');
+    if (!host) { host = document.createElement('div'); host.id = 'fx'; host.setAttribute('aria-hidden', 'true'); document.body.appendChild(host); }
+    const cols = ['#f4dc3e', '#4cc3cb', '#d9573a', '#2f8f5b', '#4b5fd6', '#8a58c9'];
+    for (let i = 0; i < 46; i++) {
+      const c = document.createElement('i');
+      c.className = 'cf';
+      const ang = (-0.15 - Math.random() * 0.7) * Math.PI, dist = 180 + Math.random() * 360;
+      c.style.left = (42 + Math.random() * 16) + '%';
+      c.style.background = cols[i % cols.length];
+      c.style.setProperty('--dx', Math.round(Math.cos(ang) * dist * (Math.random() < .5 ? -1 : 1)) + 'px');
+      c.style.setProperty('--dy', Math.round(Math.abs(Math.sin(ang)) * -dist * 0.55 + 240 + Math.random() * 220) + 'px');
+      c.style.setProperty('--rot', Math.round(Math.random() * 900 - 450) + 'deg');
+      c.style.setProperty('--dl', (Math.random() * 0.12).toFixed(2) + 's');
+      host.appendChild(c);
+    }
+    setTimeout(() => { host.textContent = ''; }, 2200);
+  },
+};
+
+/* Frist-Leiste: Zahlungen und Fristen der nächsten 30 Tage auf einer Zeitachse.
+   Rechnungen erscheinen als gelber Textmarker an dem Tag, an dem überwiesen wird. */
+function drawRibbon(host, P) {
+  const DAYS = 30, LANE = 31;
+  const W = Math.max(260, Math.floor(host.clientWidth || (host.parentElement && host.parentElement.clientWidth) || 640));
+  const list = P.opt.log.filter(e => e.i <= DAYS && ['invoice', 'rate', 'prepay', 'income'].includes(e.type)).sort((a, b) => a.t - b.t || TYPE_ORDER[a.type] - TYPE_ORDER[b.type]);
+  const head = `<div class="rb-t"><b>Fristen und Zahlungen der nächsten 30 Tage</b><span>${list.length} ${list.length === 1 ? 'Termin' : 'Termine'}</span></div>`;
+  if (!list.length) { host.innerHTML = head + '<p class="rb-empty">Es stehen keine Rechnungen, Raten oder Einnahmen an.</p>'; return; }
+
+  const short = (t, n) => (t.length > n ? t.slice(0, n - 1) + '…' : t);
+  const lanes = [];
+  let k = 0, chips = '';
+  for (const e of list) {
+    const label = e.type === 'income' ? `${short(e.name, 14)} +${fmtCompact(e.amount)}` : `${short(e.name, 14)} ${fmtCompact(-e.amount)}`;
+    const w = 22 + label.length * 6.7;
+    const px = Math.round((e.i / DAYS) * (W - 10));
+    let left = Math.max(0, Math.min(px, W - w)), dot = false, lane = lanes.findIndex(r => r + 6 <= left);
+    if (lane < 0 && lanes.length < 3) { lane = lanes.length; lanes.push(-99); }
+    if (lane < 0) {                                      // kein Platz für den Text: nur ein Punkt
+      dot = true; left = Math.max(0, Math.min(px, W - 12));
+      lane = lanes.findIndex(r => r + 4 <= left);
+      if (lane < 0) continue;
+    }
+    lanes[lane] = left + (dot ? 12 : w);
+    const cls = e.type === 'invoice' ? 'inv' : e.type === 'prepay' ? 'pre' : e.type === 'income' ? 'inc' : '';
+    const title = `${e.name}, ${fmtWd(P.dateAt(e.i))}, ${fmtEUR(e.amount)}${e.type === 'invoice' && e.due ? `, Frist ${fmtShort(fromDayNum(e.due))}` : ''}`;
+    chips += `<span class="rb-chip ${cls}${dot ? ' dot' : ''}" style="left:${left}px;bottom:${28 + lane * LANE}px;--k:${e.type === 'invoice' ? k++ : 0}" title="${esc(title)}">${dot ? '' : esc(label)}</span>`;
+  }
+  let ticks = '';
+  for (let d = 0; d <= 28; d += 7) {
+    const px = Math.round((d / DAYS) * (W - 10));
+    ticks += `<span class="rb-tick" style="left:${px}px"></span><span class="rb-lbl${d === 0 ? ' first' : ''}" style="left:${px}px">${d === 0 ? 'heute' : esc(fmtShort(P.dateAt(d)))}</span>`;
+  }
+  host.innerHTML = head + `<div class="rb-track" style="height:${lanes.length * LANE + 34}px"><div class="rb-axis"></div>${ticks}${chips}</div>`;
+}
+
+/* =====================================================================
+   SYNCHRONISATION (Handy, Laptop) über ein privates GitHub-Repository
+   Im Repository liegt nur der bereits verschlüsselte Tresor. Passwort und
+   Token verlassen das Gerät nie. Zugriff über die GitHub-Contents-API.
+   ===================================================================== */
+const GH_API = 'https://api.github.com';
+const SYNC_FILE = 'kassensturz-tresor.json';
+
+class SyncError extends Error { constructor(kind, msg) { super(msg); this.kind = kind; } }
+
+const ghUrl = (cfg, sub) => `${GH_API}/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}${sub || ''}`;
+const ghContentsUrl = cfg => ghUrl(cfg, '/contents/' + cfg.path.split('/').map(encodeURIComponent).join('/'));
+const ghHeaders = (token, accept) => ({ Authorization: `Bearer ${token}`, Accept: accept || 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' });
+
+async function ghFetch(url, opts) {
+  try { return await fetch(url, opts); } catch (e) { throw new SyncError('offline', 'Keine Verbindung zu GitHub.'); }
+}
+async function ghCheck(res) {
+  if (res.ok) return;
+  if (res.status === 401) throw new SyncError('auth', 'Der Token ist ungültig oder abgelaufen. Erstelle einen neuen und trage ihn unter „Token erneuern“ ein.');
+  if (res.status === 403) {
+    const left = res.headers && res.headers.get ? res.headers.get('x-ratelimit-remaining') : null;
+    if (left === '0') throw new SyncError('rate', 'GitHub-Limit erreicht. Versuche es in einigen Minuten erneut.');
+    throw new SyncError('auth', 'Der Token hat keine Berechtigung. Er braucht „Contents: Read and write“ für dieses Repository.');
+  }
+  if (res.status === 404) throw new SyncError('notfound', 'Repository nicht gefunden, oder der Token hat keinen Zugriff darauf.');
+  throw new SyncError('other', `GitHub antwortet mit Fehler ${res.status}.`);
+}
+async function ghRepoInfo(cfg) {
+  const res = await ghFetch(ghUrl(cfg), { headers: ghHeaders(cfg.token), cache: 'no-store' });
+  await ghCheck(res);
+  return res.json();
+}
+/* Gibt {sha, text} zurück oder null, wenn die Datei noch nicht existiert */
+async function ghGetFile(cfg) {
+  const url = ghContentsUrl(cfg);
+  const res = await ghFetch(url, { headers: ghHeaders(cfg.token), cache: 'no-store' });
+  if (res.status === 404) return null;
+  await ghCheck(res);
+  const j = await res.json();
+  if (j.content && j.encoding === 'base64') return { sha: j.sha, text: atob(j.content.replace(/\s/g, '')) };
+  const r2 = await ghFetch(url, { headers: ghHeaders(cfg.token, 'application/vnd.github.raw+json'), cache: 'no-store' });   // Dateien über 1 MB
+  await ghCheck(r2);
+  return { sha: j.sha, text: await r2.text() };
+}
+async function ghPutFile(cfg, text, sha, message) {
+  const body = { message, content: btoa(text) };
+  if (sha) body.sha = sha;
+  const res = await ghFetch(ghContentsUrl(cfg), { method: 'PUT', headers: { ...ghHeaders(cfg.token), 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (res.status === 409 || res.status === 422) throw new SyncError('conflict', 'Gleichzeitige Änderung auf einem anderen Gerät.');
+  await ghCheck(res);
+  const j = await res.json();
+  return j.content.sha;
+}
+
+const remoteRev = text => { try { return (JSON.parse(text).meta || {}).rev || 0; } catch (e) { return 0; } };
+const syncErrorText = e => (e instanceof SyncError ? e.message : `Unerwarteter Fehler: ${e && e.message ? e.message : e}`);
+
+/* ---------- Ablaufsteuerung ---------- */
+const Sync = {
+  busy: false, again: false, timer: null, poll: null, status: 'off', message: '', last: null, reason: '', checkedAt: 0, installed: false, epoch: 0, conflicts: 0,
+  cfg() { return App.state && !App.preview ? App.state.sync : null; },
+  enabled() { return !!this.cfg(); },
+  dirty() { const c = this.cfg(); return !c || !c.base || !sameState(c.base, stripSync(App.state)); },
+  setStatus(s, msg) { this.status = s; this.message = msg || ''; refreshSyncUI(); },
+
+  install() {
+    if (this.installed) return;
+    this.installed = true;
+    document.addEventListener('visibilitychange', () => {
+      if (!this.enabled()) return;
+      if (document.hidden) { if (this.dirty()) this.run('hide'); } else if (Date.now() - this.checkedAt > 20000) this.run('focus');
+    });
+    window.addEventListener('online', () => { if (this.enabled()) this.run('online'); });
+    window.addEventListener('offline', () => { if (this.enabled()) this.setStatus('offline', 'Offline. Änderungen werden hochgeladen, sobald du wieder online bist.'); });
+  },
+  start() {
+    this.epoch++; clearTimeout(this.timer); clearInterval(this.poll); this.poll = null;
+    if (!this.enabled()) { this.setStatus('off'); return; }
+    this.poll = setInterval(() => { if (!document.hidden && this.enabled() && !this.busy) this.run('poll'); }, 120000);
+    this.checkedAt = 0;
+    this.run('unlock');
+  },
+  stop() { this.epoch++; clearTimeout(this.timer); clearInterval(this.poll); this.poll = null; this.setStatus('off'); },
+  schedule(ms) {
+    if (!this.enabled()) return;
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => this.run('auto'), ms == null ? 1500 : ms);
+  },
+
+  /* true bei Erfolg, false bei Fehler */
+  async run(reason) {
+    if (!this.enabled()) return false;
+    if (this.busy) { this.again = true; return false; }
+    this.busy = true; this.reason = reason; this.conflicts = 0;
+    const epoch = this.epoch;
+    this.setStatus('syncing');
+    let okay = false;
+    try {
+      const r = await this.cycle(epoch);
+      this.last = new Date(); this.checkedAt = Date.now(); okay = true;
+      this.setStatus('ok');
+      if (reason === 'manual') {
+        toast(r === 'uptodate' ? 'Alles auf dem neuesten Stand.' : r === 'pulled' ? 'Änderungen vom anderen Gerät übernommen.'
+          : r === 'merged' ? `Änderungen zusammengeführt${this.conflicts ? ` (${this.conflicts} Widerspruch: deine Änderung gilt)` : ''}.` : 'Synchronisiert.');
+      } else if (r === 'pulled' || r === 'merged') toast('Änderungen vom anderen Gerät übernommen');
+    } catch (e) {
+      if (e.kind !== 'stopped') this.handleError(e, reason);
+    } finally {
+      this.busy = false;
+      if (this.again && this.enabled()) { this.again = false; this.schedule(400); }
+    }
+    return okay;
+  },
+  handleError(e, reason) {
+    const msg = syncErrorText(e);
+    if (e.kind === 'offline') this.setStatus('offline', 'Offline. Änderungen werden hochgeladen, sobald du wieder online bist.');
+    else if (e.kind === 'password') this.setStatus('password', msg);
+    else { this.setStatus('error', msg); if (e.kind === 'conflict') this.schedule(5000); }
+    if (reason === 'manual' && e.kind !== 'offline') toast(msg, 'bad');
+  },
+
+  async seal(state, rev) {
+    const rec = await sealRecord(state, App.key, App.salt, App.iter);
+    rec.meta = { rev, at: new Date().toISOString() };
+    return JSON.stringify(rec);
+  },
+  /* Entschlüsselt den Stand aus dem Repository. Bei geändertem Passwort wird das neue Passwort erfragt. */
+  async openRemote(rec) {
+    checkRecord(rec);
+    if (rec.salt === b64(App.salt) && rec.iter === App.iter) return this.decryptSameKey(rec);
+    if (this.reason !== 'manual' && Modal.el.hasAttribute('open')) throw new SyncError('password', 'Das Passwort wurde auf einem anderen Gerät geändert. Tippe unter „Einstellungen“ auf „Jetzt synchronisieren“ und gib das neue Passwort ein.');
+    const r = await askRemotePassword(rec, '<p>Das Passwort wurde auf einem anderen Gerät geändert. Gib das <b>neue</b> Passwort ein, um weiter zu synchronisieren.</p>');
+    if (!r) throw new SyncError('password', 'Das Passwort wurde auf einem anderen Gerät geändert. Gib das neue Passwort ein, um weiter zu synchronisieren.');
+    App.key = r.key; App.salt = r.salt; App.iter = r.iter;
+    return r.state;
+  },
+  async decryptSameKey(rec) {
+    try {
+      const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(rec.iv), additionalData: AAD }, App.key, unb64(rec.ct));
+      return normalizeState(JSON.parse(dec.decode(plain)));
+    } catch (e) { throw new SyncError('decrypt', 'Der Tresor im Repository lässt sich nicht entschlüsseln. Die Datei ist beschädigt oder stammt aus einem anderen Tresor.'); }
+  },
+  applyMerged(merged) {
+    const sync = App.state.sync;
+    Object.assign(App.state, merged);
+    App.state.sync = sync;
+    App.plan = null; persist(); render();
+  },
+  markSynced(sha, snap, rev) {
+    const c = App.state.sync;
+    c.prev = [c.sha, ...(c.prev || [])].filter(Boolean).slice(0, 6);
+    c.sha = sha; c.base = cloneJSON(snap); c.rev = rev; c.last = new Date().toISOString();
+    persist();
+  },
+
+  /* Ein Abgleich: holen, zusammenführen, hochladen. Wiederholt sich bei gleichzeitigen Änderungen. */
+  async cycle(epoch) {
+    const alive = () => { if (epoch !== this.epoch || !App.state || !App.state.sync) throw new SyncError('stopped', ''); };
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const cfg = App.state.sync;
+      const remote = await ghGetFile(cfg); alive();
+
+      if (!remote || cfg.pwChanged) {                       // Datei fehlt oder Passwort wurde hier geändert: lokalen Stand hochladen
+        const snap = stripSync(App.state), rev = remote ? remoteRev(remote.text) : 0;
+        try {
+          const sha = await ghPutFile(cfg, await this.seal(snap, rev + 1), remote ? remote.sha : null, remote ? 'Kassensturz: Passwort geändert' : 'Kassensturz: Tresor angelegt'); alive();
+          cfg.pwChanged = false; this.markSynced(sha, snap, rev + 1); return 'pushed';
+        } catch (e) { if (e.kind === 'conflict') continue; throw e; }
+      }
+
+      /* Veralteter Lesestand direkt nach einem eigenen Upload: nicht übernehmen, sonst würde lokale Arbeit überschrieben */
+      if (remote.sha !== cfg.sha && (cfg.prev || []).includes(remote.sha)) { this.schedule(6000); return 'uptodate'; }
+
+      let rec;
+      try { rec = JSON.parse(remote.text); } catch (e) { throw new SyncError('decrypt', 'Die Datei im Repository ist kein gültiger Tresor.'); }
+      const rev = (rec.meta || {}).rev || 0;
+
+      if (remote.sha === cfg.sha && cfg.base) {             // Repository unverändert: nur hochladen, falls hier etwas geändert wurde
+        const snap = stripSync(App.state);
+        if (sameState(cfg.base, snap)) return 'uptodate';
+        try {
+          const sha = await ghPutFile(cfg, await this.seal(snap, rev + 1), remote.sha, 'Kassensturz: Änderungen'); alive();
+          this.markSynced(sha, snap, rev + 1); return 'pushed';
+        } catch (e) { if (e.kind === 'conflict') continue; throw e; }
+      }
+
+      const remoteState = stripSync(await this.openRemote(rec)); alive();
+      const localSnap = stripSync(App.state);               // direkt vor dem Zusammenführen, ohne Pause dazwischen
+      const { merged, conflicts } = merge3State(cfg.base || null, localSnap, remoteState);
+      const changedLocal = !sameState(merged, localSnap);
+      if (changedLocal) this.applyMerged(merged);
+      if (sameState(merged, remoteState)) { this.markSynced(remote.sha, merged, rev); return changedLocal ? 'pulled' : 'uptodate'; }
+      try {
+        const sha = await ghPutFile(App.state.sync, await this.seal(merged, rev + 1), remote.sha, 'Kassensturz: Änderungen zusammengeführt'); alive();
+        this.markSynced(sha, merged, rev + 1); this.conflicts = conflicts; return changedLocal ? 'merged' : 'pushed';
+      } catch (e) { if (e.kind === 'conflict') continue; throw e; }
+    }
+    throw new SyncError('conflict', 'Mehrere Geräte schreiben gleichzeitig. Es wird gleich erneut versucht.');
+  },
+};
+
+/* ---------- Oberfläche ---------- */
+const SYNC_SHORT = { off: '', idle: 'Verbunden', syncing: 'Synchronisiere …', ok: 'Synchronisiert', offline: 'Offline', error: 'Sync-Fehler', password: 'Passwort nötig' };
+const syncDot = () => ({ ok: 'ok', syncing: 'busy', offline: 'busy', error: 'bad', password: 'bad' }[Sync.status] || '');
+
+function syncStatusHTML() {
+  const c = App.state && App.state.sync;
+  if (!c) return '';
+  const last = c.last ? `Zuletzt abgeglichen ${fmtStamp(c.last)}.` : 'Noch nicht abgeglichen.';
+  const dirty = Sync.dirty() && Sync.status !== 'syncing' ? ' Lokale Änderungen warten auf den Upload.' : '';
+  const text = Sync.status === 'error' || Sync.status === 'password' || Sync.status === 'offline' ? Sync.message : (Sync.status === 'syncing' ? 'Synchronisiere …' : `${SYNC_SHORT[Sync.status] || 'Verbunden'}. ${last}`);
+  return `<span class="sd ${syncDot()}"></span><span>${esc(text)}${esc(Sync.status === 'ok' || Sync.status === 'idle' ? dirty : '')}</span>`;
+}
+
+function refreshSyncUI() {
+  const chip = document.getElementById('syncChip');
+  const on = Sync.enabled();
+  if (chip) {
+    chip.hidden = !on;
+    if (on) { chip.querySelector('.sd').className = 'sd ' + syncDot(); chip.querySelector('.sync-t').textContent = SYNC_SHORT[Sync.status] || 'Verbunden'; }
+  }
+  const st = document.getElementById('syncStatus');
+  if (st) st.innerHTML = syncStatusHTML();
+}
+
+function syncWarning() {
+  if (!Sync.enabled()) return null;
+  if (Sync.status === 'error' || Sync.status === 'password') return { level: 'warn', tab: 'settings', title: 'Synchronisation', text: Sync.message };
+  return null;
+}
+
+function syncPanel() {
+  const c = App.state.sync;
+  if (!c) {
+    return `<section class="panel"><div class="panel-h"><h2>Synchronisation</h2></div>
+    <p class="lead">Handy und Laptop abgleichen. Der verschlüsselte Tresor liegt dafür in einem privaten GitHub-Repository. GitHub sieht nur Chiffretext, dein Passwort und der Zugriffstoken verlassen das Gerät nie.</p>
+    <ol class="steps">
+      <li>Lege auf GitHub ein <b>privates</b> Repository an, z. B. <code>kassensturz-daten</code>.</li>
+      <li>Erstelle einen Zugriffstoken: GitHub → Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> → Generate new token. Bei „Repository access“ wählst du <b>Only select repositories</b> und dein Daten-Repository, bei „Permissions“ → „Repository permissions“ den Eintrag <b>Contents: Read and write</b>. Wähle einen Ablauf, z. B. ein Jahr.</li>
+      <li>Verbinde dieses Gerät hier. Auf dem zweiten Gerät wählst du beim Start „Tresor aus GitHub laden“.</li>
+    </ol>
+    <div class="row-actions"><button class="btn primary" data-act="syncConnect">Mit GitHub verbinden</button></div></section>`;
+  }
+  return `<section class="panel"><div class="panel-h"><h2>Synchronisation</h2></div>
+    <p>Verbunden mit <b>${esc(c.owner)}/${esc(c.repo)}</b>, Datei <code>${esc(c.path)}</code>.</p>
+    <div id="syncStatus" class="syncstat">${syncStatusHTML()}</div>
+    <div class="row-actions"><button class="btn primary" data-act="syncNow">Jetzt synchronisieren</button><button class="btn" data-act="syncToken">Token erneuern</button><button class="btn" data-act="syncDisconnect">Verbindung trennen</button></div>
+    <p class="fine muted tbl-note">Änderungen werden automatisch hochgeladen und beim Öffnen, Zurückkehren in die App und alle paar Minuten abgeholt. Ändern beide Geräte zwischendurch etwas, führt die App die Änderungen eintragsweise zusammen. Bearbeiten auf einem Gerät und Löschen auf dem anderen: die Bearbeitung bleibt. Der Token liegt nur in deinem verschlüsselten Tresor und steht weder im Repository noch in Backups.</p></section>`;
+}
+
+/* ---------- Formulare ---------- */
+function syncCfgFrom(x) {
+  return { owner: String(x.owner || '').trim(), repo: String(x.repo || '').trim().replace(/\.git$/, ''), path: String(x.path || SYNC_FILE).trim() || SYNC_FILE, token: String(x.token || '').trim() };
+}
+function syncValidateCfg(c) {
+  if (!/^[A-Za-z0-9-]+$/.test(c.owner)) return 'Bitte deinen GitHub-Benutzernamen eingeben (nur Buchstaben, Ziffern, Bindestrich).';
+  if (!/^[A-Za-z0-9._-]+$/.test(c.repo)) return 'Bitte den Namen des Repositorys eingeben.';
+  if (!c.token) return 'Bitte den Zugriffstoken einfügen.';
+  if (/^\/|\.\.|\/\//.test(c.path)) return 'Der Dateiname ist ungültig.';
+  return null;
+}
+async function syncCheckRepo(cfg) {
+  const info = await ghRepoInfo(cfg);
+  if (info.private === false) throw new SyncError('public', 'Dieses Repository ist öffentlich. Dein Tresor ist verschlüsselt, aber lege bitte ein privates Repository an, damit nichts davon öffentlich sichtbar ist.');
+}
+const syncFields = (renew) => [
+  { key: 'owner', label: 'GitHub-Benutzername', type: 'text', half: true, required: true, disabled: renew, placeholder: 'dein-name' },
+  { key: 'repo', label: 'Repository (privat)', type: 'text', half: true, required: true, disabled: renew, placeholder: 'kassensturz-daten' },
+  { key: 'token', label: 'Zugriffstoken', type: 'password', required: true, hint: 'Fine-grained Token mit „Contents: Read and write“, nur für dieses Repository.' },
+  { key: 'path', label: 'Dateiname im Repository', type: 'text', disabled: renew },
+];
+
+function askRemotePassword(rec, intro) {
+  return new Promise(resolve => {
+    let done = false;
+    openForm({
+      title: 'Passwort bestätigen', submit: 'Weiter', intro,
+      fields: [{ key: 'pw', label: 'Passwort', type: 'password', auto: 'current-password', required: true }],
+      onSubmit: async x => { try { const r = await openRecord(rec, x.pw); done = true; resolve(r); return null; } catch (e) { return e.message; } },
+    });
+    Modal.onCancel = () => { if (!done) resolve(null); };
+  });
+}
+
+function setSyncCfg(cfg, sha, snap, rev) {
+  App.state.sync = { ...cfg, sha, prev: [], base: cloneJSON(snap), rev, last: new Date().toISOString() };
+}
+
+function syncConnectForm(existing) {
+  const renew = !!existing;
+  openForm({
+    title: renew ? 'Token erneuern' : 'Mit GitHub verbinden',
+    intro: renew ? '<p>Trage den neuen Zugriffstoken ein. Repository und Datei bleiben gleich.</p>' : '<p>Das Repository muss <b>privat</b> sein. Im Repository liegt nur die verschlüsselte Tresor-Datei.</p>',
+    values: renew ? { owner: existing.owner, repo: existing.repo, path: existing.path, token: '' } : { owner: '', repo: '', path: SYNC_FILE, token: '' },
+    fields: syncFields(renew),
+    onSubmit: async x => {
+      const cfg = syncCfgFrom(x), bad = syncValidateCfg(cfg);
+      if (bad) return bad;
+      let remote;
+      try { await syncCheckRepo(cfg); remote = await ghGetFile(cfg); } catch (e) { return syncErrorText(e); }
+      if (renew) {
+        App.state.sync.token = cfg.token; persist(); Sync.setStatus('idle'); Sync.run('manual');
+        toast('Token gespeichert'); return null;
+      }
+      if (!remote) {
+        const snap = stripSync(App.state);
+        const sha = await ghPutFile(cfg, await Sync.seal(snap, 1), null, 'Kassensturz: Tresor angelegt');
+        setSyncCfg(cfg, sha, snap, 1);
+        persist(); render(); Sync.start();
+        toast('Verbunden. Dein verschlüsselter Tresor liegt jetzt im Repository.');
+        return null;
+      }
+      setTimeout(() => syncChoiceForm(cfg, remote), 30);
+      return null;
+    },
+  });
+}
+
+function syncChoiceForm(cfg, remote) {
+  openForm({
+    title: 'Im Repository liegt schon ein Tresor', submit: 'Weiter',
+    intro: '<p>Was soll mit dem vorhandenen Tresor geschehen? Sichere vorher bei Bedarf ein Backup.</p>',
+    values: { mode: 'merge', pw: '' },
+    fields: [
+      { key: 'mode', label: 'Vorgehen', type: 'select', options: [
+        ['merge', 'Zusammenführen: Daten beider Seiten vereinen (wenn der Tresor von diesem Gerät stammt)'],
+        ['load', 'Vorhandenen Tresor laden: die Daten auf diesem Gerät werden ersetzt'],
+        ['push', 'Diesen Tresor hochladen: der Tresor im Repository wird überschrieben'],
+      ] },
+      { key: 'pw', label: 'Passwort des Tresors im Repository', type: 'password', hint: 'Nur nötig, wenn der Tresor im Repository ein anderes Passwort hat (Laden, Zusammenführen).' },
+    ],
+    onSubmit: async x => {
+      let rec;
+      try { rec = JSON.parse(remote.text); checkRecord(rec); } catch (e) { return 'Die Datei im Repository ist kein gültiger Tresor.'; }
+      const rev = remoteRev(remote.text);
+      if (x.mode === 'push') {
+        const snap = stripSync(App.state);
+        const sha = await ghPutFile(cfg, await Sync.seal(snap, rev + 1), remote.sha, 'Kassensturz: Tresor überschrieben');
+        setSyncCfg(cfg, sha, snap, rev + 1); persist(); render(); Sync.start(); toast('Verbunden. Der Tresor im Repository wurde ersetzt.');
+        return null;
+      }
+      const sameKey = rec.salt === b64(App.salt) && rec.iter === App.iter;
+      let remoteState;
+      if (sameKey) remoteState = await Sync.decryptSameKey(rec);
+      else {
+        if (!x.pw) return 'Bitte das Passwort des Tresors im Repository eingeben.';
+        const r = await openRecord(rec, x.pw);
+        App.key = r.key; App.salt = r.salt; App.iter = r.iter; remoteState = r.state;
+      }
+      if (x.mode === 'load') {
+        App.state = remoteState; App.plan = null;
+        setSyncCfg(cfg, remote.sha, stripSync(App.state), rev);
+        await persist(); render(); Sync.start(); toast('Tresor aus dem Repository geladen und verbunden.');
+        return null;
+      }
+      const { merged } = merge3State(null, stripSync(App.state), stripSync(remoteState));
+      const sync = App.state.sync; Object.assign(App.state, merged); App.state.sync = sync; App.plan = null;
+      const sha = await ghPutFile(cfg, await Sync.seal(merged, rev + 1), remote.sha, 'Kassensturz: Tresore zusammengeführt');
+      setSyncCfg(cfg, sha, merged, rev + 1); persist(); render(); Sync.start(); toast('Verbunden. Die Daten beider Seiten wurden zusammengeführt.');
+      return null;
+    },
+  });
+}
+
+/* Zweites Gerät: Tresor aus dem Repository laden (vom Sperrbildschirm aus) */
+function syncLoadForm() {
+  const has = !!Store.get();
+  openForm({
+    title: 'Tresor aus GitHub laden', submit: 'Laden und entsperren',
+    intro: `<p>Für ein zweites Gerät: Hier holst du den verschlüsselten Tresor aus deinem privaten Repository.${has ? ' <b>Ein vorhandener Tresor auf diesem Gerät wird dabei ersetzt.</b>' : ''}</p>`,
+    values: { owner: '', repo: '', path: SYNC_FILE, token: '', pw: '' },
+    fields: [...syncFields(false), { key: 'pw', label: 'Passwort deines Tresors', type: 'password', auto: 'current-password', required: true }],
+    onSubmit: async x => {
+      const cfg = syncCfgFrom(x), bad = syncValidateCfg(cfg);
+      if (bad) return bad;
+      let remote;
+      try { await syncCheckRepo(cfg); remote = await ghGetFile(cfg); } catch (e) { return syncErrorText(e); }
+      if (!remote) return 'Im Repository wurde keine Tresor-Datei gefunden. Prüfe Repository und Dateiname.';
+      let rec;
+      try { rec = JSON.parse(remote.text); } catch (e) { return 'Die Datei im Repository ist kein gültiger Tresor.'; }
+      if (!x.pw) return 'Bitte das Passwort deines Tresors eingeben.';
+      const r = await openRecord(rec, x.pw);
+      Object.assign(App, { state: r.state, key: r.key, salt: r.salt, iter: r.iter, plan: null, tab: 'home', preview: false });
+      setSyncCfg(cfg, remote.sha, stripSync(App.state), remoteRev(remote.text));
+      await persist(); armIdle(); render(); Sync.start();
+      toast('Tresor geladen und verbunden');
+      return null;
+    },
+  });
+}
+
+Object.assign(Actions, {
+  syncConnect() { if (App.preview) return toast('Im Vorschau-Modus gibt es keine Synchronisation.'); syncConnectForm(null); },
+  syncLoad() { if (App.preview) return toast('Im Vorschau-Modus gibt es keine Synchronisation.'); syncLoadForm(); },
+  syncToken() { if (App.state && App.state.sync) syncConnectForm(App.state.sync); },
+  syncNow() { if (Sync.enabled()) Sync.run('manual'); },
+  async syncDisconnect() {
+    const r = await askConfirm({ title: 'Verbindung trennen?', text: 'Dieses Gerät gleicht danach nicht mehr ab. Deine Daten hier und die Datei im Repository bleiben unverändert. Der Token wird von diesem Gerät entfernt.', ok: 'Trennen', danger: true });
+    if (!r.ok) return;
+    App.state.sync = null; Sync.stop(); persist(); render(); toast('Verbindung getrennt');
   },
 });
 
