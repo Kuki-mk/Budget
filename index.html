@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-ClOeVxWb7hp6q3gn9CQD2aTeINTSq+SDWdN+7ncsy2I='; style-src 'unsafe-inline'; img-src data:; connect-src https://api.github.com; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-vSJvJfpCR3715dxP1qbIV2EnbT234VrEDTvj5WHjSgk='; style-src 'unsafe-inline'; img-src data:; connect-src https://api.github.com; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="referrer" content="no-referrer">
 <meta name="color-scheme" content="light dark">
@@ -188,6 +188,7 @@ button.kpi:hover::after { transform: scaleX(1); }
 .v-main > * { margin: 0; }
 .v-sub { margin-top: 6px; color: var(--h-muted); font-size: 13.5px; }
 .range { display: flex; gap: 6px; margin: 4px 0 4px; flex-wrap: wrap; }
+.range .sep { width: 1px; align-self: stretch; margin: 3px 4px; background: var(--h-line); }
 .hero .chip-btn { border-color: var(--h-line); color: var(--h-muted); }
 .hero .chip-btn:hover { color: var(--h-ink); border-color: var(--h-muted); }
 .hero .chip-btn.on { background: var(--h-ink); color: var(--hero); border-color: var(--h-ink); }
@@ -287,6 +288,7 @@ button.kpi:hover::after { transform: scaleX(1); }
 .tl .ev.prepay { --ec: var(--accent); }
 .tl .ev.oma_out { --ec: var(--c2); }
 .tl .ev.expense { --ec: var(--line); }
+.tl .ev.flex { --ec: var(--c4); }
 
 .item { display: flex; justify-content: space-between; gap: 18px; padding: 16px 0; border-top: 1px solid var(--line-2); }
 .item:first-child { border-top: 0; }
@@ -737,6 +739,7 @@ const DEFAULT_SETTINGS = {
   horizonMonths: 24,    // Planungshorizont
   lockMinutes: 10,      // automatische Sperre
   trackStart: '2026-11-01', // Erfassungsstart: Buchungen und Oma-Vorgänge ab diesem Datum
+  budgetMode: 'start',  // Budgets in der Prognose: 'start' = Monatsbetrag zum Monatsanfang reservieren, 'end' = am Monatsende, 'daily' = gleichmäßig auf die Tage
 };
 
 /* Ratenplan grob durchrechnen (für Formular-Vorschau und Anzeigen) */
@@ -897,13 +900,17 @@ function buildContext(state, today) {
     });
   }
 
-  /* Flexible Ausgaben: aktuelles Monatsrest-Budget bzw. volles Monatsbudget gleichmäßig auf die Tage verteilen */
+  /* Flexible Ausgaben (Budgets) werden als Monatsbetrag gerechnet.
+     'start': der Betrag wird zum Monatsanfang eingeplant (im laufenden Monat der noch nicht ausgegebene Rest heute),
+     'end': zum Monatsende, 'daily': gleichmäßig auf alle Tage des Monats verteilt. */
   const budgets = state.budgets || [];
   if (budgets.length) {
+    const mode = ['start', 'end', 'daily'].includes(s.budgetMode) ? s.budgetMode : 'start';
     const tracking = trackStarted(state, today), ts = trackStartOf(state), curKey = today.slice(0, 7);
     const { y: cy, m: cm, d: cd } = parseISO(today);
     const curDim = dim(cy, cm), daysLeft = curDim - cd + 1;
-    const perDay = new Array(n).fill(0);
+    const perDay = new Array(n).fill(0), lumps = [];
+    let curRemaining = 0;
     for (const b of budgets) {
       const amt = budgetAmount(b, curKey);
       let remaining;
@@ -912,18 +919,31 @@ function buildContext(state, today) {
         if (ts.slice(0, 7) === curKey) eff = amt * (curDim - parseISO(ts).d + 1) / curDim;
         remaining = Math.max(0, eff - budgetSpent(state, b, curKey));
       } else remaining = amt * daysLeft / curDim;
-      for (let k = 0; k < daysLeft && k < n; k++) perDay[k] += remaining / daysLeft;
+      curRemaining += remaining;
+      if (mode === 'daily') for (let k = 0; k < daysLeft && k < n; k++) perDay[k] += remaining / daysLeft;
+    }
+    if (mode !== 'daily') {
+      const idx = mode === 'start' ? 0 : daysLeft - 1;
+      if (curRemaining > 0.0001 && idx < n) lumps.push({ i: idx, amount: curRemaining, label: `Budgets ${fmtMonthKey(curKey)} (Rest)` });
     }
     let i = daysLeft;
     while (i < n) {
       const date = fromDayNum(d0 + i), { y, m, d } = parseISO(date), mk = date.slice(0, 7), dm = dim(y, m);
       const len = Math.min(dm - d + 1, n - i);
-      let daily = 0;
-      for (const b of budgets) daily += budgetAmount(b, mk) / dm;
-      for (let k = 0; k < len; k++) perDay[i + k] += daily;
+      if (mode === 'daily') {
+        let daily = 0;
+        for (const b of budgets) daily += budgetAmount(b, mk) / dm;
+        for (let k = 0; k < len; k++) perDay[i + k] += daily;
+      } else {
+        let total = 0;
+        for (const b of budgets) total += budgetAmount(b, mk);
+        const fullMonth = d === 1 && len === dm;
+        if (total > 0.0001 && (mode === 'start' || fullMonth)) lumps.push({ i: mode === 'start' ? i : i + len - 1, amount: total, label: `Budgets ${fmtMonthKey(mk)}` });
+      }
       i += len;
     }
     for (let k = 0; k < n; k++) if (perDay[k] > 0.0001) add(d0 + k, { name: 'Flexible Ausgaben', amount: -perDay[k], type: 'flex', cat: 'Flexibel' });
+    for (const l of lumps) add(d0 + l.i, { name: l.label, amount: -l.amount, type: 'flex', cat: 'Flexibel', lump: true });
   }
 
   /* Oma: geplante Zahlungsschritte über dein Konto + Geld von Oma, das schon auf dem Konto liegt */
@@ -956,7 +976,7 @@ function stepDay(S, ctx, i, log) {
   if (evs) {
     for (const e of evs) {
       S.bal += e.amount;
-      if (log) log.push({ i, t, name: e.name, amount: e.amount, type: e.type, cat: e.cat, provider: e.provider || '' });
+      if (log) log.push({ i, t, name: e.name, amount: e.amount, type: e.type, cat: e.cat, provider: e.provider || '', lump: !!e.lump });
     }
   }
   for (const d of S.debts) {
@@ -1649,11 +1669,11 @@ function drawLineChart(host, cfg) {
   let xt = '', lastX = -999;
   for (let i = 0; i < n; i++) {
     const d = cfg.dateAt(i);
-    if (i === 0 || d.endsWith('-01')) {
+    if (cfg.xDays ? i % 7 === 0 : (i === 0 || d.endsWith('-01'))) {
       const px = x(i);
       if (px - lastX < 62) continue;
       lastX = px;
-      const label = i === 0 ? 'heute' : fmtMonthKey(d.slice(0, 7));
+      const label = i === 0 ? (cfg.firstLabel || 'heute') : (cfg.xDays ? fmtShort(d) : fmtMonthKey(d.slice(0, 7)));
       xt += `<text class="ax" x="${px.toFixed(1)}" y="${H - 7}" text-anchor="${i === 0 ? 'start' : 'middle'}">${esc(label)}</text>`;
     }
   }
@@ -1709,21 +1729,36 @@ function drawLineChart(host, cfg) {
   svg.addEventListener('pointerleave', hide);
 }
 
+/* Zeitfenster des Filters in der Übersicht: „Dieser Monat“, „Nächster Monat“ oder 3 bis 24 Monate ab heute.
+   c = Diagramm, r = Frist-Leiste, l = Liste „Als Nächstes“ (jeweils Tagesindex ab heute). */
+function rangeWindow(P) {
+  const d0 = P.ctx.d0, n = P.ctx.n, { y, m } = parseISO(P.today), r = App.range;
+  const eom = (yy, mm) => dayNum(iso(yy, mm, dim(yy, mm))) - d0;
+  const win = (i0, i1, mode, key) => { i0 = Math.min(i0, n - 2); i1 = Math.min(n - 1, Math.max(i1, i0 + 1)); return { mode, key, c0: i0, c1: i1, r0: i0, r1: i1, l0: i0, l1: i1 }; };
+  if (r === 'cur') return win(0, eom(y, m), 'cur', P.today.slice(0, 7));
+  if (r === 'next') {
+    const [ny, nm] = m === 12 ? [y + 1, 1] : [y, m + 1];
+    return win(dayNum(iso(ny, nm, 1)) - d0, eom(ny, nm), 'next', iso(ny, nm, 1).slice(0, 7));
+  }
+  const months = Number(r) || 12;
+  return { mode: 'range', key: null, c0: 0, c1: Math.min(n - 1, dayNum(addMonths(P.today, months)) - d0), r0: 0, r1: Math.min(30, n - 1), l0: 0, l1: 21 };
+}
+
 function drawCharts() {
   const P = getPlan();
   $$('[data-ribbon]').forEach(h => drawRibbon(h, P));
   $$('[data-chart]').forEach(host => {
     const kind = host.dataset.chart;
     if (kind === 'balance') {
-      const months = App.range;
-      const nn = Math.min(P.ctx.n, dayNum(addMonths(P.today, months)) - P.ctx.d0 + 1);
-      const markers = P.opt.log.filter(e => e.i < nn && (e.type === 'invoice' || e.type === 'prepay'))
-        .map(e => ({ i: e.i, cls: e.type === 'invoice' ? 'inv' : 'pre', title: `${e.name}: ${fmtEUR(-e.amount)}` }));
+      const W = rangeWindow(P), i0 = W.c0, i1 = W.c1, nn = i1 - i0 + 1;
+      const markers = P.opt.log.filter(e => e.i >= i0 && e.i <= i1 && (e.type === 'invoice' || e.type === 'prepay'))
+        .map(e => ({ i: e.i - i0, cls: e.type === 'invoice' ? 'inv' : 'pre', title: `${e.name}: ${fmtEUR(-e.amount)}` }));
       drawLineChart(host, {
-        n: nn, height: 270, label: 'Kontostand-Prognose', dateAt: P.dateAt, buffer: P.ctx.settings.buffer,
-        series: [{ name: 'Kontostand', values: P.opt.days, cls: 'pri', area: true }, ...(P.reserveMax > 0.005 ? [{ name: 'Eigenes Geld', values: P.opt.own, cls: 'ref', dash: true }] : [])],
+        n: nn, height: 270, label: 'Kontostand-Prognose', dateAt: i => P.dateAt(i + i0), buffer: P.ctx.settings.buffer,
+        xDays: W.mode !== 'range', firstLabel: i0 === 0 ? 'heute' : fmtShort(P.dateAt(i0)),
+        series: [{ name: 'Kontostand', values: P.opt.days.slice(i0, i1 + 1), cls: 'pri', area: true }, ...(P.reserveMax > 0.005 ? [{ name: 'Eigenes Geld', values: P.opt.own.slice(i0, i1 + 1), cls: 'ref', dash: true }] : [])],
         markers,
-        eventsAt: i => P.opt.log.filter(e => e.i === i && e.amount !== 0).map(e => `${e.type === 'prepay' ? 'Sondertilgung: ' : ''}${e.name} ${fmtEUR(e.amount)}`),
+        eventsAt: i => P.opt.log.filter(e => e.i === i + i0 && e.amount !== 0).map(e => `${e.type === 'prepay' ? 'Sondertilgung: ' : ''}${e.name} ${fmtEUR(e.amount)}`),
       });
     } else if (kind === 'debt') {
       drawLineChart(host, {
@@ -1744,14 +1779,15 @@ function drawCharts() {
 const TYPE_ORDER = { income: 0, oma_in: 0, invoice: 1, rate: 2, prepay: 3, oma_out: 3, expense: 4, flex: 5 };
 
 function tagFor(e, inPlan) {
+  if (e.type === 'flex') return '<span class="tag">Budget</span>';
   if (e.type === 'invoice') return e.overdue ? '<span class="stamp">Überfällig</span>' : `<span class="mark">Frist ${esc(fmtShort(fromDayNum(e.due)))}</span>`;
   if (e.type === 'rate') return e.overdue ? '<span class="stamp">Überfällig</span>' : (inPlan ? '' : '<span class="tag">Rate</span>');
   if (e.type === 'prepay') return inPlan ? '' : '<span class="tag acc">Sondertilgung</span>';
   return '';
 }
 
-function eventRows(P, days) {
-  const list = P.opt.log.filter(e => e.i <= days && e.amount !== 0 && e.type !== 'flex')
+function eventRows(P, l0, l1) {
+  const list = P.opt.log.filter(e => e.i >= l0 && e.i <= l1 && e.amount !== 0 && (e.type !== 'flex' || e.lump))
     .sort((a, b) => a.t - b.t || TYPE_ORDER[a.type] - TYPE_ORDER[b.type]);
   if (!list.length) return '<p class="empty">In diesem Zeitraum stehen keine Buchungen an.</p>';
   const groups = new Map();
@@ -1832,7 +1868,7 @@ function viewHome() {
       </div>
       ${empty ? '' : verdictHTML(P)}
     </div>
-    ${empty ? '' : `<div class="range" role="group" aria-label="Zeitraum">${[3, 6, 12, 24].filter(m => m <= s.horizonMonths).map(m => `<button class="chip-btn ${App.range === m ? 'on' : ''}" data-act="range" data-m="${m}">${m} Monate</button>`).join('')}</div>
+    ${empty ? '' : `<div class="range" role="group" aria-label="Zeitraum">${[['cur', 'Dieser Monat'], ['next', 'Nächster Monat']].map(([k, l]) => `<button class="chip-btn ${App.range === k ? 'on' : ''}" data-act="range" data-m="${k}">${l}</button>`).join('')}<span class="sep" aria-hidden="true"></span>${[3, 6, 12, 24].filter(m => m <= s.horizonMonths).map(m => `<button class="chip-btn ${App.range === m ? 'on' : ''}" data-act="range" data-m="${m}">${m} Monate</button>`).join('')}</div>
     <div class="chart" data-chart="balance"></div>
     <p class="legend"><span><i class="lg inv"></i>Rechnung wird bezahlt</span><span><i class="lg pre"></i>Sondertilgung</span><span><i class="lg buf"></i>Sicherheitspuffer</span>${P.reserveMax > 0.005 ? '<span><i class="lg ref"></i>Eigenes Geld (ohne Omas Anteil)</span>' : ''}</p>
     <div class="ribbon" data-ribbon></div>`}
@@ -1851,6 +1887,8 @@ function viewHome() {
     </section>`;
   }
 
+  const win = rangeWindow(P);
+  const listTitle = win.mode === 'cur' ? ['Dieser Monat', `bis ${fmtDate(P.dateAt(win.l1))}`] : win.mode === 'next' ? ['Nächster Monat', monthLabel(win.key)] : ['Als Nächstes', '21 Tage'];
   const m = min30(P);
   const free = (P.opt.own[0] != null ? P.opt.own[0] : s.balance) - s.buffer;
   const kpis = `<div class="strip">
@@ -1864,7 +1902,7 @@ function viewHome() {
   ${hero}
   ${kpis}
   <div class="cols home">
-    <section class="panel"><div class="panel-h"><h2>Als Nächstes</h2><span class="muted">21 Tage</span></div>${eventRows(P, 21)}</section>
+    <section class="panel"><div class="panel-h"><h2>${esc(listTitle[0])}</h2><span class="muted">${esc(listTitle[1])}</span></div>${eventRows(P, win.l0, win.l1)}</section>
     <div class="stack side">
       <section class="panel"><div class="panel-h"><h2>Hinweise</h2></div>${warningList(P)}</section>
       ${budgetHomePanel()}
@@ -2027,7 +2065,7 @@ function viewPlan() {
       <li><b>Nie früher zahlen als nötig.</b> Rechnungen von PayPal, Klarna und Händlern kosten bis zur Frist nichts. Das Geld bleibt bis dahin auf deinem Konto und kann für teurere Schulden genutzt werden.</li>
       <li><b>Freies Geld geht in die teuerste Rate.</b> Frei ist nur, was nach allen Fixkosten, Raten und Rechnungen der kommenden ${s.horizonMonths} Monate über deinem Sicherheitspuffer von ${esc(fmtEUR(s.buffer))} bleibt. Zuerst wird die Rate mit dem höchsten Zinssatz getilgt, bei Gleichstand die kleinere Restschuld.</li>
       <li><b>Zinsfreie Raten laufen planmäßig.</b> Eine Sondertilgung spart hier nichts, dein Geld bleibt flexibel.</li>
-      <li><b>Flexible Ausgaben sind fest eingeplant.</b> Monatsbudgets für Einkauf, Shopping und Freizeit werden gleichmäßig auf die Tage verteilt, im laufenden Monat nur der noch nicht ausgegebene Rest. Freies Geld ist, was danach noch übrig bleibt.</li>
+      <li><b>Flexible Ausgaben sind fest eingeplant.</b> Monatsbudgets für Einkauf, Shopping und Freizeit werden als Monatsbetrag gerechnet und ${s.budgetMode === 'daily' ? 'gleichmäßig auf die Tage verteilt' : s.budgetMode === 'end' ? 'am Monatsende abgezogen' : 'zum Monatsanfang reserviert'}, im laufenden Monat nur der noch nicht ausgegebene Rest. Freies Geld ist, was danach noch übrig bleibt.</li>
       <li><b>Omas Geld bleibt unberührt.</b> Verkaufserlöse für Oma, die auf deinem Konto liegen, zählen nie als freies Geld. Auslagen für Oma gelten erst als verfügbar, wenn sie erstattet sind.</li>
       <li><b>Sondertilgungen gibt es höchstens einmal pro Geldeingang</b> (mindestens ${esc(fmtEUR(s.minPrepay))}), nicht täglich in kleinen Beträgen.</li>
     </ol>
@@ -2538,6 +2576,7 @@ const SETTINGS_FIELDS = [
   { key: 'payBufferDays', label: 'Rechnungen überweisen', type: 'number', half: true, hint: 'So viele Tage vor Fristende. 2 bis 3 Tage sind sicher, falls die Überweisung länger braucht.' },
   { key: 'minPrepay', label: 'Kleinste Sondertilgung', type: 'money', half: true, hint: 'Kleinere Beträge werden nicht vorgeschlagen.' },
   { key: 'horizonMonths', label: 'Planungszeitraum', type: 'select', half: true, options: [[12, '12 Monate'], [24, '24 Monate'], [36, '36 Monate']] },
+  { key: 'budgetMode', label: 'Budgets in der Prognose', type: 'select', options: [['start', 'Zum Monatsanfang reservieren'], ['end', 'Zum Monatsende abziehen'], ['daily', 'Gleichmäßig auf die Tage verteilen']], hint: 'Wann die Prognose den Monatsbetrag vom Konto abzieht. Am Monatsanfang ist das Geld für den ganzen Monat reserviert, das ist die vorsichtigste Variante.' },
   { key: 'trackStart', label: 'Erfassungsstart', type: 'date', half: true, hint: 'Buchungen und Oma-Vorgänge werden ab diesem Datum geführt (Historie).' },
   { key: 'lockMinutes', label: 'Automatisch sperren nach', type: 'select', half: true, options: [[2, '2 Minuten'], [5, '5 Minuten'], [10, '10 Minuten'], [30, '30 Minuten'], [60, '1 Stunde']] },
 ];
@@ -2553,8 +2592,8 @@ function bindSettings() {
     if (!(x.payBufferDays >= 0 && x.payBufferDays <= 14)) { err.textContent = 'Die Überweisungs-Vorlaufzeit liegt zwischen 0 und 14 Tagen.'; return; }
     if (!(x.minPrepay >= 1)) { err.textContent = 'Die kleinste Sondertilgung muss mindestens 1 € betragen.'; return; }
     if (!validISO(x.trackStart)) { err.textContent = 'Bitte einen gültigen Erfassungsstart wählen.'; return; }
-    Object.assign(App.state.settings, { buffer: round2(x.buffer), payBufferDays: Math.round(x.payBufferDays), minPrepay: round2(x.minPrepay), horizonMonths: Number(x.horizonMonths), lockMinutes: Number(x.lockMinutes), trackStart: x.trackStart });
-    if (App.range > App.state.settings.horizonMonths) App.range = App.state.settings.horizonMonths;
+    Object.assign(App.state.settings, { buffer: round2(x.buffer), payBufferDays: Math.round(x.payBufferDays), minPrepay: round2(x.minPrepay), horizonMonths: Number(x.horizonMonths), lockMinutes: Number(x.lockMinutes), trackStart: x.trackStart, budgetMode: ['start', 'end', 'daily'].includes(x.budgetMode) ? x.budgetMode : 'start' });
+    if (typeof App.range === 'number' && App.range > App.state.settings.horizonMonths) App.range = App.state.settings.horizonMonths;
     armIdle(); commit(); toast('Einstellungen gespeichert');
   });
 }
@@ -2601,7 +2640,7 @@ function wipeForm() {
 /* ---------- Aktionen ---------- */
 const Actions = {
   nav(d) { App.tab = d.tab; App.animateNext = true; render(); window.scrollTo(0, 0); const v = $('#view'); if (v) v.focus({ preventScroll: true }); },
-  range(d) { App.range = Number(d.m); render(); },
+  range(d) { App.range = d.m === 'cur' || d.m === 'next' ? d.m : Number(d.m); render(); },
   privacy() { App.privacy = !App.privacy; render(); },
   lock() { lockVault(); },
   theme(d) { memTheme = d.v; if (!App.preview) { try { localStorage.setItem(THEME_KEY, d.v); } catch (e) { /* ignorieren */ } } applyTheme(); render(); },
@@ -3165,10 +3204,9 @@ function budgetHomePanel() {
 function budgetCard(r, daysLeft, idx) {
   const { b, amt, spent, left } = r;
   const over = left < -0.005, tracking = isTracking();
-  const perDay = left > 0 && daysLeft > 0 ? left / daysLeft : 0;
   const note = !tracking
     ? `Budget ${fmtEUR(amt)} pro Monat. Bis zum Erfassungsstart rechnet die Prognose mit dem anteiligen Betrag.`
-    : `Ausgegeben ${fmtEUR(spent)} von ${fmtEUR(amt)}${over ? `, Budget um ${fmtEUR(-left)} überzogen.` : `. Noch ${daysLeft} ${daysLeft === 1 ? 'Tag' : 'Tage'}: ca. ${fmtEUR(perDay)} pro Tag.`}`;
+    : `Ausgegeben ${fmtEUR(spent)} von ${fmtEUR(amt)} in diesem Monat${over ? `, Budget um ${fmtEUR(-left)} überzogen.` : '.'}`;
   return `<li class="item bud" style="--bc:var(--c${(idx % 6) + 1})">
     <div class="oma-h"><div class="item-t"><span class="bud-dot"></span><b>${esc(b.name)}</b><span class="tag">${esc(fmtEUR(amt))} pro Monat</span></div>
       <div class="item-amt ${over ? 'neg' : ''}">${money(left)}<small>${over ? 'überzogen' : 'noch übrig'}</small></div></div>
@@ -3190,7 +3228,7 @@ function viewBudgets() {
       <ol class="steps">
         <li><b>Budget festlegen.</b> Zum Beispiel Lebensmittel 400 €, Shopping 100 €, Freizeit 90 € pro Monat. Schau dafür in deinen Kontoauszug der letzten Monate.</li>
         <li><b>Ausgaben erfassen.</b> Nach dem Einkauf oder Shopping genügt Betrag und Kategorie, optional das Geschäft. Das dauert wenige Sekunden.</li>
-        <li><b>Den Rest im Blick behalten.</b> Die Seite zeigt, wie viel pro Tag noch übrig ist. Die Prognose und die Strategie rechnen automatisch mit dem Rest des Monats.</li>
+        <li><b>Den Rest im Blick behalten.</b> Die Seite zeigt, wie viel im Monat noch übrig ist. Die Prognose und die Strategie rechnen automatisch mit dem Rest des Monats.</li>
       </ol>
       <p class="muted">Gleichmäßig wiederkehrende Beträge wie Miete oder Abos gehören weiter unter „Daueraufträge“. Ein Budget ersetzt keinen Dauerauftrag.</p>
       <div class="row-actions"><button class="btn primary" data-act="quickBudgets">Budgets anlegen</button><button class="btn" data-act="addBudget">Einzelnes Budget</button></div></section>`;
@@ -3204,7 +3242,7 @@ function viewBudgets() {
 
   const summary = `<section class="panel"><div class="panel-h"><h2>${esc(monthLabel(mk))}</h2></div>
     <div class="ringwrap"><svg class="ring ${barClass(spent, tot)}" viewBox="0 0 112 112" aria-hidden="true"><circle class="r-bg" cx="56" cy="56" r="44"/><circle class="r-fg" cx="56" cy="56" r="44" style="--len:${(2 * Math.PI * 44 * Math.min(1, tot > 0 ? spent / tot : 0)).toFixed(1)}"/><text x="56" y="56">${Math.round(Math.min(1, tot > 0 ? spent / tot : 0) * 100)} %</text></svg>
-      <div><p class="bud-sum">${money(Math.max(0, tot - spent))}</p><p class="muted">${tot - spent < -0.005 ? `Gesamtbudget um ${esc(fmtEUR(spent - tot))} überzogen.` : `noch übrig von ${esc(fmtEUR(tot))}${daysLeft > 0 && tracking ? `, ca. ${esc(fmtEUR(Math.max(0, tot - spent) / daysLeft))} pro Tag` : ''}`}</p></div></div>
+      <div><p class="bud-sum">${money(Math.max(0, tot - spent))}</p><p class="muted">${tot - spent < -0.005 ? `Gesamtbudget um ${esc(fmtEUR(spent - tot))} überzogen.` : `noch übrig von ${esc(fmtEUR(tot))}`}</p></div></div>
     <dl class="kv"><div><dt>Ausgegeben</dt><dd>${money(spent)}</dd></div><div><dt>Budget gesamt</dt><dd>${money(tot)}</dd></div>${noBud > 0.005 ? `<div><dt>Weitere Ausgaben</dt><dd>${money(noBud)}</dd></div>` : ''}</dl></section>`;
 
   const recentHTML = recent.length ? `<ul class="evs">${recent.map(j => `<li class="ev"><span class="ev-d">${esc(fmtWd(j.date))}</span><span class="ev-n"><b>${esc(j.title)}</b>${j.cat ? `<span class="tag">${esc(j.cat)}</span>` : ''}${j.provider ? `<span class="tag plat">${esc(j.provider)}</span>` : ''}</span><span class="ev-a">${money(j.amount)}</span></li>`).join('')}</ul>` : `<p class="empty">${tracking ? 'Noch keine Ausgaben erfasst.' : 'Ausgaben lassen sich ab dem Erfassungsstart erfassen.'}</p>`;
@@ -3217,7 +3255,7 @@ function viewBudgets() {
   }).join('')}</tbody></table></div><p class="fine muted tbl-note">Verglichen wird mit dem Budget, das in dem jeweiligen Monat galt. Positive Differenz: Geld gespart (im laufenden Monat: noch übrig), negative: überzogen. Weitere Ausgaben sind Buchungen ohne Budget-Kategorie, zum Beispiel Fixkosten.</p></section>` : '';
 
   return head + banner + `<div class="cols wide-l">
-    <section class="panel"><div class="panel-h"><h2>Budgets</h2><span class="muted">noch ${daysLeft} ${daysLeft === 1 ? 'Tag' : 'Tage'} im Monat</span></div><ul class="items">${rows.map((r, k) => budgetCard(r, daysLeft, k)).join('')}</ul></section>
+    <section class="panel"><div class="panel-h"><h2>Budgets</h2><span class="muted">${esc(monthLabel(mk))}</span></div><ul class="items">${rows.map((r, k) => budgetCard(r, daysLeft, k)).join('')}</ul></section>
     <div class="stack">${summary}<section class="panel"><div class="panel-h"><h2>Letzte Ausgaben</h2><button class="link" data-act="nav" data-tab="journal">Historie</button></div>${recentHTML}</section></div>
   </div>${hist}${fabHTML()}`;
 }
@@ -3231,7 +3269,7 @@ function budgetNameTaken(name, exceptId) {
 function budgetForm(item) {
   openForm({
     title: item ? 'Budget bearbeiten' : 'Budget anlegen',
-    intro: '<p>Der Betrag gilt pro Monat und wird gleichmäßig auf die Tage verteilt. Für bereits vergangene Monate bleibt der damalige Betrag erhalten.</p>',
+    intro: '<p>Der Betrag gilt für den ganzen Monat. Wann die Prognose ihn abzieht, stellst du unter „Einstellungen“ ein. Für bereits vergangene Monate bleibt der damalige Betrag erhalten.</p>',
     values: item || { name: '', amount: '' },
     fields: [
       { key: 'name', label: 'Kategorie', type: 'text', half: true, required: true, placeholder: 'z. B. Lebensmittel', list: ['Lebensmittel', 'Shopping', 'Freizeit', 'Mobilität', 'Kleidung', 'Gesundheit', 'Sonstiges'] },
@@ -3354,10 +3392,13 @@ const Fx = {
 /* Frist-Leiste: Zahlungen und Fristen der nächsten 30 Tage auf einer Zeitachse.
    Rechnungen erscheinen als gelber Textmarker an dem Tag, an dem überwiesen wird. */
 function drawRibbon(host, P) {
-  const DAYS = 30, LANE = 31;
+  const LANE = 31, win = rangeWindow(P), r0 = win.r0, r1 = win.r1, DAYS = Math.max(1, r1 - r0);
   const W = Math.max(260, Math.floor(host.clientWidth || (host.parentElement && host.parentElement.clientWidth) || 640));
-  const list = P.opt.log.filter(e => e.i <= DAYS && ['invoice', 'rate', 'prepay', 'income'].includes(e.type)).sort((a, b) => a.t - b.t || TYPE_ORDER[a.type] - TYPE_ORDER[b.type]);
-  const head = `<div class="rb-t"><b>Fristen und Zahlungen der nächsten 30 Tage</b><span>${list.length} ${list.length === 1 ? 'Termin' : 'Termine'}</span></div>`;
+  const list = P.opt.log.filter(e => e.i >= r0 && e.i <= r1 && ['invoice', 'rate', 'prepay', 'income'].includes(e.type)).sort((a, b) => a.t - b.t || TYPE_ORDER[a.type] - TYPE_ORDER[b.type]);
+  const title = win.mode === 'cur' ? 'Fristen und Zahlungen bis Monatsende'
+    : win.mode === 'next' ? `Fristen und Zahlungen im ${new Date(+win.key.slice(0, 4), +win.key.slice(5) - 1, 1).toLocaleDateString('de-DE', { month: 'long' })}`
+      : 'Fristen und Zahlungen der nächsten 30 Tage';
+  const head = `<div class="rb-t"><b>${esc(title)}</b><span>${list.length} ${list.length === 1 ? 'Termin' : 'Termine'}</span></div>`;
   if (!list.length) { host.innerHTML = head + '<p class="rb-empty">Es stehen keine Rechnungen, Raten oder Einnahmen an.</p>'; return; }
 
   const short = (t, n) => (t.length > n ? t.slice(0, n - 1) + '…' : t);
@@ -3366,7 +3407,7 @@ function drawRibbon(host, P) {
   for (const e of list) {
     const label = e.type === 'income' ? `${short(e.name, 14)} +${fmtCompact(e.amount)}` : `${short(e.name, 14)} ${fmtCompact(-e.amount)}`;
     const w = 22 + label.length * 6.7;
-    const px = Math.round((e.i / DAYS) * (W - 10));
+    const px = Math.round(((e.i - r0) / DAYS) * (W - 10));
     let left = Math.max(0, Math.min(px, W - w)), dot = false, lane = lanes.findIndex(r => r + 6 <= left);
     if (lane < 0 && lanes.length < 3) { lane = lanes.length; lanes.push(-99); }
     if (lane < 0) {                                      // kein Platz für den Text: nur ein Punkt
@@ -3380,9 +3421,9 @@ function drawRibbon(host, P) {
     chips += `<span class="rb-chip ${cls}${dot ? ' dot' : ''}" style="left:${left}px;bottom:${28 + lane * LANE}px;--k:${e.type === 'invoice' ? k++ : 0}" title="${esc(title)}">${dot ? '' : esc(label)}</span>`;
   }
   let ticks = '';
-  for (let d = 0; d <= 28; d += 7) {
+  for (let d = 0; d <= DAYS - 1; d += 7) {
     const px = Math.round((d / DAYS) * (W - 10));
-    ticks += `<span class="rb-tick" style="left:${px}px"></span><span class="rb-lbl${d === 0 ? ' first' : ''}" style="left:${px}px">${d === 0 ? 'heute' : esc(fmtShort(P.dateAt(d)))}</span>`;
+    ticks += `<span class="rb-tick" style="left:${px}px"></span><span class="rb-lbl${d === 0 ? ' first' : ''}" style="left:${px}px">${d === 0 && r0 === 0 ? 'heute' : esc(fmtShort(P.dateAt(r0 + d)))}</span>`;
   }
   host.innerHTML = head + `<div class="rb-track" style="height:${lanes.length * LANE + 34}px"><div class="rb-axis"></div>${ticks}${chips}</div>`;
 }
