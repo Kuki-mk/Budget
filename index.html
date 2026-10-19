@@ -1,0 +1,2932 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-68MX4wNVvdMJWCvIG5asgVlVxlRH1b5dX1VYJpV5NjQ='; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#101a24">
+<title>Kassensturz – privates Budget</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a6c74'/%3E%3Cpath d='M7 19l5-5 4 4 8-9' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='7' y='23' width='18' height='3.2' rx='1' fill='%23f4dc3e'/%3E%3C/svg%3E">
+<style>
+:root {
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --display: "Bahnschrift", "DIN Alternate", "DIN 1451 Std", "Avenir Next Condensed", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --bg: #e7ecef; --surface: #fafbfc; --surface-2: #eff3f5; --ink: #14202b; --muted: #566574;
+  --line: #d3dbe1; --line-2: #e3e9ed;
+  --accent: #0a6c74; --accent-ink: #ffffff; --accent-soft: #d4eaec;
+  --mark: #f4dc3e; --mark-ink: #2b2500;
+  --neg: #c0271b; --neg-soft: #fbe4e0; --pos: #1a7a45; --pos-soft: #dcf0e4; --warn: #8a5a00; --warn-soft: #f8ecc8;
+  --rail: #101a24; --rail-ink: #e6ecf1; --rail-muted: #8d9dab; --rail-line: #223140;
+  --hero: #12202c; --h-ink: #e8eef3; --h-muted: #8fa2b2; --h-line: #2a3b4a; --h-accent: #4cc3cb; --h-neg: #ff8478;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1319; --surface: #131c24; --surface-2: #18232d; --ink: #e6ecf1; --muted: #93a2af;
+    --line: #25323e; --line-2: #1d2933;
+    --accent: #4cc3cb; --accent-ink: #06191b; --accent-soft: #12353a;
+    --mark: #e9d13c; --mark-ink: #201b00;
+    --neg: #ff7b6e; --neg-soft: #3a1d19; --pos: #5fd08a; --pos-soft: #14301f; --warn: #e7bd5c; --warn-soft: #33270d;
+    --rail: #091017; --rail-ink: #e6ecf1; --rail-muted: #8d9dab; --rail-line: #1c2935;
+    --hero: #0f1a23; --h-ink: #e8eef3; --h-muted: #8fa2b2; --h-line: #263644; --h-accent: #4cc3cb; --h-neg: #ff8478;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1319; --surface: #131c24; --surface-2: #18232d; --ink: #e6ecf1; --muted: #93a2af;
+    --line: #25323e; --line-2: #1d2933;
+    --accent: #4cc3cb; --accent-ink: #06191b; --accent-soft: #12353a;
+    --mark: #e9d13c; --mark-ink: #201b00;
+    --neg: #ff7b6e; --neg-soft: #3a1d19; --pos: #5fd08a; --pos-soft: #14301f; --warn: #e7bd5c; --warn-soft: #33270d;
+    --rail: #091017; --rail-ink: #e6ecf1; --rail-muted: #8d9dab; --rail-line: #1c2935;
+    --hero: #0f1a23; --h-ink: #e8eef3; --h-muted: #8fa2b2; --h-line: #263644; --h-accent: #4cc3cb; --h-neg: #ff8478;
+    color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); -webkit-font-smoothing: antialiased; }
+[hidden] { display: none !important; }
+button, input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3 { font-family: var(--display); margin: 0; }
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.money { font-variant-numeric: tabular-nums; }
+.pos { color: var(--pos); }
+.neg { color: var(--neg); }
+.muted { color: var(--muted); }
+.fine { font-size: 12.5px; }
+
+/* ---------- Gerüst ---------- */
+.shell { display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100vh; }
+.rail { background: var(--rail); color: var(--rail-ink); position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 22px 14px 16px; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 20px var(--display); letter-spacing: .01em; padding: 0 8px 24px; color: inherit; }
+.logo { width: 30px; height: 30px; flex: none; }
+.nav { display: grid; gap: 2px; }
+.nav button, .rail-btn { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 0; background: none; color: var(--rail-muted); font-weight: 600; font-size: 15px; border-radius: 6px; cursor: pointer; text-align: left; width: 100%; }
+.nav button:hover, .rail-btn:hover { color: var(--rail-ink); background: rgba(255, 255, 255, .06); }
+.nav button[aria-current="page"] { color: var(--rail-ink); background: rgba(255, 255, 255, .09); box-shadow: inset 3px 0 0 var(--mark); }
+.rail-foot { margin-top: auto; display: grid; gap: 2px; border-top: 1px solid var(--rail-line); padding-top: 12px; }
+.rail-btn { font-size: 14px; }
+.rail-btn[aria-pressed="true"], .rail-btn[aria-current="page"] { color: var(--mark); }
+.rail-btn.mob { display: none; }
+.ic { width: 20px; height: 20px; flex: none; }
+.main { padding: 30px clamp(16px, 3vw, 40px) 80px; max-width: 1180px; width: 100%; outline: none; }
+
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+h1 { font-size: 30px; line-height: 1.1; font-weight: 700; letter-spacing: -.005em; }
+.sub { margin-top: 6px; color: var(--muted); max-width: 66ch; }
+.actions, .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.row-actions { margin-top: 14px; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 18px 20px; margin-bottom: 18px; }
+.panel-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+.panel-h h2 { font-size: 18px; font-weight: 650; }
+.cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 18px; align-items: start; margin-bottom: 18px; }
+.cols.even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.cols.wide-l { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+.cols .panel, .stack .panel { margin-bottom: 0; }
+.stack { display: grid; gap: 18px; }
+.empty { color: var(--muted); max-width: 62ch; margin: 4px 0 6px; }
+
+/* ---------- Bedienelemente ---------- */
+.btn { appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 8px 14px; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; line-height: 1.2; }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.1); background: var(--accent); }
+.btn.ghost { border-color: transparent; background: transparent; color: var(--muted); }
+.btn.ghost:hover { color: var(--ink); background: var(--surface-2); }
+.btn.danger { background: var(--neg); border-color: var(--neg); color: #fff; }
+.btn.sm { padding: 5px 10px; font-size: 13px; }
+.btn.block { width: 100%; padding: 12px; }
+.btn:disabled { opacity: .55; cursor: default; }
+.link { appearance: none; background: none; border: 0; padding: 0; color: var(--accent); font: inherit; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.chip-btn { border: 1px solid var(--line); background: transparent; color: inherit; border-radius: 999px; padding: 5px 13px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.chip-btn.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.seg { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.tag { display: inline-block; font-size: 12px; line-height: 1.55; padding: 0 7px; border-radius: 4px; background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); margin-left: 6px; vertical-align: 1px; white-space: nowrap; font-weight: 500; }
+.tag.ok { background: var(--pos-soft); border-color: transparent; color: var(--pos); font-weight: 600; }
+.tag.warnt { background: var(--warn-soft); border-color: transparent; color: var(--warn); font-weight: 600; }
+.tag.acc { background: var(--accent-soft); border-color: transparent; color: var(--accent); font-weight: 600; }
+.mark { display: inline-block; background: var(--mark); color: var(--mark-ink); font-weight: 650; font-size: 12.5px; line-height: 1.5; padding: 0 7px; border-radius: 2px; transform: rotate(-.7deg); margin-left: 6px; }
+.stamp { display: inline-block; font: 700 12px/1.35 var(--display); letter-spacing: .06em; color: var(--neg); border: 2px solid var(--neg); border-radius: 3px; padding: 0 6px; transform: rotate(-2.5deg); margin-left: 6px; }
+.item-s .mark, .rank .mark, .preview .mark { margin-left: 0; }
+
+/* ---------- Hero ---------- */
+.hero { background: var(--hero); color: var(--h-ink); border: 1px solid var(--h-line); border-radius: 10px; padding: 22px 24px 16px; margin-bottom: 18px; }
+.hero-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 22px; flex-wrap: wrap; margin-bottom: 12px; }
+.hero-bal { display: grid; gap: 4px; }
+.hero-lbl { color: var(--h-muted); font-size: 14px; }
+.hero-num { font: 700 clamp(40px, 7vw, 60px)/1 var(--display); letter-spacing: -.01em; }
+.hero-num.neg { color: var(--h-neg); }
+.hero-meta { color: var(--h-muted); font-size: 13.5px; }
+.hero .link { color: var(--h-accent); margin-left: 6px; }
+.verdict { max-width: 44ch; }
+.v-main { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; font-size: 16px; font-weight: 600; }
+.v-main > * { margin: 0; }
+.v-sub { margin-top: 6px; color: var(--h-muted); font-size: 13.5px; }
+.range { display: flex; gap: 6px; margin: 4px 0 6px; flex-wrap: wrap; }
+.hero .chip-btn { border-color: var(--h-line); color: var(--h-muted); }
+.hero .chip-btn:hover { color: var(--h-ink); }
+.hero .chip-btn.on { background: var(--h-ink); color: var(--hero); border-color: var(--h-ink); }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+.hero .legend { color: var(--h-muted); }
+.lg { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.lg.inv { background: var(--mark); }
+.lg.pre, .lg.pri { background: var(--accent); }
+.hero .lg.pre { background: var(--h-accent); }
+.lg.ref { background: var(--muted); }
+.lg.buf { height: 0; width: 16px; border-radius: 0; border-top: 2px dashed var(--mark); vertical-align: 3px; }
+
+/* ---------- Diagramm ---------- */
+.chart { position: relative; --c-line: var(--line-2); --c-ax: var(--muted); --c-main: var(--accent); --c-neg: var(--neg); --c-dot: var(--surface); }
+.hero .chart { --c-line: var(--h-line); --c-ax: var(--h-muted); --c-main: var(--h-accent); --c-neg: var(--h-neg); --c-dot: var(--hero); }
+.chart svg { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.gl { stroke: var(--c-line); stroke-width: 1; }
+.gz { stroke: var(--c-ax); opacity: .55; }
+.ax { font: 11px var(--sans); fill: var(--c-ax); }
+.ln { fill: none; stroke-width: 2.3; stroke-linejoin: round; }
+.ln.pri { stroke: var(--c-main); }
+.ln.neg { stroke: var(--c-neg); }
+.ln.ref { stroke: var(--c-ax); stroke-width: 1.8; }
+.ln.dash { stroke-dasharray: 5 4; }
+.area.pos { fill: var(--c-main); opacity: .16; }
+.area.neg { fill: var(--c-neg); opacity: .28; }
+.buf { stroke: var(--mark); stroke-width: 1.3; stroke-dasharray: 3 4; opacity: .9; }
+.mk { stroke: var(--c-dot); stroke-width: 1.6; }
+.mk.inv { fill: var(--mark); }
+.mk.pre { fill: var(--c-main); }
+.cur { stroke: var(--c-ax); stroke-width: 1; stroke-dasharray: 2 3; }
+.dot { fill: var(--c-main); stroke: var(--c-dot); stroke-width: 2; }
+.dot.ref { fill: var(--c-ax); }
+.hit { fill: transparent; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 11px; font-size: 12.5px; box-shadow: 0 10px 30px rgba(0, 0, 0, .28); min-width: 176px; max-width: 280px; z-index: 3; }
+.tip .tr { display: grid; grid-template-columns: 14px 1fr auto; gap: 6px; align-items: center; margin-top: 3px; }
+.tip .sw { width: 10px; height: 3px; background: var(--accent); border-radius: 2px; }
+.tip .sw.ref { background: var(--muted); }
+.tip .te { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); color: var(--muted); }
+
+/* ---------- Listen ---------- */
+.evs, .items, .plan, .rank, .notes, .bars, .qp { list-style: none; margin: 0; padding: 0; }
+.ev { display: grid; grid-template-columns: 86px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line-2); }
+.ev:first-child { border-top: 0; }
+.ev-d { color: var(--muted); font-size: 13px; white-space: nowrap; }
+.ev-n b { font-weight: 600; }
+.ev-a { font-weight: 650; font-variant-numeric: tabular-nums; }
+.ev.prepay .ev-n b { color: var(--accent); }
+
+.item { display: flex; justify-content: space-between; gap: 18px; padding: 15px 0; border-top: 1px solid var(--line-2); }
+.item:first-child { border-top: 0; }
+.item.is-over { box-shadow: inset 3px 0 0 var(--neg); padding-left: 14px; }
+.item.compact { padding: 11px 0; }
+.item-main { min-width: 0; flex: 1; }
+.item-t { display: flex; flex-wrap: wrap; align-items: center; row-gap: 4px; }
+.item-t b { font-size: 16px; font-weight: 650; }
+.item-s { margin-top: 4px; }
+.item-n { margin-top: 5px; color: var(--muted); font-size: 13.5px; max-width: 64ch; }
+.item-side { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex: none; }
+.item-amt { font: 700 22px/1.1 var(--display); font-variant-numeric: tabular-nums; text-align: right; }
+.item-amt small { display: block; font: 500 12px var(--sans); color: var(--muted); margin-top: 2px; }
+.item-btns { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: 340px; }
+.quiet .item { padding: 10px 0; }
+.rel { font-size: 13px; font-weight: 600; margin-left: 8px; color: var(--muted); }
+.rel.bad { color: var(--neg); }
+.rel.warn { color: var(--warn); }
+.rel.ok { color: var(--pos); }
+.term { height: 6px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; margin: 9px 0 2px; max-width: 320px; overflow: hidden; }
+.term i { display: block; height: 100%; background: var(--mark); }
+.fold { margin-top: 12px; border-top: 1px solid var(--line-2); padding-top: 10px; }
+.fold summary { cursor: pointer; font-weight: 600; color: var(--muted); }
+.fold[open] summary { margin-bottom: 8px; }
+.fold.open-flat { border-top: 0; margin: 0; padding: 0; }
+.fold.open-flat summary { color: var(--ink); font: 650 18px var(--display); }
+
+.notes { display: grid; gap: 10px; }
+.note { display: grid; gap: 2px; padding: 10px 12px; border-radius: 6px; border-left: 4px solid var(--line); background: var(--surface-2); }
+.note.bad { border-color: var(--neg); background: var(--neg-soft); }
+.note.warn { border-color: var(--mark); background: var(--warn-soft); }
+.note.info { border-color: var(--accent); }
+.note b { font-weight: 650; }
+.note span { font-size: 14px; }
+.note .link { justify-self: start; font-size: 13px; margin-top: 2px; }
+.calm { padding: 12px 14px; border-radius: 6px; background: var(--pos-soft); }
+
+.kv { margin: 0; display: grid; }
+.kv > div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line-2); }
+.kv > div:first-child { border-top: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; }
+.kv .sum { border-top: 2px solid var(--ink); }
+.bars { display: grid; gap: 9px; margin-top: 16px; }
+.bars li { display: grid; grid-template-columns: 112px 1fr auto; gap: 10px; align-items: center; font-size: 13.5px; }
+.b-t { height: 8px; background: var(--surface-2); border-radius: 2px; overflow: hidden; }
+.b-t i { display: block; height: 100%; background: var(--accent); }
+.b-v { font-variant-numeric: tabular-nums; }
+
+.cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 12px; }
+.cmp-c { border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; }
+.cmp-c.best { border-color: var(--accent); box-shadow: inset 0 3px 0 var(--accent); }
+.cmp-c h3 { font-size: 15px; font-weight: 650; margin-bottom: 4px; }
+.saving { margin: 4px 0 16px; }
+
+.pl { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 12px; padding: 13px 0; border-top: 1px solid var(--line-2); }
+.pl:first-child { border-top: 0; }
+.pl-d { color: var(--muted); font-size: 13px; padding-top: 2px; }
+.pl-m b { font-weight: 650; }
+.pl-k { display: block; font-size: 12.5px; color: var(--muted); font-weight: 600; margin-top: 1px; }
+.pl.prepay .pl-k { color: var(--accent); }
+.pl-m p { margin-top: 3px; color: var(--muted); font-size: 13.5px; max-width: 62ch; }
+.pl-a { font: 700 18px var(--display); font-variant-numeric: tabular-nums; }
+.rank li { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 10px; padding: 12px 0; border-top: 1px solid var(--line-2); }
+.rank li:first-child { border-top: 0; }
+.rk { font: 700 16px var(--display); color: var(--accent); }
+.rank p { margin-top: 3px; font-size: 13.5px; color: var(--muted); }
+.rank .tag { margin-left: 2px; }
+.rules { display: grid; gap: 10px; padding-left: 20px; max-width: 70ch; margin: 0 0 12px; }
+.steps { margin: 0 0 12px; padding-left: 22px; display: grid; gap: 8px; max-width: 66ch; }
+.start { max-width: 760px; }
+.start h2 { margin-bottom: 10px; font-size: 20px; }
+
+.tbl-wrap { overflow-x: auto; }
+.tbl { border-collapse: collapse; width: 100%; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+.tbl th, .tbl td { padding: 8px 10px; text-align: right; border-top: 1px solid var(--line-2); white-space: nowrap; }
+.tbl thead th { color: var(--muted); font-weight: 600; border-top: 0; font-size: 12.5px; }
+.tbl tbody th { text-align: left; font-weight: 600; }
+.tbl thead th:first-child { text-align: left; }
+.danger-zone { border-color: color-mix(in srgb, var(--neg) 35%, var(--line)); }
+
+/* ---------- Dialog und Formulare ---------- */
+#dlg { border: 0; padding: 0; background: transparent; color: var(--ink); width: min(560px, calc(100vw - 20px)); max-width: none; max-height: none; margin: auto; }
+#dlg:has(.wide) { width: min(720px, calc(100vw - 20px)); }
+#dlg::backdrop { background: rgba(8, 14, 20, .6); }
+.dlg-form { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; box-shadow: 0 24px 60px -12px rgba(0, 0, 0, .5); max-height: calc(100vh - 28px); overflow: auto; }
+.dlg-form header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 10px; }
+.dlg-form h2 { font-size: 21px; font-weight: 700; }
+.x { border: 0; background: none; font-size: 28px; line-height: 1; color: var(--muted); cursor: pointer; padding: 0 6px; }
+.dlg-form footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+.lead { color: var(--muted); margin: 0 0 14px; max-width: 64ch; }
+.lead p + p { margin-top: 8px; }
+.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.f { display: grid; gap: 5px; grid-column: 1 / -1; min-width: 0; align-content: start; }
+.f.half { grid-column: auto; }
+.f > span { font-weight: 600; font-size: 13.5px; }
+.f small, .chk small { color: var(--muted); font-size: 12.5px; line-height: 1.4; }
+.f small:empty { display: none; }
+input[type=text], input[type=password], input[type=number], input[type=date], select, textarea {
+  width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); font-size: 15px; min-height: 40px; }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: 2px solid color-mix(in srgb, var(--accent) 30%, transparent); outline-offset: 0; }
+textarea { resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; line-height: 1.55; }
+.affix { position: relative; }
+.affix input { padding-right: 32px; text-align: right; }
+.affix i { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); font-style: normal; color: var(--muted); }
+.chk { display: grid; grid-template-columns: 20px 1fr; gap: 2px 10px; align-items: start; cursor: pointer; }
+.chk input { margin: 3px 0 0; width: 18px; height: 18px; accent-color: var(--accent); }
+.chk small { grid-column: 2; }
+.chk.full { grid-column: 1 / -1; }
+.preview:not(:empty) { margin-top: 14px; padding: 10px 12px; background: var(--surface-2); border-radius: 6px; font-size: 14px; }
+.err { color: var(--neg); font-weight: 600; margin-top: 10px; }
+.err:empty { display: none; }
+.code { background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; font-size: 13px; line-height: 1.8; margin: 8px 0; }
+.qp { display: grid; gap: 5px; font-size: 13.5px; }
+.qp .bad { color: var(--neg); }
+.qp .ok b { color: var(--accent); }
+
+/* ---------- Sperrbildschirm ---------- */
+.lock { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--bg); }
+.lock-card { width: min(440px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 30px 28px; }
+.brand.big { padding: 0 0 20px; font-size: 24px; }
+.lock-card h1 { font-size: 26px; margin-bottom: 8px; }
+.lock-card .lead { margin-bottom: 18px; }
+.lock form { display: grid; gap: 14px; }
+.lock-foot { margin-top: 20px; text-align: center; font-size: 14px; }
+.meter { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.meter i { height: 5px; background: var(--line); border-radius: 2px; }
+.meter small { grid-column: 1 / -1; color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.meter[data-n="1"] i:nth-child(-n+1) { background: var(--neg); }
+.meter[data-n="2"] i:nth-child(-n+2) { background: var(--mark); }
+.meter[data-n="3"] i:nth-child(-n+3) { background: var(--accent); }
+.meter[data-n="4"] i { background: var(--pos); }
+
+#toasts { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); display: grid; gap: 8px; z-index: 100; width: min(460px, calc(100vw - 24px)); pointer-events: none; }
+.toast { background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 6px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, .3); animation: tin .18s ease-out; }
+.toast.bad { background: var(--neg); color: #fff; }
+@keyframes tin { from { opacity: 0; transform: translateY(6px); } }
+
+.privacy .money, .privacy .hero-num { filter: blur(8px); user-select: none; }
+.privacy .chart, .privacy .b-t { filter: blur(6px); }
+
+/* ---------- Budgets ---------- */
+.item.bud { display: block; }
+.bar { height: 9px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 5px; overflow: hidden; margin: 10px 0 4px; }
+.bar i { display: block; height: 100%; background: var(--accent); }
+.bar.warn i, .b-t.warn i { background: var(--mark); }
+.bar.over i, .b-t.over i { background: var(--neg); }
+.bud-sum { font: 700 clamp(22px, 3vw, 28px)/1.15 var(--display); margin: 0 0 4px; }
+
+/* ---------- Vorschau-Modus ---------- */
+.pv-bar { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--mark); color: var(--mark-ink); padding: 9px 14px; border-radius: 6px; margin-bottom: 18px; font-size: 14px; }
+.pv-bar .link { color: var(--mark-ink); }
+
+/* ---------- Oma und Historie ---------- */
+.saldo { font: 700 clamp(24px, 3.4vw, 30px)/1.15 var(--display); margin: 0 0 12px; }
+.saldo.pos { color: var(--pos); }
+.saldo.owe { color: var(--warn); }
+.subh { font: 650 14px var(--display); color: var(--muted); margin: 14px 0 4px; }
+.subh:first-of-type { margin-top: 0; }
+.tbl-note { margin-top: 10px; }
+.item.oma, .item.bud { display: block; }
+.oma-h { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.item-btns.start { justify-content: flex-start; margin-top: 12px; max-width: none; }
+.legs { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 7px; }
+.leg { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 13.5px; min-height: 30px; }
+.ld { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--muted); display: block; }
+.leg.done .ld { background: var(--pos); border-color: var(--pos); }
+.leg.late .ld { border-color: var(--neg); background: var(--neg-soft); }
+.l-s { color: var(--muted); }
+.leg.late .l-s { color: var(--neg); font-weight: 600; }
+.leg.done .l-s { color: var(--pos); }
+.banner { display: flex; gap: 12px; padding: 12px 14px; border-radius: 6px; background: var(--warn-soft); border-left: 4px solid var(--mark); margin-bottom: 18px; }
+.banner.flat { margin-bottom: 14px; }
+.ctl { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.inl { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13.5px; }
+.ctl select { width: auto; min-width: 170px; }
+.jrs { list-style: none; margin: 0; padding: 0; }
+.jr { display: grid; grid-template-columns: 86px minmax(0, 1fr) auto auto; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line-2); align-items: start; }
+.jr:first-child { border-top: 0; }
+.jr-d { color: var(--muted); font-size: 13px; padding-top: 2px; white-space: nowrap; }
+.jr-t { font-weight: 650; }
+.jr-meta { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+.jr-a { font: 700 17px var(--display); font-variant-numeric: tabular-nums; padding-top: 1px; }
+.jr-b { display: flex; gap: 6px; }
+.jr.void .jr-t, .jr.void .jr-a { text-decoration: line-through; color: var(--muted); }
+
+/* ---------- Mobil ---------- */
+@media (max-width: 980px) {
+  .cols, .cols.even, .cols.wide-l { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 860px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .rail { position: static; height: auto; flex-direction: row; align-items: center; padding: 10px 14px; }
+  .brand { padding: 0; font-size: 18px; }
+  .logo { width: 26px; height: 26px; }
+  .rail-foot { margin: 0 0 0 auto; border: 0; padding: 0; display: flex; }
+  .rail-btn { padding: 8px; width: auto; }
+  .rail-btn span { display: none; }
+  .rail-btn.mob { display: flex; }
+  .nav .desk { display: none; }
+  .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0; background: var(--rail); border-top: 1px solid var(--rail-line); padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); }
+  .nav button { flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; padding: 6px 2px; font-size: 10.5px; line-height: 1.15; text-align: center; box-shadow: none !important; }
+  .nav button[aria-current="page"] { background: none; color: var(--mark); }
+  .main { padding: 18px 14px 100px; }
+  #toasts { bottom: 84px; }
+  h1 { font-size: 26px; }
+}
+@media (max-width: 640px) {
+  .item { flex-direction: column; gap: 10px; }
+  .item-side { align-items: stretch; }
+  .item-amt { text-align: left; }
+  .item-btns { justify-content: flex-start; max-width: none; }
+  .cmp { grid-template-columns: 1fr; }
+  .ev { grid-template-columns: 74px minmax(0, 1fr) auto; }
+  .jr { grid-template-columns: minmax(0, 1fr) auto; }
+  .jr-d { grid-column: 1 / -1; padding: 0; }
+  .jr-b { grid-column: 1 / -1; }
+  .pl { grid-template-columns: minmax(0, 1fr) auto; }
+  .pl-d { grid-column: 1 / -1; padding: 0; }
+  .hero { padding: 18px 16px 12px; }
+  .panel { padding: 16px 14px; }
+}
+@media (max-width: 520px) {
+  .fgrid { grid-template-columns: 1fr; }
+  .f.half { grid-column: 1 / -1; }
+  .dlg-form { padding: 16px 16px; }
+  .bars li { grid-template-columns: 90px 1fr auto; }
+}
+@media (max-width: 400px) {
+  .rail { padding: 10px 10px; }
+  .brand { gap: 8px; font-size: 17px; }
+  .rail-foot { gap: 0; }
+  .rail-btn { padding: 7px; }
+}
+@media (max-width: 350px) {
+  .brand span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toasts" aria-live="polite"></div>
+<dialog id="dlg" aria-modal="true"></dialog>
+<noscript><p style="padding:24px;font-family:sans-serif">Kassensturz braucht JavaScript, um deine Daten lokal zu verschlüsseln.</p></noscript>
+<script>'use strict';
+/* =====================================================================
+   ENGINE – Datum, Wiederholungen, Liquiditätsprognose, Abzahlungsstrategie
+   Reine Funktionen, keine DOM-Zugriffe.
+   ===================================================================== */
+const DAY_MS = 86400000;
+const pad = n => String(n).padStart(2, '0');
+const iso = (y, m, d) => `${y}-${pad(m)}-${pad(d)}`;
+const parseISO = s => { const [y, m, d] = String(s).split('-').map(Number); return { y, m, d }; };
+const dayNum = s => { const { y, m, d } = parseISO(s); return Math.round(Date.UTC(y, m - 1, d) / DAY_MS); };
+const fromDayNum = n => { const dt = new Date(n * DAY_MS); return iso(dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate()); };
+const todayISO = () => { const t = new Date(); return iso(t.getFullYear(), t.getMonth() + 1, t.getDate()); };
+const dim = (y, m) => new Date(Date.UTC(y, m, 0)).getUTCDate();
+const round2 = x => Math.round(x * 100) / 100;
+
+function validISO(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+  if (!m) return false;
+  const y = +m[1], mo = +m[2], d = +m[3];
+  return mo >= 1 && mo <= 12 && d >= 1 && d <= dim(y, mo);
+}
+
+/* Monat verschieben, Tag am "Anker" festhalten (31. → 30./28. in kürzeren Monaten) */
+function addMonthsAnchor(y, m, anchorDay, k) {
+  let mm = (m - 1) + k;
+  const yy = y + Math.floor(mm / 12);
+  mm = ((mm % 12) + 12) % 12 + 1;
+  return iso(yy, mm, Math.min(anchorDay, dim(yy, mm)));
+}
+const addMonths = (s, k) => { const { y, m, d } = parseISO(s); return addMonthsAnchor(y, m, d, k); };
+
+/* Nächster Termin nach t (Tagesnummer), der auf dem Ankertag im Monat liegt */
+function nextAnchorAfter(t, anchor) {
+  const { y, m } = parseISO(fromDayNum(t));
+  const cand = dayNum(addMonthsAnchor(y, m, anchor, 0));
+  return cand > t ? cand : dayNum(addMonthsAnchor(y, m, anchor, 1));
+}
+
+/* ---------- Formatierung ---------- */
+const EUR = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' });
+const EUR_COMPACT = new Intl.NumberFormat('de-DE', { notation: 'compact', maximumFractionDigits: 1 });
+const fmtEUR = v => EUR.format(Math.abs(v) < 0.005 ? 0 : v);
+const fmtCompact = v => EUR_COMPACT.format(v) + ' €';
+const fmtDate = s => { if (!s) return '–'; const { y, m, d } = parseISO(s); return `${pad(d)}.${pad(m)}.${y}`; };
+const fmtShort = s => { if (!s) return '–'; const { m, d } = parseISO(s); return `${pad(d)}.${pad(m)}.`; };
+const fmtPct = v => new Intl.NumberFormat('de-DE', { maximumFractionDigits: 2 }).format(v) + ' %';
+const fmtMonthKey = k => { const [y, m] = k.split('-').map(Number); return new Date(y, m - 1, 1).toLocaleDateString('de-DE', { month: 'short', year: '2-digit' }); };
+const WEEKDAYS = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const fmtWd = s => { const { y, m, d } = parseISO(s); return `${WEEKDAYS[new Date(y, m - 1, d).getDay()]}, ${pad(d)}.${pad(m)}.`; };
+function relDays(s, today) {
+  const diff = dayNum(s) - dayNum(today);
+  if (diff === 0) return 'heute';
+  if (diff === 1) return 'morgen';
+  if (diff === -1) return 'gestern';
+  return diff > 0 ? `in ${diff} Tagen` : `vor ${-diff} Tagen`;
+}
+
+/* ---------- Eingaben lesen ---------- */
+function parseNum(s) {
+  if (typeof s === 'number') return s;
+  s = String(s == null ? '' : s).trim().replace(/[\s€%]/g, '');
+  if (!s) return NaN;
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if ((s.match(/\./g) || []).length > 1) s = s.replace(/\./g, '');
+  else if (/^\d{1,3}\.\d{3}$/.test(s)) s = s.replace('.', '');
+  const v = Number(s);
+  return Number.isFinite(v) ? v : NaN;
+}
+
+function parseDateFlexible(s, today) {
+  s = String(s || '').trim();
+  let m;
+  if ((m = /^\+(\d{1,4})$/.exec(s))) return fromDayNum(dayNum(today) + Number(m[1]));
+  if ((m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s))) {
+    const r = iso(+m[1], +m[2], +m[3]);
+    return validISO(r) ? r : null;
+  }
+  if ((m = /^(\d{1,2})\.(\d{1,2})\.(\d{2,4})?$/.exec(s))) {
+    const d = +m[1], mo = +m[2];
+    let y;
+    if (m[3]) { y = +m[3]; if (m[3].length === 2) y += 2000; }
+    else {
+      y = parseISO(today).y;
+      let r = iso(y, mo, d);
+      if (validISO(r) && dayNum(r) < dayNum(today)) y += 1;
+    }
+    const r = iso(y, mo, d);
+    return validISO(r) ? r : null;
+  }
+  return null;
+}
+
+/* ---------- Wiederholungen ---------- */
+const INTERVALS = {
+  weekly: { label: 'Wöchentlich', factor: 52 / 12 },
+  biweekly: { label: 'Alle 2 Wochen', factor: 26 / 12 },
+  monthly: { label: 'Monatlich', factor: 1, step: 1 },
+  quarterly: { label: 'Vierteljährlich', factor: 1 / 3, step: 3 },
+  halfyearly: { label: 'Halbjährlich', factor: 1 / 6, step: 6 },
+  yearly: { label: 'Jährlich', factor: 1 / 12, step: 12 },
+};
+
+function occurrences(item, d0, d1) {
+  const out = [];
+  if (!validISO(item.start)) return out;
+  const start = dayNum(item.start);
+  const end = item.end && validISO(item.end) ? dayNum(item.end) : Infinity;
+  const last = Math.min(d1, end);
+  if (item.interval === 'weekly' || item.interval === 'biweekly') {
+    const step = item.interval === 'weekly' ? 7 : 14;
+    let t = start;
+    if (t < d0) t += Math.ceil((d0 - t) / step) * step;
+    for (; t <= last; t += step) out.push(t);
+  } else {
+    const step = (INTERVALS[item.interval] && INTERVALS[item.interval].step) || 1;
+    const { y, m, d } = parseISO(item.start);
+    for (let k = 0; k < 12 * 80; k += step) {
+      const t = dayNum(addMonthsAnchor(y, m, d, k));
+      if (t > last) break;
+      if (t >= d0) out.push(t);
+    }
+  }
+  return out;
+}
+
+/* ---------- Einstellungen / Standardwerte ---------- */
+const DEFAULT_SETTINGS = {
+  balance: 0, balanceDate: null,
+  buffer: 200,          // Sicherheitspuffer auf dem Konto (€)
+  payBufferDays: 2,     // Rechnungen so viele Tage vor Fälligkeit überweisen
+  minPrepay: 25,        // kleinste sinnvolle Sondertilgung (€)
+  horizonMonths: 24,    // Planungshorizont
+  lockMinutes: 10,      // automatische Sperre
+  trackStart: '2026-11-01', // Erfassungsstart: Buchungen und Oma-Vorgänge ab diesem Datum
+};
+
+/* Ratenplan grob durchrechnen (für Formular-Vorschau und Anzeigen) */
+function amortize(balance, pay, aprPct, maxMonths = 600) {
+  const r = (aprPct || 0) / 1200;
+  let B = balance, months = 0, interest = 0;
+  if (!(balance > 0) || !(pay > 0)) return { months: 0, interest: 0, ok: false };
+  while (B > 0.005 && months < maxMonths) {
+    const i = B * r;
+    const amt = Math.min(pay, B + i);
+    if (amt <= i + 1e-9 && r > 0) return { months: Infinity, interest: Infinity, ok: false };
+    B = B + i - amt; interest += i; months++;
+  }
+  return { months, interest, ok: B <= 0.005 };
+}
+
+
+/* ---------- Journal (Historie) und Oma-Verrechnungskonto ---------- */
+const JOURNAL_KINDS = {
+  income: 'Einnahme', expense: 'Ausgabe', invoice: 'Rechnung bezahlt', rate: 'Rate bezahlt', prepay: 'Sondertilgung', adjust: 'Kontoabgleich',
+  oma_order: 'Bestellung für Oma bezahlt', oma_reimb: 'Erstattung von Oma', oma_sale: 'Verkaufserlös erhalten', oma_payout: 'An Oma ausgezahlt',
+};
+
+/* Zwei Zahlungsschritte pro Oma-Vorgang.
+   Bestellung: a = du zahlst, b = Oma erstattet.  Verkauf: a = Zahlungseingang, b = Auszahlung an Oma.
+   Gebucht ist ein Schritt, sobald nicht stornierte Journalzeilen dafür existieren (auch Teilzahlungen). */
+function omaLegs(item, journal) {
+  const defs = item.kind === 'order'
+    ? [
+      { key: 'a', jkind: 'oma_order', label: 'Von dir bezahlt', dir: -1, date: item.payDate || item.date, cash: item.pay !== 'other' },
+      { key: 'b', jkind: 'oma_reimb', label: 'Von Oma erstattet', dir: 1, date: item.expectBack || '', cash: true },
+    ]
+    : [
+      { key: 'a', jkind: 'oma_sale', label: 'Zahlungseingang', dir: 1, date: item.expectIn || item.date, cash: item.via !== 'other' },
+      { key: 'b', jkind: 'oma_payout', label: 'An Oma ausgezahlt', dir: -1, date: item.payoutDate || '', cash: true },
+    ];
+  return defs.map(d => {
+    const lines = (item.bk || []).filter(b => b.leg === d.key)
+      .map(b => (journal || []).find(j => j.id === b.jid)).filter(j => j && !j.void);
+    const done = round2(lines.reduce((a, j) => a + Math.abs(j.amount), 0));
+    const remaining = round2(Math.max(0, item.amount - done));
+    return { ...d, lines, done, remaining, complete: remaining <= 0.005 };
+  });
+}
+
+/* Offene Schritte aller Vorgänge, nach Datum sortiert */
+function omaPending(state, today) {
+  const out = [];
+  for (const it of state.oma || []) {
+    const legs = omaLegs(it, state.journal);
+    legs.forEach((leg, idx) => {
+      if (leg.remaining <= 0.005) return;
+      out.push({ item: it, leg, ready: idx === 0 || legs[0].complete, overdue: validISO(leg.date) && leg.date < today });
+    });
+  }
+  return out.sort((a, b) => (a.leg.date || '9999').localeCompare(b.leg.date || '9999'));
+}
+
+/* Saldo > 0: Oma schuldet dir.  Saldo < 0: du schuldest Oma.
+   held > 0: so viel Geld von Oma liegt gerade auf deinem Konto. */
+function omaTotals(journal) {
+  const t = { order: 0, reimb: 0, sale: 0, payout: 0, saldo: 0, held: 0 };
+  for (const j of journal || []) {
+    if (j.void || j.area !== 'oma') continue;
+    const a = Math.abs(j.amount);
+    const k = j.kind.replace('oma_', '');
+    if (k in t) t[k] += a;
+    if (j.cash) t.held += j.amount;
+  }
+  t.saldo = round2(t.order + t.payout - t.sale - t.reimb);
+  t.held = round2(t.held);
+  return t;
+}
+
+const trackStartOf = state => (state.settings && state.settings.trackStart) || DEFAULT_SETTINGS.trackStart;
+const trackStarted = (state, today) => today >= trackStartOf(state);
+
+
+/* ---------- Flexible Ausgaben: Monatsbudgets ---------- */
+/* Ein Budget hat einen Verlauf der Beträge, damit alte Monate mit dem damaligen Budget verglichen werden. */
+function budgetAmount(b, monthKey) {
+  const h = b.history && b.history.length ? b.history : [{ from: '0000-00', amount: b.amount }];
+  let a = h[0].amount;
+  for (const e of h) if (e.from <= monthKey) a = e.amount;
+  return a;
+}
+/* Ausgegeben im Monat = nicht stornierte eigene Ausgaben-Buchungen, die zum Budget gehören */
+function budgetMatches(j, b) { return j.budgetId ? j.budgetId === b.id : j.cat === b.name; }
+function budgetSpent(state, b, monthKey) {
+  let sum = 0;
+  for (const j of state.journal || []) {
+    if (j.void || j.area !== 'own' || j.kind !== 'expense' || j.date.slice(0, 7) !== monthKey) continue;
+    if (budgetMatches(j, b)) sum += -j.amount;
+  }
+  return round2(sum);
+}
+/* Name; Betrag */
+function parseBudgetLines(text, existing) {
+  const rows = [], seen = new Set((existing || []).map(n => n.toLowerCase()));
+  String(text || '').split(/\r?\n/).forEach((raw, idx) => {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) return;
+    const p = line.split(/[;|\t]/).map(x => x.trim());
+    const name = p[0], amount = parseNum(p[1]);
+    const fail = msg => rows.push({ line: idx + 1, raw: line, error: msg });
+    if (!name) return fail('Name fehlt');
+    if (!(amount > 0)) return fail('Betrag ungültig (Erwartet: Name; Betrag pro Monat)');
+    if (seen.has(name.toLowerCase())) return fail(`„${name}“ gibt es schon`);
+    seen.add(name.toLowerCase());
+    rows.push({ line: idx + 1, raw: line, item: { name, amount: round2(amount) } });
+  });
+  return rows;
+}
+
+/* ---------- Kontext aufbauen ---------- */
+function buildContext(state, today) {
+  const s = { ...DEFAULT_SETTINGS, ...(state.settings || {}) };
+  const d0 = dayNum(today);
+  const n = dayNum(addMonths(today, s.horizonMonths)) - d0 + 1;
+  const d1 = d0 + n - 1;
+  const base = new Array(n).fill(null);
+  const add = (t, ev) => {
+    const i = t - d0;
+    if (i < 0 || i >= n) return;
+    (base[i] || (base[i] = [])).push(ev);
+  };
+
+  for (const r of state.recurring || []) {
+    for (const t of occurrences(r, d0, d1)) {
+      add(t, { name: r.name, amount: r.type === 'income' ? r.amount : -r.amount, type: r.type, cat: r.category });
+    }
+  }
+  for (const o of state.oneoffs || []) {
+    if (!validISO(o.date)) continue;
+    add(dayNum(o.date), { name: o.name, amount: o.type === 'income' ? o.amount : -o.amount, type: o.type, cat: o.category });
+  }
+
+  const debts = [];
+  for (const it of state.installments || []) {
+    if (!(it.balance > 0.005) || !validISO(it.nextDue)) continue;
+    const due = dayNum(it.nextDue);
+    const overdue = due < d0;
+    debts.push({
+      kind: 'inst', id: it.id, name: it.name, provider: it.provider || '',
+      B: it.balance, B0: it.balance, pay: it.payment, apr: it.rate || 0, r: (it.rate || 0) / 1200,
+      allowPrepay: !!it.allowPrepay, anchor: it.anchorDay || parseISO(it.nextDue).d,
+      next: overdue ? d0 : due, overdue, caught: false, intSum: 0, paidOffT: null,
+    });
+  }
+  for (const inv of state.invoices || []) {
+    if (inv.paid || !validISO(inv.due)) continue;
+    const due = dayNum(inv.due);
+    const overdue = due < d0;
+    debts.push({
+      kind: 'inv', id: inv.id, name: inv.name, provider: inv.provider || '',
+      amount: inv.amount, due, payDay: overdue ? d0 : Math.max(d0, due - s.payBufferDays),
+      overdue, done: false,
+    });
+  }
+
+  /* Flexible Ausgaben: aktuelles Monatsrest-Budget bzw. volles Monatsbudget gleichmäßig auf die Tage verteilen */
+  const budgets = state.budgets || [];
+  if (budgets.length) {
+    const tracking = trackStarted(state, today), ts = trackStartOf(state), curKey = today.slice(0, 7);
+    const { y: cy, m: cm, d: cd } = parseISO(today);
+    const curDim = dim(cy, cm), daysLeft = curDim - cd + 1;
+    const perDay = new Array(n).fill(0);
+    for (const b of budgets) {
+      const amt = budgetAmount(b, curKey);
+      let remaining;
+      if (tracking) {
+        let eff = amt;
+        if (ts.slice(0, 7) === curKey) eff = amt * (curDim - parseISO(ts).d + 1) / curDim;
+        remaining = Math.max(0, eff - budgetSpent(state, b, curKey));
+      } else remaining = amt * daysLeft / curDim;
+      for (let k = 0; k < daysLeft && k < n; k++) perDay[k] += remaining / daysLeft;
+    }
+    let i = daysLeft;
+    while (i < n) {
+      const date = fromDayNum(d0 + i), { y, m, d } = parseISO(date), mk = date.slice(0, 7), dm = dim(y, m);
+      const len = Math.min(dm - d + 1, n - i);
+      let daily = 0;
+      for (const b of budgets) daily += budgetAmount(b, mk) / dm;
+      for (let k = 0; k < len; k++) perDay[i + k] += daily;
+      i += len;
+    }
+    for (let k = 0; k < n; k++) if (perDay[k] > 0.0001) add(d0 + k, { name: 'Flexible Ausgaben', amount: -perDay[k], type: 'flex', cat: 'Flexibel' });
+  }
+
+  /* Oma: geplante Zahlungsschritte über dein Konto + Geld von Oma, das schon auf dem Konto liegt */
+  const journal = state.journal || [];
+  let omaC0 = 0;
+  for (const j of journal) if (!j.void && j.area === 'oma' && j.cash) omaC0 += j.amount;
+  const omaNet = new Array(n).fill(0);
+  const omaLate = [];
+  for (const it of state.oma || []) {
+    for (const leg of omaLegs(it, journal)) {
+      if (leg.remaining <= 0.005 || !validISO(leg.date)) continue;
+      let t = dayNum(leg.date);
+      if (t < d0) { omaLate.push({ item: it, leg }); if (leg.dir > 0) continue; t = d0; }
+      if (!leg.cash) continue;
+      const amount = leg.dir * leg.remaining;
+      add(t, { name: `Oma: ${it.title}`, amount, type: leg.dir > 0 ? 'oma_in' : 'oma_out', cat: 'Oma', provider: it.party || '' });
+      if (t - d0 < n) omaNet[t - d0] += amount;
+    }
+  }
+  const reserve = new Array(n);
+  let c = omaC0;
+  for (let i = 0; i < n; i++) { c += omaNet[i]; reserve[i] = Math.max(0, c); }
+  return { today, d0, n, d1, base, debts, settings: s, reserve, omaC0: round2(omaC0), omaLate };
+}
+
+/* ---------- Simulation ---------- */
+function stepDay(S, ctx, i, log) {
+  const t = ctx.d0 + i;
+  const evs = ctx.base[i];
+  if (evs) {
+    for (const e of evs) {
+      S.bal += e.amount;
+      if (log) log.push({ i, t, name: e.name, amount: e.amount, type: e.type, cat: e.cat, provider: e.provider || '' });
+    }
+  }
+  for (const d of S.debts) {
+    if (d.kind === 'inst') {
+      if (d.B > 0.005 && d.next === t) {
+        const interest = d.B * d.r;
+        const amt = Math.min(d.pay, d.B + interest);
+        d.B = d.B + interest - amt;
+        if (d.B < 0.005) { d.B = 0; d.paidOffT = t; }
+        S.bal -= amt; S.interest += interest; d.intSum += interest;
+        if (log) log.push({ i, t, name: d.name, amount: -amt, type: 'rate', id: d.id, apr: d.apr, interest, overdue: d.overdue && !d.caught, provider: d.provider });
+        d.caught = true;
+        d.next = d.B > 0 ? nextAnchorAfter(t, d.anchor) : -1;
+      }
+    } else if (!d.done && d.payDay === t) {
+      d.done = true;
+      S.bal -= d.amount;
+      if (log) log.push({ i, t, name: d.name, amount: -d.amount, type: 'invoice', id: d.id, due: d.due, overdue: d.overdue, provider: d.provider });
+    }
+  }
+}
+
+/* Tiefster Kontostand ab Tag i+1, wenn keine weiteren Sondertilgungen erfolgen */
+function projectMin(S, ctx, fromI) {
+  const C = { bal: S.bal, interest: 0, debts: S.debts.map(d => ({ ...d })) };
+  let min = C.bal - ctx.reserve[fromI];
+  for (let i = fromI + 1; i < ctx.n; i++) {
+    stepDay(C, ctx, i, null);
+    const own = C.bal - ctx.reserve[i];
+    if (own < min) min = own;
+  }
+  return min;
+}
+
+/* Sondertilgung: nur aus Geld, das auch nach allen Pflichtzahlungen
+   (Raten, Rechnungen, Fixkosten) über dem Sicherheitspuffer bleibt.
+   Reihenfolge: höchster Zinssatz zuerst, bei Gleichstand kleinere Restschuld. */
+function decide(S, ctx, i, log) {
+  const set = ctx.settings;
+  let free = projectMin(S, ctx, i) - set.buffer;
+  if (free < set.minPrepay) return;
+  const cands = S.debts
+    .filter(d => d.kind === 'inst' && d.allowPrepay && d.apr > 0 && d.B > 0.005)
+    .sort((a, b) => b.apr - a.apr || a.B - b.B);
+  for (const d of cands) {
+    if (free < 1) break;
+    const full = free >= d.B;
+    const amt = full ? round2(d.B) : Math.floor(free);
+    if (!full && amt < set.minPrepay) continue;
+    d.B = round2(d.B - amt);
+    if (d.B < 0.005) { d.B = 0; d.paidOffT = ctx.d0 + i; d.next = -1; }
+    S.bal -= amt; free -= amt;
+    log.push({ i, t: ctx.d0 + i, name: d.name, amount: -amt, type: 'prepay', id: d.id, apr: d.apr, provider: d.provider });
+  }
+}
+
+/* Entscheidungstage: heute + jeweils der erste Geldeingang im Monat
+   (sonst der 1.) – so entstehen keine täglichen Mini-Überweisungen. */
+function decisionDays(ctx) {
+  const set = new Set([0]);
+  const withIncome = new Set();
+  const keyOf = i => fromDayNum(ctx.d0 + i).slice(0, 7);
+  for (let i = 1; i < ctx.n; i++) {
+    const evs = ctx.base[i];
+    if (evs && evs.some(e => e.type === 'income')) {
+      const k = keyOf(i);
+      if (!withIncome.has(k)) { withIncome.add(k); set.add(i); }
+    }
+  }
+  for (let i = 1; i < ctx.n; i++) {
+    const ds = fromDayNum(ctx.d0 + i);
+    if (ds.endsWith('-01') && !withIncome.has(ds.slice(0, 7))) set.add(i);
+  }
+  return set;
+}
+
+function runSim(ctx, dec, optimize) {
+  const S = { bal: ctx.settings.balance, interest: 0, debts: ctx.debts.map(d => ({ ...d })) };
+  const log = [];
+  const days = new Array(ctx.n);
+  const own = new Array(ctx.n);
+  const debtDays = new Array(ctx.n);
+  for (let i = 0; i < ctx.n; i++) {
+    stepDay(S, ctx, i, log);
+    if (optimize && dec.has(i)) decide(S, ctx, i, log);
+    days[i] = S.bal;
+    own[i] = S.bal - ctx.reserve[i];
+    let sum = 0;
+    for (const d of S.debts) sum += d.kind === 'inst' ? d.B : (d.done ? 0 : d.amount);
+    debtDays[i] = sum;
+  }
+  return { days, own, debtDays, log, interest: S.interest, debts: S.debts };
+}
+
+function summarize(ctx, res) {
+  const set = ctx.settings;
+  let minBal = Infinity, minI = 0, firstNeg = -1, firstBuf = -1, firstOwnNeg = -1;
+  res.days.forEach((v, i) => {
+    if (v < minBal) { minBal = v; minI = i; }
+    if (firstNeg < 0 && v < -0.005) firstNeg = i;
+    const o = res.own[i];
+    if (firstOwnNeg < 0 && o < -0.005) firstOwnNeg = i;
+    if (firstBuf < 0 && o < set.buffer - 0.005) firstBuf = i;
+  });
+  const debtFree = res.debtDays[0] > 0.005 ? res.debtDays.findIndex(v => v <= 0.005) : -1;
+
+  const monthly = new Map();
+  for (let i = 0; i < ctx.n; i++) {
+    const key = fromDayNum(ctx.d0 + i).slice(0, 7);
+    let m = monthly.get(key);
+    if (!m) { m = { key, inc: 0, exp: 0, flex: 0, rate: 0, inv: 0, prepay: 0, oma: 0, end: 0, debt: 0 }; monthly.set(key, m); }
+    m.end = res.days[i]; m.debt = res.debtDays[i];
+  }
+  for (const e of res.log) {
+    const m = monthly.get(fromDayNum(e.t).slice(0, 7));
+    if (!m) continue;
+    if (e.type === 'income') m.inc += e.amount;
+    else if (e.type === 'expense') m.exp += -e.amount;
+    else if (e.type === 'flex') m.flex += -e.amount;
+    else if (e.type === 'rate') m.rate += -e.amount;
+    else if (e.type === 'invoice') m.inv += -e.amount;
+    else if (e.type === 'prepay') m.prepay += -e.amount;
+    else if (e.type === 'oma_in' || e.type === 'oma_out') m.oma += e.amount;
+  }
+  return {
+    minBal, minI, firstNeg, firstBuf, firstOwnNeg, debtFree,
+    monthly: [...monthly.values()],
+  };
+}
+
+/* ---------- Gesamtplan ---------- */
+function monthlyStats(state) {
+  let income = 0, expense = 0, rates = 0, flex = 0;
+  const byCat = {};
+  for (const r of state.recurring || []) {
+    const f = (INTERVALS[r.interval] || INTERVALS.monthly).factor;
+    const v = r.amount * f;
+    if (r.type === 'income') income += v;
+    else { expense += v; byCat[r.category || 'Sonstiges'] = (byCat[r.category || 'Sonstiges'] || 0) + v; }
+  }
+  for (const it of state.installments || []) if (it.balance > 0.005) rates += it.payment;
+  for (const b of state.budgets || []) { flex += b.amount; byCat[b.name] = (byCat[b.name] || 0) + b.amount; }
+  return { income, expense, rates, flex, byCat };
+}
+
+function buildPlan(state, today) {
+  const ctx = buildContext(state, today);
+  const dec = decisionDays(ctx);
+  const opt = runSim(ctx, dec, true);
+  const base = runSim(ctx, dec, false);
+  opt.sum = summarize(ctx, opt);
+  base.sum = summarize(ctx, base);
+
+  const s = ctx.settings;
+  const dateAt = i => fromDayNum(ctx.d0 + i);
+  const warnings = [];
+
+  for (const inv of state.invoices || []) {
+    if (inv.paid || !validISO(inv.due)) continue;
+    const diff = dayNum(inv.due) - ctx.d0;
+    if (diff < 0) warnings.push({ level: 'bad', tab: 'debts', title: 'Überfällig', text: `${inv.name} war am ${fmtDate(inv.due)} fällig (${fmtEUR(inv.amount)}). Jetzt zahlen, bevor Mahngebühren entstehen.` });
+    else if (diff <= 7) warnings.push({ level: 'warn', tab: 'debts', title: 'Frist läuft ab', text: `${inv.name}: spätestens ${fmtDate(inv.due)} (${relDays(inv.due, today)}) zahlen – ${fmtEUR(inv.amount)}.` });
+  }
+  for (const it of state.installments || []) {
+    if (!(it.balance > 0.005) || !validISO(it.nextDue)) continue;
+    if (dayNum(it.nextDue) < ctx.d0) warnings.push({ level: 'warn', tab: 'debts', title: 'Rate nicht aktualisiert', text: `Bei „${it.name}“ liegt die nächste Rate in der Vergangenheit (${fmtDate(it.nextDue)}). Mit „Rate bezahlt“ den Stand fortschreiben.` });
+    const monthlyInterest = it.balance * (it.rate || 0) / 1200;
+    if ((it.rate || 0) > 0 && it.payment <= monthlyInterest + 0.005) warnings.push({ level: 'bad', tab: 'debts', title: 'Rate zu niedrig', text: `Die Rate von „${it.name}“ (${fmtEUR(it.payment)}) deckt die monatlichen Zinsen (${fmtEUR(monthlyInterest)}) nicht ab – die Schuld würde wachsen.` });
+  }
+  const n0 = opt.sum;
+  if (n0.firstNeg >= 0) {
+    const i = n0.firstNeg;
+    const names = opt.log.filter(e => e.i === i && e.amount < 0).map(e => e.name);
+    warnings.push({
+      level: 'bad', tab: 'plan', title: 'Engpass voraus',
+      text: `Am ${fmtDate(dateAt(i))} fehlen voraussichtlich ${fmtEUR(-opt.days[i])}${names.length ? ` (Zahlungen: ${names.slice(0, 4).join(', ')})` : ''}. Ausgaben verschieben, Einnahmen vorziehen oder Raten bzw. Rechnungen anpassen.`,
+    });
+  } else if (n0.firstBuf >= 0) {
+    warnings.push({ level: 'warn', tab: 'plan', title: 'Unter Sicherheitspuffer', text: `Ab ${fmtDate(dateAt(n0.firstBuf))} liegt der Kontostand unter deinem Puffer von ${fmtEUR(s.buffer)}. Es gibt dann keinen Spielraum für Sondertilgungen.` });
+  }
+  if (n0.firstNeg < 0 && n0.firstOwnNeg >= 0) {
+    warnings.push({ level: 'warn', tab: 'oma', title: 'Omas Geld wird gebraucht', text: `Ab ${fmtDate(dateAt(n0.firstOwnNeg))} reicht dein eigenes Geld nicht, du müsstest Geld nutzen, das Oma gehört. Zahle Oma aus oder passe Ausgaben an.` });
+  }
+  const lateOma = (ctx.omaLate || []).slice(0, 3);
+  for (const l of lateOma) {
+    warnings.push({ level: 'warn', tab: 'oma', title: l.leg.dir > 0 ? 'Eingang für Oma überfällig' : 'Zahlung für Oma überfällig', text: `${l.item.title}: „${l.leg.label}“ war für ${fmtDate(l.leg.date)} vorgesehen (${fmtEUR(l.leg.remaining)}). Ist das passiert? Dann unter „Oma“ buchen.` });
+  }
+
+  /* Budgets: Überschreitung im laufenden Monat, mögliche Doppelplanung mit Daueraufträgen */
+  const curKey = today.slice(0, 7);
+  if (trackStarted(state, today)) {
+    for (const b of state.budgets || []) {
+      const amt = budgetAmount(b, curKey), spent = budgetSpent(state, b, curKey);
+      if (spent > amt + 0.005) warnings.push({ level: 'warn', tab: 'budgets', title: 'Budget überschritten', text: `„${b.name}“: ${fmtEUR(spent)} von ${fmtEUR(amt)} in diesem Monat ausgegeben.` });
+    }
+  }
+  for (const b of state.budgets || []) {
+    /* Doppelplanung: gleicher Name, oder wöchentlicher/14-täglicher Dauerauftrag in derselben Kategorie (typischer Wocheneinkauf). Monatliche Fixkosten wie Fitnessstudio sind kein Duplikat. */
+    const bn = b.name.toLowerCase();
+    const dup = (state.recurring || []).find(r => r.type === 'expense' && ((r.name || '').toLowerCase() === bn || ((r.category || '').toLowerCase() === bn && (r.interval === 'weekly' || r.interval === 'biweekly'))));
+    if (dup) warnings.push({ level: 'info', tab: 'flows', title: 'Doppelt eingeplant?', text: `„${b.name}“ steht als Budget und als Dauerauftrag („${dup.name}“). Behalte nur eins davon, sonst rechnet die Prognose doppelt.` });
+  }
+  if (!s.balanceDate || dayNum(s.balanceDate) < ctx.d0 - 7) {
+    warnings.push({ level: 'info', tab: 'settings', title: 'Kontostand veraltet', text: s.balanceDate ? `Dein Kontostand stammt vom ${fmtDate(s.balanceDate)}. Aktualisiere ihn, damit die Prognose stimmt.` : 'Trage deinen aktuellen Kontostand ein, damit die Prognose stimmt.' });
+  }
+
+  const totalDebt = (state.installments || []).reduce((a, x) => a + Math.max(0, x.balance || 0), 0) +
+    (state.invoices || []).reduce((a, x) => a + (x.paid ? 0 : x.amount), 0);
+
+  return {
+    ctx, opt, base, warnings, today,
+    dateAt, totalDebt,
+    stats: monthlyStats(state),
+    savings: base.interest - opt.interest,
+    omaHeld: Math.max(0, ctx.omaC0),
+    reserveMax: Math.max(0, ...ctx.reserve),
+  };
+}
+
+/* ---------- Schnell-Erfassung ---------- */
+/* R; Name; Betrag; Fällig; [Anbieter]
+   Z; Name; Restschuld; Rate; Zins; Nächste Fälligkeit; [Anbieter] */
+function parseQuickLines(text, today) {
+  const rows = [];
+  String(text || '').split(/\r?\n/).forEach((raw, idx) => {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) return;
+    const p = line.split(/[;|\t]/).map(x => x.trim());
+    const t = (p[0] || '').toLowerCase();
+    const fail = msg => rows.push({ line: idx + 1, raw: line, error: msg });
+    if (['r', 'rechnung'].includes(t)) {
+      if (p.length < 4) return fail('Erwartet: R; Name; Betrag; Fällig; Anbieter (optional)');
+      const amount = parseNum(p[2]);
+      const due = parseDateFlexible(p[3], today);
+      if (!p[1]) return fail('Name fehlt');
+      if (!(amount > 0)) return fail('Betrag ungültig');
+      if (!due) return fail('Datum ungültig (z. B. 24.11.2026, 24.11. oder +30)');
+      rows.push({ line: idx + 1, raw: line, kind: 'invoice', item: { name: p[1], amount, due, provider: p[4] || '', purchaseDate: '', termDays: null } });
+    } else if (['z', 'k', 'rate', 'raten', 'ratenzahlung', 'kredit'].includes(t)) {
+      if (p.length < 6) return fail('Erwartet: Z; Name; Restschuld; Rate; Zins; Nächste Fälligkeit; Anbieter (optional)');
+      const balance = parseNum(p[2]), payment = parseNum(p[3]), rate = parseNum(p[4]);
+      const nextDue = parseDateFlexible(p[5], today);
+      if (!p[1]) return fail('Name fehlt');
+      if (!(balance > 0)) return fail('Restschuld ungültig');
+      if (!(payment > 0)) return fail('Rate ungültig');
+      if (!(rate >= 0 && rate <= 100)) return fail('Zinssatz ungültig (0 bis 100)');
+      if (!nextDue) return fail('Datum ungültig (z. B. 05.12.2026, 05.12. oder +30)');
+      rows.push({ line: idx + 1, raw: line, kind: 'installment', item: { name: p[1], balance, payment, rate, nextDue, provider: p[6] || '', allowPrepay: true } });
+    } else {
+      fail('Zeile muss mit R (Rechnung) oder Z (Ratenzahlung) beginnen');
+    }
+  });
+  return rows;
+}
+
+if (typeof module !== 'undefined') {
+  module.exports = {
+    dayNum, fromDayNum, todayISO, addMonths, addMonthsAnchor, nextAnchorAfter, occurrences, validISO,
+    buildPlan, buildContext, amortize, parseNum, parseDateFlexible, parseQuickLines, monthlyStats, round2,
+    fmtEUR, fmtDate, INTERVALS, DEFAULT_SETTINGS, iso, parseISO, relDays,
+    omaLegs, omaPending, omaTotals, JOURNAL_KINDS, trackStarted, trackStartOf,
+    budgetAmount, budgetSpent, budgetMatches, parseBudgetLines,
+  };
+}
+
+/* =====================================================================
+   APP-KERN – Tresor (AES-256-GCM, PBKDF2), Zustand, Dialoge, Formulare
+   ===================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = v => `<span class="money">${esc(fmtEUR(v))}</span>`;
+const uid = () => { const a = new Uint32Array(2); crypto.getRandomValues(a); return a[0].toString(36) + a[1].toString(36); };
+
+const STORE_KEY = 'kassensturz.vault.v1';
+const THEME_KEY = 'kassensturz.theme';
+const KDF_ITER = 600000;
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+const AAD = enc.encode('kassensturz-v1');
+
+/* Vorschau-Build: startet ohne Passwort mit Beispieldaten, speichert nichts (wird vom Build gesetzt) */
+const PREVIEW_BUILD = false;
+
+const App = {
+  preview: false, state: null, key: null, salt: null, iter: KDF_ITER,
+  tab: 'home', range: 12, plan: null, privacy: false, idle: null, lastActivity: 0,
+};
+
+/* ---------- Speicher ---------- */
+const Store = {
+  get() { try { return localStorage.getItem(STORE_KEY); } catch (e) { return null; } },
+  set(v) { localStorage.setItem(STORE_KEY, v); },
+  remove() { try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignorieren */ } },
+  ok() { try { localStorage.setItem('__kt', '1'); localStorage.removeItem('__kt'); return true; } catch (e) { return false; } },
+};
+
+/* ---------- Kryptografie ---------- */
+function b64(bytes) {
+  let s = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+const unb64 = str => Uint8Array.from(atob(str), c => c.charCodeAt(0));
+
+async function deriveKey(pw, salt, iter) {
+  const km = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' }, km,
+    { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+
+async function sealRecord(state, key, salt, iter) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: AAD }, key, enc.encode(JSON.stringify(state)));
+  return { v: 1, kdf: 'PBKDF2-SHA256', iter, salt: b64(salt), iv: b64(iv), ct: b64(new Uint8Array(ct)) };
+}
+
+function checkRecord(rec) {
+  if (!rec || rec.v !== 1 || typeof rec.salt !== 'string' || typeof rec.iv !== 'string' || typeof rec.ct !== 'string') throw new Error('Das ist keine gültige Kassensturz-Datei.');
+  if (!(rec.iter >= 100000 && rec.iter <= 3000000)) throw new Error('Ungültige Verschlüsselungsparameter.');
+}
+
+async function openRecord(rec, pw) {
+  checkRecord(rec);
+  const salt = unb64(rec.salt);
+  const key = await deriveKey(pw, salt, rec.iter);
+  let plain;
+  try {
+    plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(rec.iv), additionalData: AAD }, key, unb64(rec.ct));
+  } catch (e) { throw new Error('Falsches Passwort oder beschädigte Daten.'); }
+  return { state: normalizeState(JSON.parse(dec.decode(plain))), key, salt, iter: rec.iter };
+}
+
+function normalizeState(s) {
+  s = s && typeof s === 'object' ? s : {};
+  const arr = x => (Array.isArray(x) ? x : []);
+  return {
+    version: 1,
+    settings: { ...DEFAULT_SETTINGS, ...(s.settings || {}) },
+    recurring: arr(s.recurring), oneoffs: arr(s.oneoffs),
+    invoices: arr(s.invoices), installments: arr(s.installments),
+    journal: arr(s.journal), oma: arr(s.oma), budgets: arr(s.budgets),
+  };
+}
+
+let saveChain = Promise.resolve();
+function persist() {
+  saveChain = saveChain.then(async () => {
+    if (!App.state || !App.key) return;
+    const rec = await sealRecord(App.state, App.key, App.salt, App.iter);
+    Store.set(JSON.stringify(rec));
+  }).catch(err => toast('Speichern fehlgeschlagen: ' + err.message, 'bad'));
+  return saveChain;
+}
+
+async function createVault(pw) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  App.salt = salt; App.iter = KDF_ITER;
+  App.key = await deriveKey(pw, salt, KDF_ITER);
+  App.state = normalizeState({});
+  await persist();
+}
+
+async function unlockVault(pw) {
+  const raw = Store.get();
+  if (!raw) throw new Error('Kein Tresor gefunden.');
+  const r = await openRecord(JSON.parse(raw), pw);
+  Object.assign(App, { state: r.state, key: r.key, salt: r.salt, iter: r.iter, plan: null });
+}
+
+function lockVault() {
+  if (App.preview) { toast('Im Vorschau-Modus gibt es keine Sperre.'); return; }
+  clearTimeout(App.idle);
+  App.state = null; App.key = null; App.plan = null;
+  Modal.close();
+  render();
+}
+
+function getPlan() {
+  if (!App.plan) App.plan = buildPlan(App.state, todayISO());
+  return App.plan;
+}
+function commit() { App.plan = null; persist(); render(); }
+
+function passwordStrength(pw) {
+  let pts = 0;
+  if (pw.length >= 8) pts++;
+  if (pw.length >= 12) pts++;
+  if (pw.length >= 16) pts++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) pts++;
+  if (/\d/.test(pw)) pts++;
+  if (/[^A-Za-z0-9]/.test(pw)) pts++;
+  if (/^(.)\1+$/.test(pw)) pts = 0;
+  return pts <= 2 ? { n: 1, label: 'Schwach' } : pts <= 3 ? { n: 2, label: 'Okay' } : pts <= 4 ? { n: 3, label: 'Gut' } : { n: 4, label: 'Stark' };
+}
+
+/* ---------- Hinweise ---------- */
+function toast(msg, kind) {
+  const host = $('#toasts');
+  if (!host) return;
+  const el = document.createElement('div');
+  el.className = 'toast ' + (kind || '');
+  el.textContent = msg;
+  host.appendChild(el);
+  setTimeout(() => el.remove(), kind === 'bad' ? 6000 : 3500);
+}
+
+/* ---------- Dialog ---------- */
+const Modal = {
+  el: null, onCancel: null,
+  init() {
+    this.el = $('#dlg');
+    this.el.addEventListener('click', e => {
+      if (e.target === this.el || e.target.closest('[data-close]')) this.cancel();
+    });
+    this.el.addEventListener('close', () => {
+      const f = this.onCancel; this.onCancel = null; this.el.innerHTML = '';
+      if (f) f();
+    });
+  },
+  open(html, onCancel) {
+    this.el.innerHTML = html;
+    this.onCancel = onCancel || null;
+    if (this.el.showModal) { if (!this.el.open) this.el.showModal(); } else this.el.setAttribute('open', '');
+  },
+  close() {
+    this.onCancel = null;
+    if (this.el.close) { if (this.el.open) this.el.close(); } else this.el.removeAttribute('open');
+    this.el.innerHTML = '';
+  },
+  cancel() { const f = this.onCancel; this.close(); if (f) f(); },
+};
+
+function askConfirm({ title, text, ok = 'Bestätigen', danger = false, check = null }) {
+  return new Promise(resolve => {
+    Modal.open(`<form class="dlg-form" method="dialog">
+      <header><h2>${esc(title)}</h2><button type="button" class="x" data-close aria-label="Schließen">×</button></header>
+      ${text ? `<p class="lead">${esc(text)}</p>` : ''}
+      ${check ? `<label class="chk"><input type="checkbox" id="cchk" ${check.checked ? 'checked' : ''}><span>${esc(check.label)}</span></label>` : ''}
+      <footer><button type="button" class="btn ghost" data-close>Abbrechen</button>
+      <button type="submit" class="btn ${danger ? 'danger' : 'primary'}">${esc(ok)}</button></footer></form>`,
+      () => resolve({ ok: false }));
+    const f = $('form', Modal.el);
+    f.addEventListener('submit', e => {
+      e.preventDefault();
+      const checked = $('#cchk', f) ? $('#cchk', f).checked : false;
+      Modal.close(); resolve({ ok: true, checked });
+    });
+    const first = $('button[type=submit]', f); if (first) first.focus();
+  });
+}
+
+/* ---------- Formulare ---------- */
+const fmtNumInput = v => (typeof v === 'number' ? String(v).replace('.', ',') : String(v == null ? '' : v));
+
+function fieldHTML(f, v) {
+  const id = 'f_' + f.key;
+  const common = `id="${id}" name="${f.key}" ${f.required ? 'required' : ''} ${f.disabled ? 'disabled' : ''} ${f.placeholder ? `placeholder="${esc(f.placeholder)}"` : ''}`;
+  let input;
+  switch (f.type) {
+    case 'select':
+      input = `<select ${common}>${f.options.map(([val, lab]) => `<option value="${esc(val)}" ${String(val) === String(v) ? 'selected' : ''}>${esc(lab)}</option>`).join('')}</select>`;
+      break;
+    case 'checkbox':
+      return `<label class="chk full"><input type="checkbox" id="${id}" name="${f.key}" ${v ? 'checked' : ''}><span>${esc(f.label)}</span>${f.hint ? `<small>${esc(f.hint)}</small>` : ''}</label>`;
+    case 'money': case 'percent':
+      input = `<div class="affix"><input ${common} type="text" inputmode="decimal" autocomplete="off" value="${esc(v == null || v === '' ? '' : fmtNumInput(v))}"><i>${f.type === 'money' ? '€' : '%'}</i></div>`;
+      break;
+    case 'number':
+      input = `<input ${common} type="number" inputmode="numeric" step="1" min="0" value="${esc(v == null ? '' : v)}">`;
+      break;
+    case 'date':
+      input = `<input ${common} type="date" value="${esc(v || '')}" ${f.min ? `min="${esc(f.min)}"` : ''} ${f.max ? `max="${esc(f.max)}"` : ''}>`;
+      break;
+    case 'password':
+      input = `<input ${common} type="password" autocomplete="${f.auto || 'off'}" value="">`;
+      break;
+    case 'textarea':
+      input = `<textarea ${common} rows="${f.rows || 6}" spellcheck="false">${esc(v || '')}</textarea>`;
+      break;
+    default:
+      input = `<input ${common} type="text" autocomplete="off" value="${esc(v == null ? '' : v)}" ${f.list ? `list="dl_${f.key}"` : ''}>` +
+        (f.list ? `<datalist id="dl_${f.key}">${f.list.map(o => `<option value="${esc(o)}">`).join('')}</datalist>` : '');
+  }
+  return `<label class="f ${f.half ? 'half' : ''}"><span>${esc(f.label)}</span>${input}<small id="h_${f.key}">${f.hint ? esc(f.hint) : ''}</small></label>`;
+}
+
+function readFields(form, fields) {
+  const out = {};
+  for (const f of fields) {
+    const el = form.elements[f.key];
+    if (!el) continue;
+    if (f.type === 'checkbox') out[f.key] = el.checked;
+    else if (f.type === 'money' || f.type === 'percent') out[f.key] = parseNum(el.value);
+    else if (f.type === 'number') out[f.key] = el.value === '' ? NaN : Number(el.value);
+    else if (f.type === 'password') out[f.key] = el.value;
+    else out[f.key] = String(el.value || '').trim();
+  }
+  return out;
+}
+
+function makeApi(form, fields) {
+  return {
+    get: k => readFields(form, fields)[k],
+    all: () => readFields(form, fields),
+    set: (k, v) => { const el = form.elements[k]; if (!el) return; if (el.type === 'checkbox') el.checked = !!v; else el.value = fmtNumInput(v); },
+    hint: (k, t) => { const el = $('#h_' + k, form); if (el) el.textContent = t; },
+    options: (k, opts, val) => {
+      const el = form.elements[k]; if (!el) return;
+      el.innerHTML = opts.map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join('');
+      if (val != null) el.value = val;
+    },
+    preview: html => { const el = $('#fpreview', form); if (el) el.innerHTML = html || ''; },
+  };
+}
+
+/* cfg: {title, intro, fields, values, submit, onInput(api,key), onSubmit(vals,api)→Fehlertext|null|Promise, wide} */
+function openForm(cfg) {
+  const vals = cfg.values || {};
+  Modal.open(`<form class="dlg-form ${cfg.wide ? 'wide' : ''}" novalidate>
+    <header><h2>${esc(cfg.title)}</h2><button type="button" class="x" data-close aria-label="Schließen">×</button></header>
+    ${cfg.intro ? `<div class="lead">${cfg.intro}</div>` : ''}
+    <div class="fgrid">${cfg.fields.map(f => fieldHTML(f, vals[f.key])).join('')}</div>
+    <div class="preview" id="fpreview" aria-live="polite"></div>
+    <p class="err" id="ferr" role="alert"></p>
+    <footer><button type="button" class="btn ghost" data-close>Abbrechen</button>
+    <button type="submit" class="btn primary">${esc(cfg.submit || 'Speichern')}</button></footer></form>`);
+  const form = $('form', Modal.el);
+  const api = makeApi(form, cfg.fields);
+  const run = e => { if (cfg.onInput) cfg.onInput(api, e && e.target ? e.target.name : null); };
+  form.addEventListener('input', run);
+  form.addEventListener('change', run);
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = $('button[type=submit]', form);
+    btn.disabled = true;
+    try {
+      const err = await cfg.onSubmit(api.all(), api);
+      if (err) { $('#ferr', form).textContent = err; btn.disabled = false; return; }
+      Modal.close();
+    } catch (ex) { $('#ferr', form).textContent = ex.message || String(ex); btn.disabled = false; }
+  });
+  if (cfg.onInput) cfg.onInput(api, null);
+  const first = $('input:not([type=checkbox]),select,textarea', form);
+  if (first && !/Mobi|Android/i.test(navigator.userAgent)) first.focus();
+  return api;
+}
+
+/* =====================================================================
+   DIAGRAMME
+   ===================================================================== */
+function niceStep(raw) {
+  const p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const f = raw / p;
+  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+}
+
+/* cfg: {n, height, series:[{name,values,cls,area,dash}], buffer, dateAt(i), markers:[{i,cls,title}], eventsAt(i)} */
+function drawLineChart(host, cfg) {
+  const W = Math.max(300, Math.floor(host.clientWidth || 640));
+  const H = cfg.height || 260;
+  const m = { l: 56, r: 14, t: 16, b: 26 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const n = cfg.n;
+  let lo = 0, hi = 0;
+  for (const s of cfg.series) for (let i = 0; i < n; i++) { const v = s.values[i]; if (v < lo) lo = v; if (v > hi) hi = v; }
+  if (cfg.buffer != null) { lo = Math.min(lo, cfg.buffer); hi = Math.max(hi, cfg.buffer); }
+  if (hi - lo < 1) hi = lo + 1;
+  const step = niceStep((hi - lo) / 4);
+  lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step;
+  const x = i => m.l + (n <= 1 ? 0 : (i / (n - 1)) * iw);
+  const y = v => m.t + (1 - (v - lo) / (hi - lo)) * ih;
+  const y0 = y(0);
+  const uidc = 'c' + Math.random().toString(36).slice(2, 8);
+
+  let grid = '';
+  for (let k = 0; ; k++) {
+    const v = lo + k * step;
+    if (v > hi + step * 1e-6) break;
+    const yy = y(v).toFixed(1);
+    grid += `<line class="gl${Math.abs(v) < 1e-9 ? ' gz' : ''}" x1="${m.l}" x2="${W - m.r}" y1="${yy}" y2="${yy}"/>` +
+      `<text class="ax" x="${m.l - 8}" y="${(+yy + 4).toFixed(1)}" text-anchor="end">${esc(fmtCompact(v))}</text>`;
+  }
+  let xt = '', lastX = -999;
+  for (let i = 0; i < n; i++) {
+    const d = cfg.dateAt(i);
+    if (i === 0 || d.endsWith('-01')) {
+      const px = x(i);
+      if (px - lastX < 62) continue;
+      lastX = px;
+      const label = i === 0 ? 'heute' : fmtMonthKey(d.slice(0, 7));
+      xt += `<text class="ax" x="${px.toFixed(1)}" y="${H - 7}" text-anchor="${i === 0 ? 'start' : 'middle'}">${esc(label)}</text>`;
+    }
+  }
+
+  const pathOf = vals => { let p = ''; for (let i = 0; i < n; i++) p += (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(vals[i]).toFixed(1); return p; };
+  let body = '';
+  const areaBase = Math.min(Math.max(y0, m.t), H - m.b);
+  const defs = `<defs><clipPath id="${uidc}p"><rect x="0" y="0" width="${W}" height="${Math.max(0, y0).toFixed(1)}"/></clipPath>` +
+    `<clipPath id="${uidc}n"><rect x="0" y="${y0.toFixed(1)}" width="${W}" height="${H}"/></clipPath></defs>`;
+
+  if (cfg.buffer != null) {
+    body += `<line class="buf" x1="${m.l}" x2="${W - m.r}" y1="${y(cfg.buffer).toFixed(1)}" y2="${y(cfg.buffer).toFixed(1)}"/>`;
+  }
+  for (const s of cfg.series) {
+    const p = pathOf(s.values);
+    if (s.area) {
+      const ap = `${p}L${x(n - 1).toFixed(1)},${areaBase.toFixed(1)}L${x(0).toFixed(1)},${areaBase.toFixed(1)}Z`;
+      body += `<path class="area pos" d="${ap}" clip-path="url(#${uidc}p)"/><path class="area neg" d="${ap}" clip-path="url(#${uidc}n)"/>`;
+      body += `<path class="ln ${s.cls}" d="${p}" clip-path="url(#${uidc}p)"/><path class="ln neg" d="${p}" clip-path="url(#${uidc}n)"/>`;
+    } else {
+      body += `<path class="ln ${s.cls}${s.dash ? ' dash' : ''}" d="${p}"/>`;
+    }
+  }
+  for (const mk of cfg.markers || []) {
+    const v = cfg.series[0].values[mk.i];
+    body += `<circle class="mk ${mk.cls}" cx="${x(mk.i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4.5"><title>${esc(mk.title || '')}</title></circle>`;
+  }
+  const cursor = `<line class="cur" x1="0" x2="0" y1="${m.t}" y2="${H - m.b}" visibility="hidden"/>` +
+    cfg.series.map((s, k) => `<circle class="dot ${s.cls}" data-k="${k}" r="4" visibility="hidden"/>`).join('');
+
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${esc(cfg.label || 'Verlauf')}">${defs}${grid}${xt}${body}${cursor}<rect class="hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}"/></svg><div class="tip" hidden></div>`;
+
+  const svg = $('svg', host), tip = $('.tip', host), cur = $('.cur', svg), dots = $$('.dot', svg);
+  const hide = () => { cur.setAttribute('visibility', 'hidden'); dots.forEach(d => d.setAttribute('visibility', 'hidden')); tip.hidden = true; };
+  svg.addEventListener('pointermove', e => {
+    const r = svg.getBoundingClientRect();
+    const px = (e.clientX - r.left) * (W / r.width);
+    let i = Math.round(((px - m.l) / iw) * (n - 1));
+    i = Math.max(0, Math.min(n - 1, i));
+    const xx = x(i);
+    cur.setAttribute('x1', xx); cur.setAttribute('x2', xx); cur.setAttribute('visibility', 'visible');
+    dots.forEach((d, k) => { d.setAttribute('cx', xx); d.setAttribute('cy', y(cfg.series[k].values[i])); d.setAttribute('visibility', 'visible'); });
+    const evs = cfg.eventsAt ? cfg.eventsAt(i) : [];
+    tip.innerHTML = `<b>${esc(fmtWd(cfg.dateAt(i)))}</b>` +
+      cfg.series.map(s => `<div class="tr"><i class="sw ${s.cls}${s.dash ? ' dash' : ''}"></i><span>${esc(s.name)}</span><b class="money">${esc(fmtEUR(s.values[i]))}</b></div>`).join('') +
+      (evs.length ? `<div class="te">${evs.slice(0, 5).map(t => `<div>${esc(t)}</div>`).join('')}${evs.length > 5 ? `<div>… +${evs.length - 5} weitere</div>` : ''}</div>` : '');
+    tip.hidden = false;
+    const scale = r.width / W;
+    const left = xx * scale;
+    tip.style.left = (left > r.width * 0.62 ? left - tip.offsetWidth - 12 : left + 12) + 'px';
+    tip.style.top = '8px';
+  });
+  svg.addEventListener('pointerleave', hide);
+}
+
+function drawCharts() {
+  const P = getPlan();
+  $$('[data-chart]').forEach(host => {
+    const kind = host.dataset.chart;
+    if (kind === 'balance') {
+      const months = App.range;
+      const nn = Math.min(P.ctx.n, dayNum(addMonths(P.today, months)) - P.ctx.d0 + 1);
+      const markers = P.opt.log.filter(e => e.i < nn && (e.type === 'invoice' || e.type === 'prepay'))
+        .map(e => ({ i: e.i, cls: e.type === 'invoice' ? 'inv' : 'pre', title: `${e.name}: ${fmtEUR(-e.amount)}` }));
+      drawLineChart(host, {
+        n: nn, height: 270, label: 'Kontostand-Prognose', dateAt: P.dateAt, buffer: P.ctx.settings.buffer,
+        series: [{ name: 'Kontostand', values: P.opt.days, cls: 'pri', area: true }, ...(P.reserveMax > 0.005 ? [{ name: 'Eigenes Geld', values: P.opt.own, cls: 'ref', dash: true }] : [])],
+        markers,
+        eventsAt: i => P.opt.log.filter(e => e.i === i && e.amount !== 0).map(e => `${e.type === 'prepay' ? 'Sondertilgung: ' : ''}${e.name} ${fmtEUR(e.amount)}`),
+      });
+    } else if (kind === 'debt') {
+      drawLineChart(host, {
+        n: P.ctx.n, height: 240, label: 'Schuldenverlauf', dateAt: P.dateAt,
+        series: [
+          { name: 'Nur Pflichtzahlungen', values: P.base.debtDays, cls: 'ref', dash: true },
+          { name: 'Mit Strategie', values: P.opt.debtDays, cls: 'pri' },
+        ],
+        eventsAt: i => P.opt.log.filter(e => e.i === i && (e.type === 'prepay' || e.type === 'invoice' || e.type === 'rate')).map(e => `${e.type === 'prepay' ? 'Sondertilgung: ' : ''}${e.name} ${fmtEUR(e.amount)}`),
+      });
+    }
+  });
+}
+
+/* =====================================================================
+   ANSICHTEN
+   ===================================================================== */
+const TYPE_ORDER = { income: 0, oma_in: 0, invoice: 1, rate: 2, prepay: 3, oma_out: 3, expense: 4, flex: 5 };
+
+function tagFor(e, inPlan) {
+  if (e.type === 'invoice') return e.overdue ? '<span class="stamp">Überfällig</span>' : `<span class="mark">Frist ${esc(fmtShort(fromDayNum(e.due)))}</span>`;
+  if (e.type === 'rate') return e.overdue ? '<span class="stamp">Überfällig</span>' : (inPlan ? '' : '<span class="tag">Rate</span>');
+  if (e.type === 'prepay') return inPlan ? '' : '<span class="tag acc">Sondertilgung</span>';
+  return '';
+}
+
+function eventRows(P, days) {
+  const list = P.opt.log.filter(e => e.i <= days && e.amount !== 0 && e.type !== 'flex')
+    .sort((a, b) => a.t - b.t || TYPE_ORDER[a.type] - TYPE_ORDER[b.type]);
+  if (!list.length) return '<p class="empty">In diesem Zeitraum stehen keine Buchungen an.</p>';
+  return `<ul class="evs">${list.map(e => `<li class="ev ${e.type}"><span class="ev-d">${esc(fmtWd(P.dateAt(e.i)))}</span><span class="ev-n"><b>${esc(e.name)}</b>${e.provider ? `<span class="tag plat">${esc(e.provider)}</span>` : ''} ${tagFor(e)}</span><span class="ev-a ${e.amount > 0 ? 'pos' : ''}">${money(e.amount)}</span></li>`).join('')}</ul>`;
+}
+
+function backupReminder() {
+  const st = App.state;
+  const hasData = st.recurring.length + st.oneoffs.length + st.invoices.length + st.installments.length > 0;
+  if (!hasData) return null;
+  const lb = st.settings.lastBackup;
+  if (!lb) return { level: 'info', tab: 'settings', title: 'Noch kein Backup', text: 'Deine Daten liegen nur in diesem Browser. Wird der Browser-Speicher gelöscht, sind sie weg. Exportiere ein verschlüsseltes Backup.' };
+  if (dayNum(todayISO()) - dayNum(lb) > 30) return { level: 'info', tab: 'settings', title: 'Backup auffrischen', text: `Dein letztes Backup ist vom ${fmtDate(lb)}. Exportiere ein neues, damit nichts verloren geht.` };
+  return null;
+}
+
+function warningList(P) {
+  const ws = [...P.warnings];
+  const br = backupReminder(); if (br) ws.push(br);
+  if (!ws.length) return '<p class="calm"><b>Alles im grünen Bereich.</b> Keine Frist in Gefahr, kein Engpass in Sicht.</p>';
+  const order = { bad: 0, warn: 1, info: 2 };
+  ws.sort((a, b) => order[a.level] - order[b.level]);
+  return `<ul class="notes">${ws.map(w => `<li class="note ${w.level}"><b>${esc(w.title)}</b><span>${esc(w.text)}</span>${w.tab ? `<button class="link" data-act="nav" data-tab="${w.tab}">Öffnen</button>` : ''}</li>`).join('')}</ul>`;
+}
+
+function verdictHTML(P) {
+  const o = P.opt, sum = o.sum, set = P.ctx.settings;
+  const lim = Math.min(30, P.ctx.n - 1);
+  const arr = P.reserveMax > 0.005 ? o.own : o.days;
+  let m30 = Infinity, m30i = 0;
+  for (let i = 0; i <= lim; i++) if (arr[i] < m30) { m30 = arr[i]; m30i = i; }
+  let main;
+  if (sum.firstNeg >= 0) main = `<span class="stamp">Engpass</span><span>Am ${esc(fmtDate(P.dateAt(sum.firstNeg)))} fehlen ${money(-o.days[sum.firstNeg])}.</span>`;
+  else if (sum.firstBuf >= 0) main = `<span class="mark">Knapp</span><span>Ab ${esc(fmtDate(P.dateAt(sum.firstBuf)))} liegt der Kontostand unter dem Puffer von ${money(set.buffer)}.</span>`;
+  else main = `<span class="tag ok">Gedeckt</span><span>Alle Zahlungen der nächsten ${set.horizonMonths} Monate sind abgesichert.</span>`;
+  return `<div class="verdict"><p class="v-main">${main}</p><p class="v-sub">Tiefster Stand ${P.reserveMax > 0.005 ? 'deines eigenen Geldes ' : ''}in den nächsten 30 Tagen: ${money(m30)} am ${esc(fmtDate(P.dateAt(m30i)))}.</p></div>`;
+}
+
+function categoryBars(P) {
+  const cats = Object.entries(P.stats.byCat).sort((a, b) => b[1] - a[1]);
+  if (!cats.length) return '<p class="empty">Noch keine Fixkosten erfasst.</p>';
+  const max = cats[0][1];
+  return `<ul class="bars">${cats.map(([c, v]) => `<li><span class="b-l">${esc(c)}</span><span class="b-t"><i style="width:${Math.max(3, (v / max) * 100).toFixed(1)}%"></i></span><span class="b-v">${money(v)}</span></li>`).join('')}</ul>`;
+}
+
+function viewHome() {
+  const P = getPlan(), st = App.state, s = P.ctx.settings;
+  const empty = !st.recurring.length && !st.oneoffs.length && !st.invoices.length && !st.installments.length && !st.oma.length && !st.journal.length && !st.budgets.length;
+  const dateStr = new Date().toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const stats = P.stats;
+  const surplus = stats.income - stats.expense - stats.flex - stats.rates;
+
+  const hero = `<section class="hero">
+    <div class="hero-top">
+      <div class="hero-bal">
+        <span class="hero-lbl">Kontostand heute</span>
+        <span class="hero-num money ${s.balance < 0 ? 'neg' : ''}">${esc(fmtEUR(s.balance))}</span>
+        <span class="hero-meta">${s.balanceDate ? `Stand ${esc(fmtDate(s.balanceDate))}` : 'Noch nicht eingetragen'} <button class="link inv" data-act="setBalance">Aktualisieren</button></span>
+        ${P.omaHeld > 0.005 ? `<span class="hero-meta">Davon gehören Oma ${money(P.omaHeld)}. Die Strategie rührt das Geld nicht an.</span>` : ''}
+      </div>
+      ${empty ? '' : verdictHTML(P)}
+    </div>
+    ${empty ? '' : `<div class="range" role="group" aria-label="Zeitraum">${[3, 6, 12, 24].filter(m => m <= s.horizonMonths).map(m => `<button class="chip-btn ${App.range === m ? 'on' : ''}" data-act="range" data-m="${m}">${m} Monate</button>`).join('')}</div>
+    <div class="chart" data-chart="balance"></div>
+    <p class="legend"><span><i class="lg inv"></i>Rechnung wird bezahlt</span><span><i class="lg pre"></i>Sondertilgung</span><span><i class="lg buf"></i>Sicherheitspuffer</span>${P.reserveMax > 0.005 ? '<span><i class="lg ref"></i>Eigenes Geld (ohne Omas Anteil)</span>' : ''}</p>`}
+  </section>`;
+
+  if (empty) {
+    return `<header class="page-head"><div><h1>Übersicht</h1><p class="sub">${esc(dateStr)}</p></div></header>${hero}
+    <section class="panel start"><h2>So startest du</h2>
+      <ol class="steps">
+        <li><b>Kontostand eintragen.</b> Oben bei „Aktualisieren“.</li>
+        <li><b>Einnahmen und Fixkosten erfassen.</b> Gehalt, Miete, Versicherungen und Abos unter „Daueraufträge“.</li>
+        <li><b>Rechnungen und Raten erfassen.</b> PayPal, Klarna und Ratenkäufe unter „Rechnungen &amp; Raten“. Mehrere auf einmal gehen per Schnell-Erfassung.</li>
+      </ol>
+      <p class="muted">Danach zeigt dir die Strategie, was du wann zahlen solltest.</p>
+      <div class="row-actions"><button class="btn primary" data-act="demo">Beispieldaten ansehen</button><button class="btn" data-act="nav" data-tab="flows">Mit Daueraufträgen beginnen</button></div>
+    </section>`;
+  }
+
+  const debtSummary = `<dl class="kv">
+    <div><dt>Offene Rechnungen</dt><dd>${money(st.invoices.filter(i => !i.paid).reduce((a, i) => a + i.amount, 0))}</dd></div>
+    <div><dt>Restschuld Ratenkäufe</dt><dd>${money(st.installments.reduce((a, i) => a + Math.max(0, i.balance), 0))}</dd></div>
+    <div><dt>Raten pro Monat</dt><dd>${money(stats.rates)}</dd></div>
+    <div><dt>Zinsen bis zum Ende</dt><dd>${money(P.opt.interest)}</dd></div>
+  </dl>`;
+
+  return `<header class="page-head"><div><h1>Übersicht</h1><p class="sub">${esc(dateStr)}</p></div><div class="actions"><button class="btn primary" data-act="addExpense">Ausgabe erfassen</button></div></header>
+  ${hero}
+  <div class="cols">
+    <section class="panel"><div class="panel-h"><h2>Als Nächstes</h2><span class="muted">21 Tage</span></div>${eventRows(P, 21)}</section>
+    <div class="stack">
+      <section class="panel"><div class="panel-h"><h2>Hinweise</h2></div>${warningList(P)}</section>
+      <section class="panel"><div class="panel-h"><h2>Schulden</h2><button class="link" data-act="nav" data-tab="plan">Zur Strategie</button></div>${debtSummary}</section>
+      ${budgetHomePanel()}
+      ${omaHomePanel()}
+      <section class="panel"><div class="panel-h"><h2>Monatlich im Schnitt</h2></div>
+        <dl class="kv"><div><dt>Einnahmen</dt><dd class="pos">${money(stats.income)}</dd></div><div><dt>Fixkosten</dt><dd>${money(-stats.expense)}</dd></div>${stats.flex > 0 ? `<div><dt>Flexible Ausgaben</dt><dd>${money(-stats.flex)}</dd></div>` : ''}<div><dt>Raten</dt><dd>${money(-stats.rates)}</dd></div><div class="sum"><dt>Übrig</dt><dd class="${surplus < 0 ? 'neg' : 'pos'}">${money(surplus)}</dd></div></dl>
+        ${categoryBars(P)}
+      </section>
+    </div>
+  </div>`;
+}
+
+function invoiceCard(inv, P) {
+  const today = P.today;
+  const diff = dayNum(inv.due) - dayNum(today);
+  const overdue = diff < 0;
+  const dbg = P.ctx.debts.find(d => d.id === inv.id);
+  const payDate = dbg ? P.dateAt(dbg.payDay - P.ctx.d0) : null;
+  let pct = null;
+  if (inv.purchaseDate && validISO(inv.purchaseDate)) {
+    const total = dayNum(inv.due) - dayNum(inv.purchaseDate);
+    if (total > 0) pct = Math.min(100, Math.max(0, ((dayNum(today) - dayNum(inv.purchaseDate)) / total) * 100));
+  }
+  const urgency = overdue ? 'bad' : diff <= 3 ? 'bad' : diff <= 7 ? 'warn' : 'ok';
+  return `<li class="item ${overdue ? 'is-over' : ''}">
+    <div class="item-main">
+      <div class="item-t"><b>${esc(inv.name)}</b>${inv.provider ? `<span class="tag">${esc(inv.provider)}</span>` : ''}${overdue ? '<span class="stamp">Überfällig</span>' : ''}</div>
+      <div class="item-s"><span class="mark">Frist ${esc(fmtDate(inv.due))}</span> <span class="rel ${urgency}">${esc(relDays(inv.due, today))}</span></div>
+      ${pct != null ? `<div class="term"><i style="width:${pct.toFixed(0)}%"></i></div><div class="fine muted">Zahlungsziel zu ${pct.toFixed(0)} % verstrichen</div>` : ''}
+      <div class="item-n">${payDate ? (payDate === today ? 'Plan: heute überweisen.' : `Plan: am ${esc(fmtWd(payDate))} überweisen${P.ctx.settings.payBufferDays ? ` (${P.ctx.settings.payBufferDays} Tage vor Fristende)` : ''}. Bis dahin bleibt das Geld verfügbar.`) : 'Außerhalb des Planungshorizonts.'}</div>
+    </div>
+    <div class="item-side">
+      <div class="item-amt">${money(inv.amount)}</div>
+      <div class="item-btns"><button class="btn sm primary" data-act="payInvoice" data-id="${esc(inv.id)}">Bezahlt</button><button class="btn sm" data-act="editInvoice" data-id="${esc(inv.id)}">Bearbeiten</button><button class="btn sm ghost" data-act="delInvoice" data-id="${esc(inv.id)}">Löschen</button></div>
+    </div>
+  </li>`;
+}
+
+function installmentCard(it, P) {
+  const base = P.base.debts.find(d => d.id === it.id);
+  const months = base && base.paidOffT ? Math.round((base.paidOffT - P.ctx.d0) / 30.4) : null;
+  const am = amortize(it.balance, it.payment, it.rate);
+  const over = validISO(it.nextDue) && dayNum(it.nextDue) < dayNum(P.today);
+  return `<li class="item ${over ? 'is-over' : ''}">
+    <div class="item-main">
+      <div class="item-t"><b>${esc(it.name)}</b>${it.provider ? `<span class="tag">${esc(it.provider)}</span>` : ''}<span class="tag ${it.rate > 0 ? 'warnt' : 'ok'}">${it.rate > 0 ? esc(fmtPct(it.rate)) + ' p. a.' : 'zinsfrei'}</span>${over ? '<span class="stamp">Überfällig</span>' : ''}</div>
+      <div class="item-s">Rate ${money(it.payment)} am ${esc(fmtDate(it.nextDue))} <span class="rel">${esc(relDays(it.nextDue, P.today))}</span></div>
+      <div class="item-n">${am.ok ? `Noch ${am.months} Raten${months != null ? ` (bis ca. ${esc(fmtDate(base ? fromDayNum(base.paidOffT) : ''))})` : ''}${it.rate > 0 ? `, Zinsen insgesamt ca. ${esc(fmtEUR(am.interest))}` : ''}.` : '<b>Die Rate deckt die Zinsen nicht.</b>'} ${it.allowPrepay ? 'Sondertilgung erlaubt.' : 'Keine Sondertilgung.'}</div>
+    </div>
+    <div class="item-side">
+      <div class="item-amt">${money(it.balance)}<small>Restschuld</small></div>
+      <div class="item-btns"><button class="btn sm primary" data-act="payInstallment" data-id="${esc(it.id)}">Rate bezahlt</button><button class="btn sm" data-act="prepayInstallment" data-id="${esc(it.id)}">Sondertilgung</button><button class="btn sm" data-act="editInstallment" data-id="${esc(it.id)}">Bearbeiten</button><button class="btn sm ghost" data-act="delInstallment" data-id="${esc(it.id)}">Löschen</button></div>
+    </div>
+  </li>`;
+}
+
+function viewDebts() {
+  const P = getPlan(), st = App.state;
+  const open = st.invoices.filter(i => !i.paid).sort((a, b) => a.due.localeCompare(b.due));
+  const paid = st.invoices.filter(i => i.paid).sort((a, b) => (b.paidDate || '').localeCompare(a.paidDate || ''));
+  const inst = st.installments.filter(i => i.balance > 0.005).sort((a, b) => a.nextDue.localeCompare(b.nextDue));
+  const done = st.installments.filter(i => !(i.balance > 0.005));
+  return `<header class="page-head"><div><h1>Rechnungen &amp; Raten</h1><p class="sub">Kauf auf Rechnung (PayPal, Klarna, Händler) und Ratenzahlungen mit allen Fristen.</p></div>
+    <div class="actions"><button class="btn" data-act="quick">Schnell-Erfassung</button><button class="btn" data-act="addInvoice">Rechnung</button><button class="btn primary" data-act="addInstallment">Ratenzahlung</button></div></header>
+  <section class="panel"><div class="panel-h"><h2>Kauf auf Rechnung</h2><span class="muted">${open.length ? `${money(open.reduce((a, i) => a + i.amount, 0))} offen` : ''}</span></div>
+    ${open.length ? `<ul class="items">${open.map(i => invoiceCard(i, P)).join('')}</ul>` : '<p class="empty">Keine offenen Rechnungen. Mit „Rechnung“ trägst du PayPal-, Klarna- oder Händlerrechnungen samt Zahlungsziel ein.</p>'}
+    ${paid.length ? `<details class="fold"><summary>Bezahlt (${paid.length})</summary><ul class="items quiet">${paid.map(i => `<li class="item"><div class="item-main"><div class="item-t"><b>${esc(i.name)}</b>${i.provider ? `<span class="tag">${esc(i.provider)}</span>` : ''}</div><div class="item-s">bezahlt am ${esc(fmtDate(i.paidDate))}</div></div><div class="item-side"><div class="item-amt">${money(i.amount)}</div><div class="item-btns"><button class="btn sm ghost" data-act="delInvoice" data-id="${esc(i.id)}">Löschen</button></div></div></li>`).join('')}</ul></details>` : ''}
+  </section>
+  <section class="panel"><div class="panel-h"><h2>Ratenzahlungen</h2><span class="muted">${inst.length ? `${money(inst.reduce((a, i) => a + i.balance, 0))} Restschuld` : ''}</span></div>
+    ${inst.length ? `<ul class="items">${inst.map(i => installmentCard(i, P)).join('')}</ul>` : '<p class="empty">Keine laufenden Ratenzahlungen.</p>'}
+    ${done.length ? `<details class="fold"><summary>Abbezahlt (${done.length})</summary><ul class="items quiet">${done.map(i => `<li class="item"><div class="item-main"><div class="item-t"><b>${esc(i.name)}</b></div></div><div class="item-side"><div class="item-btns"><button class="btn sm ghost" data-act="delInstallment" data-id="${esc(i.id)}">Löschen</button></div></div></li>`).join('')}</ul></details>` : ''}
+  </section>`;
+}
+
+function strategyNote(it, prepaid, firstPrepay) {
+  if (it.apr <= 0) return '0 % Zinsen: planmäßig zahlen. Das Geld bleibt auf dem Konto verfügbar.';
+  if (!it.allowPrepay) return 'Sondertilgung nicht möglich: Rate pünktlich zahlen.';
+  if (prepaid > 0) return `Sondertilgung ${fmtEUR(prepaid)} geplant, erste am ${fmtDate(firstPrepay)}.`;
+  return 'Aktuell kein freier Spielraum über dem Sicherheitspuffer.';
+}
+
+function viewPlan() {
+  const P = getPlan(), st = App.state;
+  const debts = P.ctx.debts;
+  const head = `<header class="page-head"><div><h1>Abzahlungsstrategie</h1><p class="sub">Ausgewogen: keine Frist verpassen, Geld so lange wie möglich behalten, teuerste Raten zuerst tilgen.</p></div></header>`;
+  if (!debts.length) return head + '<section class="panel"><p class="empty">Keine offenen Rechnungen oder Raten. Sobald du welche erfasst, entsteht hier dein Zahlungsplan.</p><div class="row-actions"><button class="btn primary" data-act="nav" data-tab="debts">Rechnungen &amp; Raten erfassen</button></div></section>';
+
+  const fmtFree = (r) => r.sum.debtFree >= 0 ? fmtDate(P.dateAt(r.sum.debtFree)) : `nach ${P.ctx.settings.horizonMonths} Monaten`;
+  const compare = `<section class="panel"><div class="panel-h"><h2>Vergleich</h2></div>
+    <div class="cmp">
+      <div class="cmp-c"><h3>Nur Pflichtzahlungen</h3><dl class="kv"><div><dt>Zinsen bis zum Ende</dt><dd>${money(P.base.interest)}</dd></div><div><dt>Schuldenfrei</dt><dd>${esc(fmtFree(P.base))}</dd></div></dl></div>
+      <div class="cmp-c best"><h3>Mit Strategie</h3><dl class="kv"><div><dt>Zinsen bis zum Ende</dt><dd>${money(P.opt.interest)}</dd></div><div><dt>Schuldenfrei</dt><dd>${esc(fmtFree(P.opt))}</dd></div></dl></div>
+    </div>
+    <p class="saving">${P.savings > 0.5 ? `Ersparnis durch Sondertilgungen: <b>${money(P.savings)}</b> Zinsen.` : 'Keine Zinsersparnis möglich: entweder sind alle Raten zinsfrei oder es gibt aktuell keinen freien Spielraum.'}</p>
+    <div class="chart" data-chart="debt"></div>
+    <p class="legend"><span><i class="lg ref"></i>Nur Pflichtzahlungen</span><span><i class="lg pri"></i>Mit Strategie</span></p>
+  </section>`;
+
+  const steps = P.opt.log.filter(e => ['rate', 'invoice', 'prepay'].includes(e.type) && e.i <= 60)
+    .sort((a, b) => a.t - b.t || TYPE_ORDER[a.type] - TYPE_ORDER[b.type]);
+  const why = e => {
+    if (e.type === 'invoice') {
+      if (e.overdue) return 'Bereits überfällig: sofort überweisen, um Mahngebühren zu vermeiden.';
+      const left = e.due - e.t;
+      return left <= 0 ? 'Letzter Tag der Frist.' : `${left} ${left === 1 ? 'Tag' : 'Tage'} vor Fristende: so lange bleibt das Geld verfügbar, ohne dass die Frist gefährdet ist.`;
+    }
+    if (e.type === 'rate') return e.overdue ? 'Überfällig: nachholen.' : `Pflichtrate${e.apr > 0 ? `, davon ca. ${fmtEUR(e.interest)} Zinsen` : ' (zinsfrei)'}.`;
+    return `Freies Geld über dem Puffer. Höchster Zinssatz zuerst (${fmtPct(e.apr)}).`;
+  };
+  const stepsHTML = steps.length ? `<ul class="plan">${steps.map(e => {
+    const kind = e.type === 'invoice' ? 'Rechnung zahlen' : e.type === 'rate' ? 'Rate zahlen' : 'Sondertilgung';
+    return `<li class="pl ${e.type}"><span class="pl-d">${esc(fmtWd(P.dateAt(e.i)))}</span><div class="pl-m"><b>${esc(e.name)}</b> ${tagFor(e, true)}<span class="pl-k">${esc(kind)}</span><p>${esc(why(e))}</p></div><span class="pl-a">${money(e.amount)}</span></li>`;
+  }).join('')}</ul>` : '<p class="empty">In den nächsten 60 Tagen ist keine Zahlung geplant.</p>';
+
+  const invRank = debts.filter(d => d.kind === 'inv').sort((a, b) => a.due - b.due);
+  const instRank = debts.filter(d => d.kind === 'inst').sort((a, b) => b.apr - a.apr || a.B0 - b.B0);
+  const optBy = Object.fromEntries(P.opt.debts.map(d => [d.id, d]));
+  const baseBy = Object.fromEntries(P.base.debts.map(d => [d.id, d]));
+  const prep = {};
+  for (const e of P.opt.log) if (e.type === 'prepay') { (prep[e.id] || (prep[e.id] = { sum: 0, first: P.dateAt(e.i) })).sum += -e.amount; }
+
+  const invHTML = invRank.length ? `<ol class="rank">${invRank.map((d, k) => `<li><span class="rk">${k + 1}</span><div><b>${esc(d.name)}</b>${d.provider ? ` <span class="tag">${esc(d.provider)}</span>` : ''}<p>${d.overdue ? 'Überfällig: sofort zahlen.' : `Überweisen am ${esc(fmtDate(P.dateAt(d.payDay - P.ctx.d0)))}. Frist: <span class="mark">${esc(fmtDate(fromDayNum(d.due)))}</span>`}</p></div><span>${money(d.amount)}</span></li>`).join('')}</ol>` : '<p class="empty">Keine offenen Rechnungen.</p>';
+  const instHTML = instRank.length ? `<ol class="rank">${instRank.map((d, k) => {
+    const o = optBy[d.id], b = baseBy[d.id], pr = prep[d.id];
+    const end = o && o.paidOffT ? fmtDate(fromDayNum(o.paidOffT)) : null;
+    const endB = b && b.paidOffT ? fmtDate(fromDayNum(b.paidOffT)) : null;
+    return `<li><span class="rk">${k + 1}</span><div><b>${esc(d.name)}</b> <span class="tag ${d.apr > 0 ? 'warnt' : 'ok'}">${d.apr > 0 ? esc(fmtPct(d.apr)) : 'zinsfrei'}</span>${d.provider ? ` <span class="tag">${esc(d.provider)}</span>` : ''}<p>${esc(strategyNote(d, pr ? pr.sum : 0, pr ? pr.first : null))}</p><p class="fine">${end ? `Abbezahlt ${esc(end)}${endB && endB !== end ? ` (statt ${esc(endB)})` : ''}.` : `Läuft über den Planungszeitraum hinaus.`}</p></div><span>${money(d.B0)}</span></li>`;
+  }).join('')}</ol>` : '<p class="empty">Keine laufenden Ratenzahlungen.</p>';
+
+  const months = P.opt.sum.monthly;
+  const showOma = months.some(m => Math.abs(m.oma) > 0.005);
+  const showFlex = months.some(m => m.flex > 0.005);
+  const table = `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Monat</th><th>Einnahmen</th><th>Fixkosten</th>${showFlex ? '<th>Flexibel</th>' : ''}<th>Raten</th><th>Rechnungen</th><th>Sondertilgung</th>${showOma ? '<th>Oma (netto)</th>' : ''}<th>Kontostand Ende</th><th>Schulden Ende</th></tr></thead><tbody>${months.map(m => `<tr><th>${esc(fmtMonthKey(m.key))}</th><td>${m.inc ? money(m.inc) : '–'}</td><td>${m.exp ? money(m.exp) : '–'}</td>${showFlex ? `<td>${m.flex > 0.005 ? money(m.flex) : '–'}</td>` : ''}<td>${m.rate ? money(m.rate) : '–'}</td><td>${m.inv ? money(m.inv) : '–'}</td><td>${m.prepay ? money(m.prepay) : '–'}</td>${showOma ? `<td>${Math.abs(m.oma) > 0.005 ? money(m.oma) : '–'}</td>` : ''}<td class="${m.end < 0 ? 'neg' : ''}">${money(m.end)}</td><td>${m.debt > 0.005 ? money(m.debt) : '–'}</td></tr>`).join('')}</tbody></table></div>`;
+
+  const s = P.ctx.settings;
+  return head + compare + `
+  <section class="panel"><div class="panel-h"><h2>Zahlungsplan</h2><span class="muted">nächste 60 Tage</span></div>${stepsHTML}</section>
+  <div class="cols even">
+    <section class="panel"><div class="panel-h"><h2>Rechnungen nach Frist</h2></div>${invHTML}</section>
+    <section class="panel"><div class="panel-h"><h2>Raten nach Zinssatz</h2></div>${instHTML}</section>
+  </div>
+  <section class="panel"><div class="panel-h"><h2>Monatsübersicht</h2></div>${table}</section>
+  <section class="panel"><details class="fold open-flat"><summary>So rechnet die Strategie</summary>
+    <ol class="rules">
+      <li><b>Fristen sind tabu.</b> Jede Rechnung und jede Rate wird pünktlich bezahlt. Rechnungen überweist du ${s.payBufferDays} ${s.payBufferDays === 1 ? 'Tag' : 'Tage'} vor Fristende, damit die Zahlung rechtzeitig ankommt.</li>
+      <li><b>Nie früher zahlen als nötig.</b> Rechnungen von PayPal, Klarna und Händlern kosten bis zur Frist nichts. Das Geld bleibt bis dahin auf deinem Konto und kann für teurere Schulden genutzt werden.</li>
+      <li><b>Freies Geld geht in die teuerste Rate.</b> Frei ist nur, was nach allen Fixkosten, Raten und Rechnungen der kommenden ${s.horizonMonths} Monate über deinem Sicherheitspuffer von ${esc(fmtEUR(s.buffer))} bleibt. Zuerst wird die Rate mit dem höchsten Zinssatz getilgt, bei Gleichstand die kleinere Restschuld.</li>
+      <li><b>Zinsfreie Raten laufen planmäßig.</b> Eine Sondertilgung spart hier nichts, dein Geld bleibt flexibel.</li>
+      <li><b>Flexible Ausgaben sind fest eingeplant.</b> Monatsbudgets für Einkauf, Shopping und Freizeit werden gleichmäßig auf die Tage verteilt, im laufenden Monat nur der noch nicht ausgegebene Rest. Freies Geld ist, was danach noch übrig bleibt.</li>
+      <li><b>Omas Geld bleibt unberührt.</b> Verkaufserlöse für Oma, die auf deinem Konto liegen, zählen nie als freies Geld. Auslagen für Oma gelten erst als verfügbar, wenn sie erstattet sind.</li>
+      <li><b>Sondertilgungen gibt es höchstens einmal pro Geldeingang</b> (mindestens ${esc(fmtEUR(s.minPrepay))}), nicht täglich in kleinen Beträgen.</li>
+    </ol>
+    <p class="fine">Alle Zahlen sind eine Prognose auf Basis deiner Eingaben. Je aktueller Kontostand und Restschulden sind, desto verlässlicher ist der Plan.</p>
+  </details></section>`;
+}
+
+function recurringRow(r) {
+  const next = occurrences(r, dayNum(todayISO()), dayNum(todayISO()) + 400)[0];
+  return `<li class="item compact"><div class="item-main"><div class="item-t"><b>${esc(r.name)}</b><span class="tag">${esc(r.category || '')}</span></div><div class="item-s">${esc(INTERVALS[r.interval] ? INTERVALS[r.interval].label : r.interval)}${next ? `, nächster Termin ${esc(fmtDate(fromDayNum(next)))}` : ', keine Termine mehr'}${r.end ? `, endet ${esc(fmtDate(r.end))}` : ''}</div></div>
+    <div class="item-side"><div class="item-amt ${r.type === 'income' ? 'pos' : ''}">${money(r.type === 'income' ? r.amount : -r.amount)}</div><div class="item-btns"><button class="btn sm" data-act="editRecurring" data-id="${esc(r.id)}">Bearbeiten</button><button class="btn sm ghost" data-act="delRecurring" data-id="${esc(r.id)}">Löschen</button></div></div></li>`;
+}
+
+function viewFlows() {
+  const st = App.state, today = todayISO();
+  const inc = st.recurring.filter(r => r.type === 'income');
+  const exp = st.recurring.filter(r => r.type !== 'income');
+  const sortR = (a, b) => a.name.localeCompare(b.name, 'de');
+  const one = [...st.oneoffs].sort((a, b) => a.date.localeCompare(b.date));
+  const sum = (arr) => arr.reduce((a, r) => a + r.amount * (INTERVALS[r.interval] || INTERVALS.monthly).factor, 0);
+  return `<header class="page-head"><div><h1>Daueraufträge &amp; Buchungen</h1><p class="sub">Alles, was regelmäßig oder einmalig auf dein Konto zukommt oder davon abgeht. Variable Kosten wie Lebensmittel trägst du als Durchschnitt ein.</p></div>
+    <div class="actions"><button class="btn" data-act="addOneoff">Einmalbuchung</button><button class="btn primary" data-act="addRecurring">Dauerauftrag oder Einnahme</button></div></header>
+  <section class="panel"><div class="panel-h"><h2>Einnahmen</h2><span class="muted">${inc.length ? `${money(sum(inc))} pro Monat` : ''}</span></div>${inc.length ? `<ul class="items">${inc.sort(sortR).map(recurringRow).join('')}</ul>` : '<p class="empty">Noch keine Einnahmen. Trage dein Gehalt mit dem nächsten Zahltag ein.</p>'}</section>
+  <section class="panel"><div class="panel-h"><h2>Ausgaben</h2><span class="muted">${exp.length ? `${money(sum(exp))} pro Monat` : ''}</span></div>${exp.length ? `<ul class="items">${exp.sort(sortR).map(recurringRow).join('')}</ul>` : '<p class="empty">Noch keine Ausgaben. Miete, Strom, Versicherungen, Abos und Lebenshaltung gehören hierher.</p>'}</section>
+  <section class="panel"><div class="panel-h"><h2>Einmalige Buchungen</h2></div>${one.length ? `<ul class="items">${one.map(o => `<li class="item compact"><div class="item-main"><div class="item-t"><b>${esc(o.name)}</b>${o.category ? `<span class="tag">${esc(o.category)}</span>` : ''}${o.date < today ? '<span class="tag">vergangen, nicht eingerechnet</span>' : ''}</div><div class="item-s">${esc(fmtDate(o.date))}</div></div><div class="item-side"><div class="item-amt ${o.type === 'income' ? 'pos' : ''}">${money(o.type === 'income' ? o.amount : -o.amount)}</div><div class="item-btns"><button class="btn sm" data-act="editOneoff" data-id="${esc(o.id)}">Bearbeiten</button><button class="btn sm ghost" data-act="delOneoff" data-id="${esc(o.id)}">Löschen</button></div></div></li>`).join('')}</ul>` : '<p class="empty">Keine einmaligen Buchungen, zum Beispiel Steuerrückerstattung, Reparatur oder Urlaub.</p>'}</section>`;
+}
+
+function viewSettings() {
+  const s = App.state.settings;
+  const fields = SETTINGS_FIELDS;
+  const theme = currentTheme();
+  const secure = `  <section class="panel"><div class="panel-h"><h2>Sicherheit und Backup</h2></div>
+    <p class="lead">Deine Daten werden mit deinem Passwort verschlüsselt (AES-256) und nur in diesem Browser gespeichert. Es gibt keinen Server und kein Konto. Wer das Passwort vergisst, kann die Daten nicht wiederherstellen.</p>
+    <p class="muted">${s.lastBackup ? `Letztes Backup: ${esc(fmtDate(s.lastBackup))}.` : 'Noch kein Backup erstellt.'} Das Backup ist verschlüsselt und nur mit deinem Passwort lesbar. Damit ziehst du auch auf ein anderes Gerät um.</p>
+    <div class="row-actions"><button class="btn primary" data-act="export">Backup exportieren</button><button class="btn" data-act="import">Backup importieren</button><button class="btn" data-act="changePw">Passwort ändern</button><button class="btn" data-act="lock">Jetzt sperren</button></div>
+  </section>
+  <section class="panel danger-zone"><div class="panel-h"><h2>Daten entfernen</h2></div><p class="muted">Einträge löschen behält Passwort und Einstellungen, zum Beispiel nach dem Ausprobieren mit Beispieldaten. Den Tresor zu löschen entfernt alles aus diesem Browser, ohne Backup endgültig.</p><div class="row-actions"><button class="btn" data-act="clearEntries">Alle Einträge löschen</button><button class="btn danger" data-act="wipe">Tresor löschen</button></div></section>`;
+  const previewPanel = `<section class="panel"><div class="panel-h"><h2>Vorschau-Modus</h2></div>
+    <p class="lead">Hier gibt es keinen Tresor, kein Passwort und keine Speicherung. Alles liegt nur im Arbeitsspeicher und ist beim Neuladen weg. Backup, Passwortwechsel und Löschen stehen in der echten App zur Verfügung.</p>
+    <div class="row-actions"><button class="btn" data-act="pvReset">Beispieldaten zurücksetzen</button><button class="btn" data-act="clearEntries">Alle Einträge löschen</button></div></section>`;
+  return `<header class="page-head"><div><h1>Einstellungen</h1><p class="sub">Planung, Darstellung und Sicherheit.</p></div></header>
+  <section class="panel"><div class="panel-h"><h2>Planung</h2></div>
+    <form id="settingsForm" class="inline-form" novalidate><div class="fgrid">${fields.map(f => fieldHTML(f, s[f.key])).join('')}</div>
+    <p class="err" id="serr" role="alert"></p><div class="row-actions"><button class="btn primary" type="submit">Einstellungen speichern</button></div></form></section>
+  <section class="panel"><div class="panel-h"><h2>Darstellung</h2></div>
+    <div class="seg" role="group" aria-label="Farbschema">${[['auto', 'Automatisch'], ['light', 'Hell'], ['dark', 'Dunkel']].map(([v, l]) => `<button class="chip-btn ${theme === v ? 'on' : ''}" data-act="theme" data-v="${v}">${l}</button>`).join('')}</div></section>
+  ${App.preview ? previewPanel : secure}`;
+}
+
+const Views = { home: viewHome, plan: viewPlan, debts: viewDebts, flows: viewFlows, settings: viewSettings };
+
+/* =====================================================================
+   SPERRBILDSCHIRM, SHELL, AKTIONEN
+   ===================================================================== */
+const ICONS = {
+  home: '<path d="M4 13h6V4H4zM14 20h6v-9h-6zM14 4h6v4h-6zM4 20h6v-4H4z"/>',
+  plan: '<path d="M5 21V4m0 0h12l-2.5 4 2.5 4H5"/>',
+  debts: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/>',
+  flows: '<path d="M17 3l4 4-4 4M3 11V9a2 2 0 012-2h16M7 21l-4-4 4-4m14-1v2a2 2 0 01-2 2H3"/>',
+  settings: '<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
+  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',
+  oma: '<path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/>',
+  journal: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  budgets: '<path d="M12 3v9h9"/><path d="M20.5 15A9 9 0 1111 3.5"/>',
+};
+const icon = n => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
+const LOGO = '<svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--accent)"/><path d="M7 19l5-5 4 4 8-9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="7" y="23" width="18" height="3.2" rx="1" fill="#f4dc3e"/></svg>';
+
+const NAV = [['home', 'Übersicht'], ['plan', 'Strategie'], ['debts', 'Rechnungen & Raten'], ['budgets', 'Budgets'], ['oma', 'Oma'], ['journal', 'Historie'], ['flows', 'Daueraufträge'], ['settings', 'Einstellungen']];
+const DESK_ONLY = ['journal', 'flows', 'settings'];
+const AfterRender = { settings: () => bindSettings() };
+
+function fatalScreen(title, text, withPreview) {
+  const app = $('#app'); app.dataset.mode = 'lock';
+  app.innerHTML = `<main class="lock"><div class="lock-card"><div class="brand big">${LOGO}<span>Kassensturz</span></div><h1>${esc(title)}</h1><p class="lead">${esc(text)}</p>${withPreview ? '<div class="row-actions"><button class="btn" data-act="pvStart">Vorschau mit Beispieldaten ansehen</button></div><p class="fine muted tbl-note">Die Vorschau speichert nichts und braucht kein Passwort.</p>' : ''}</div></main>`;
+}
+
+/* Vorschau: ohne Passwort, nur im Arbeitsspeicher, mit Beispieldaten. Berührt den echten Tresor nie. */
+const embedded = () => { try { return window.parent !== window; } catch (e) { return true; } };
+function startPreview() {
+  App.preview = true; App.key = null; App.salt = null; App.plan = null;
+  App.state = normalizeState(demoData());
+  App.tab = 'home';
+  render();
+}
+const previewBar = () => '<div class="pv-bar" role="status"><span><b>Vorschau</b> mit Beispieldaten. Kein Passwort, es wird nichts gespeichert. Änderungen sind beim Neuladen weg.</span><button class="link" data-act="pvReset">Zurücksetzen</button></div>';
+
+function renderLock() {
+  const app = $('#app');
+  app.dataset.mode = 'lock';
+  app.classList.remove('privacy');
+  const has = !!Store.get();
+  app.innerHTML = `<main class="lock"><div class="lock-card">
+    <div class="brand big">${LOGO}<span>Kassensturz</span></div>
+    <h1>${has ? 'Tresor entsperren' : 'Tresor anlegen'}</h1>
+    <p class="lead">${has ? 'Gib dein Passwort ein, um dein Budget zu öffnen.' : 'Lege ein Passwort fest. Alle Daten werden damit verschlüsselt, bevor sie in diesem Browser gespeichert werden. Es verlässt nichts dein Gerät.'}</p>
+    <form id="lockForm" novalidate>
+      <label class="f"><span>${has ? 'Passwort' : 'Neues Passwort'}</span><input id="pw" type="password" autocomplete="${has ? 'current-password' : 'new-password'}" required autofocus></label>
+      ${has ? '' : `<label class="f"><span>Passwort wiederholen</span><input id="pw2" type="password" autocomplete="new-password" required></label>
+      <div class="meter" id="meter" data-n="0"><i></i><i></i><i></i><i></i><small id="pwLabel">Mindestens 8 Zeichen. Ein langer Satz ist besser als ein kurzes Passwort.</small></div>
+      <label class="chk"><input type="checkbox" id="ack"><span>Mir ist klar: Wenn ich das Passwort vergesse, kann niemand die Daten wiederherstellen.</span></label>`}
+      <p class="err" id="lockErr" role="alert"></p>
+      <button class="btn primary block" type="submit" id="lockBtn">${has ? 'Entsperren' : 'Tresor anlegen'}</button>
+    </form>
+    <div class="lock-foot"><button class="link" data-act="importBackup">Backup einer anderen Installation laden</button></div>
+  </div></main>`;
+
+  const form = $('#lockForm');
+  if (!has) {
+    $('#pw').addEventListener('input', () => {
+      const s = passwordStrength($('#pw').value);
+      $('#meter').dataset.n = $('#pw').value ? s.n : 0;
+      $('#pwLabel').textContent = $('#pw').value ? `Stärke: ${s.label}` : 'Mindestens 8 Zeichen. Ein langer Satz ist besser als ein kurzes Passwort.';
+    });
+  }
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = $('#lockErr'), btn = $('#lockBtn');
+    err.textContent = '';
+    const pw = $('#pw').value;
+    if (!pw) { err.textContent = 'Bitte Passwort eingeben.'; return; }
+    if (!has) {
+      if (pw.length < 8) { err.textContent = 'Das Passwort braucht mindestens 8 Zeichen.'; return; }
+      if (pw !== $('#pw2').value) { err.textContent = 'Die beiden Passwörter stimmen nicht überein.'; return; }
+      if (!$('#ack').checked) { err.textContent = 'Bitte bestätige den Hinweis zur Wiederherstellung.'; return; }
+    }
+    btn.disabled = true; btn.textContent = has ? 'Wird entsperrt …' : 'Wird verschlüsselt …';
+    await new Promise(r => setTimeout(r, 30));
+    try {
+      if (has) await unlockVault(pw); else await createVault(pw);
+      App.tab = 'home';
+      armIdle();
+      render();
+    } catch (ex) {
+      err.textContent = ex.message || 'Das hat nicht geklappt.';
+      btn.disabled = false; btn.textContent = has ? 'Entsperren' : 'Tresor anlegen';
+      $('#pw').select();
+    }
+  });
+}
+
+function mountShell() {
+  const app = $('#app');
+  app.dataset.mode = 'app';
+  app.innerHTML = `<div class="shell">
+    <aside class="rail">
+      <div class="brand">${LOGO}<span>Kassensturz</span></div>
+      <nav class="nav" aria-label="Hauptnavigation">${NAV.map(([k, l]) => `<button class="${DESK_ONLY.includes(k) ? 'desk' : ''}" data-act="nav" data-tab="${k}">${icon(k)}<span>${l}</span></button>`).join('')}</nav>
+      <div class="rail-foot">
+        ${DESK_ONLY.map(k => `<button class="rail-btn mob" data-act="nav" data-tab="${k}" aria-label="${NAV.find(n => n[0] === k)[1]}" title="${NAV.find(n => n[0] === k)[1]}">${icon(k)}</button>`).join('')}
+        <button class="rail-btn" data-act="privacy" aria-pressed="false" title="Beträge ausblenden">${icon('eye')}<span>Beträge ausblenden</span></button>
+        ${App.preview ? '' : `<button class="rail-btn" data-act="lock" title="Tresor sperren">${icon('lock')}<span>Sperren</span></button>`}
+      </div>
+    </aside>
+    <main class="main" id="view" tabindex="-1"></main>
+  </div>`;
+}
+
+function render() {
+  const app = $('#app');
+  if (!App.state) { renderLock(); return; }
+  if (app.dataset.mode !== 'app' || !$('#view')) mountShell();
+  const y = window.scrollY;
+  $('#view').innerHTML = (App.preview ? previewBar() : '') + Views[App.tab]();
+  $$('.rail [data-act=nav]').forEach(b => b.setAttribute('aria-current', b.dataset.tab === App.tab ? 'page' : 'false'));
+  app.classList.toggle('privacy', App.privacy);
+  const pb = $('[data-act=privacy]'); if (pb) pb.setAttribute('aria-pressed', String(App.privacy));
+  drawCharts();
+  const hook = AfterRender[App.tab]; if (hook) hook();
+  window.scrollTo(0, y);
+}
+
+/* ---------- Hilfsfunktionen ---------- */
+const upsert = (list, item) => { const i = list.findIndex(x => x.id === item.id); if (i >= 0) list[i] = item; else list.push(item); };
+const byId = (list, id) => list.find(x => x.id === id);
+const CATS_EXP = ['Wohnen', 'Lebensmittel', 'Mobilität', 'Versicherung', 'Abos & Medien', 'Freizeit', 'Gesundheit', 'Kinder & Familie', 'Kleidung', 'Sonstiges'];
+const CATS_INC = ['Gehalt', 'Sonstige Einnahmen'];
+const budgetNames = () => (App.state && App.state.budgets ? App.state.budgets.map(b => b.name) : []);
+const catOptions = (type, cur) => {
+  const a = type === 'income' ? [...CATS_INC] : [...budgetNames(), ...CATS_EXP.filter(c => !budgetNames().includes(c))];
+  if (cur && !a.includes(cur)) a.push(cur);
+  return a.map(c => [c, c]);
+};
+function setBalance(value) { App.state.settings.balance = round2(value); App.state.settings.balanceDate = todayISO(); }
+function armIdle() {
+  clearTimeout(App.idle);
+  if (!App.state || App.preview) return;
+  const m = Number(App.state.settings.lockMinutes) || 10;
+  App.idle = setTimeout(lockVault, m * 60000);
+}
+let memTheme = null;
+function currentTheme() {
+  if (memTheme) return memTheme;
+  try { return localStorage.getItem(THEME_KEY) || 'auto'; } catch (e) { return 'auto'; }
+}
+function applyTheme() {
+  const t = currentTheme();
+  if (t === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+}
+
+/* ---------- Formulare ---------- */
+function recurringForm(item) {
+  const v = item || { type: 'expense', name: '', amount: '', interval: 'monthly', start: todayISO(), end: '', category: 'Wohnen' };
+  openForm({
+    title: item ? 'Eintrag bearbeiten' : 'Dauerauftrag oder Einnahme',
+    values: v,
+    fields: [
+      { key: 'type', label: 'Art', type: 'select', half: true, options: [['expense', 'Ausgabe'], ['income', 'Einnahme']] },
+      { key: 'name', label: 'Bezeichnung', type: 'text', half: true, required: true, placeholder: 'z. B. Miete, Gehalt' },
+      { key: 'amount', label: 'Betrag', type: 'money', half: true, required: true },
+      { key: 'interval', label: 'Rhythmus', type: 'select', half: true, options: Object.entries(INTERVALS).map(([k, x]) => [k, x.label]) },
+      { key: 'start', label: 'Nächster Termin', type: 'date', half: true, required: true, hint: 'Der Tag im Monat gilt für alle Folgetermine.' },
+      { key: 'end', label: 'Endet am (optional)', type: 'date', half: true },
+      { key: 'category', label: 'Kategorie', type: 'select', options: catOptions(v.type, v.category) },
+    ],
+    onInput: (api, key) => { if (key === 'type') api.options('category', catOptions(api.get('type')), api.get('type') === 'income' ? 'Gehalt' : 'Wohnen'); },
+    onSubmit: x => {
+      if (!x.name) return 'Bitte eine Bezeichnung eingeben.';
+      if (!(x.amount > 0)) return 'Bitte einen Betrag größer als 0 eingeben.';
+      if (!validISO(x.start)) return 'Bitte den nächsten Termin wählen.';
+      if (x.end && !validISO(x.end)) return 'Das Enddatum ist ungültig.';
+      if (x.end && x.end < x.start) return 'Das Enddatum liegt vor dem Termin.';
+      upsert(App.state.recurring, { id: item ? item.id : uid(), name: x.name, amount: round2(x.amount), type: x.type, category: x.category, interval: x.interval, start: x.start, end: x.end || '' });
+      commit(); toast('Gespeichert');
+    },
+  });
+}
+
+function oneoffForm(item) {
+  const v = item || { type: 'expense', name: '', amount: '', date: todayISO(), category: 'Sonstiges' };
+  openForm({
+    title: item ? 'Einmalbuchung bearbeiten' : 'Einmalbuchung',
+    values: v,
+    fields: [
+      { key: 'type', label: 'Art', type: 'select', half: true, options: [['expense', 'Ausgabe'], ['income', 'Einnahme']] },
+      { key: 'name', label: 'Bezeichnung', type: 'text', half: true, required: true, placeholder: 'z. B. Steuererstattung' },
+      { key: 'amount', label: 'Betrag', type: 'money', half: true, required: true },
+      { key: 'date', label: 'Datum', type: 'date', half: true, required: true },
+      { key: 'category', label: 'Kategorie', type: 'select', options: catOptions(v.type, v.category) },
+    ],
+    onInput: (api, key) => { if (key === 'type') api.options('category', catOptions(api.get('type')), api.get('type') === 'income' ? 'Sonstige Einnahmen' : 'Sonstiges'); },
+    onSubmit: x => {
+      if (!x.name) return 'Bitte eine Bezeichnung eingeben.';
+      if (!(x.amount > 0)) return 'Bitte einen Betrag größer als 0 eingeben.';
+      if (!validISO(x.date)) return 'Bitte ein Datum wählen.';
+      upsert(App.state.oneoffs, { id: item ? item.id : uid(), name: x.name, amount: round2(x.amount), type: x.type, category: x.category, date: x.date });
+      commit(); toast('Gespeichert');
+    },
+  });
+}
+
+function invoiceForm(item) {
+  const today = todayISO();
+  const v = item || { name: '', provider: '', amount: '', purchaseDate: today, termDays: 30, due: fromDayNum(dayNum(today) + 30) };
+  const touched = { term: !!item };
+  const recompute = api => {
+    const p = api.get('purchaseDate'), t = api.get('termDays');
+    if (validISO(p) && t >= 0) api.set('due', fromDayNum(dayNum(p) + t));
+  };
+  const preview = api => {
+    const due = api.get('due');
+    if (!validISO(due)) { api.preview(''); return; }
+    const set = App.state.settings;
+    const pay = Math.max(dayNum(todayISO()), dayNum(due) - (Number(set.payBufferDays) || 0));
+    api.preview(`<p>Geplante Überweisung: <b>${esc(fmtDate(fromDayNum(pay)))}</b>. Spätestens fällig: <span class="mark">${esc(fmtDate(due))}</span>.</p>`);
+  };
+  openForm({
+    title: item ? 'Rechnung bearbeiten' : 'Kauf auf Rechnung',
+    values: v,
+    fields: [
+      { key: 'name', label: 'Bezeichnung', type: 'text', required: true, placeholder: 'z. B. Sneaker, Kopfhörer' },
+      { key: 'provider', label: 'Anbieter', type: 'text', half: true, list: ['PayPal', 'Klarna', 'Händler', 'Sonstige'], placeholder: 'PayPal, Klarna …' },
+      { key: 'amount', label: 'Betrag', type: 'money', half: true, required: true },
+      { key: 'purchaseDate', label: 'Kauf- oder Rechnungsdatum', type: 'date', half: true },
+      { key: 'termDays', label: 'Zahlungsziel in Tagen', type: 'number', half: true, hint: 'Bei PayPal und Klarna oft 30 Tage ab Rechnung. Bitte mit deiner Rechnung abgleichen.' },
+      { key: 'due', label: 'Spätestens fällig am', type: 'date', required: true, hint: 'Das maximale Zahlungsziel. Die App plant die Zahlung kurz davor, nie später.' },
+    ],
+    onInput: (api, key) => {
+      if (key === 'provider' && !touched.term && /paypal|klarna/i.test(api.get('provider'))) { api.set('termDays', 30); recompute(api); }
+      if (key === 'termDays') { touched.term = true; recompute(api); }
+      if (key === 'purchaseDate') recompute(api);
+      if (key === 'due') { const p = api.get('purchaseDate'), d = api.get('due'); if (validISO(p) && validISO(d)) api.set('termDays', dayNum(d) - dayNum(p)); }
+      preview(api);
+    },
+    onSubmit: x => {
+      if (!x.name) return 'Bitte eine Bezeichnung eingeben.';
+      if (!(x.amount > 0)) return 'Bitte einen Betrag größer als 0 eingeben.';
+      if (!validISO(x.due)) return 'Bitte das Fälligkeitsdatum wählen.';
+      upsert(App.state.invoices, {
+        id: item ? item.id : uid(), name: x.name, provider: x.provider, amount: round2(x.amount),
+        purchaseDate: validISO(x.purchaseDate) ? x.purchaseDate : '', termDays: Number.isFinite(x.termDays) ? x.termDays : null,
+        due: x.due, paid: item ? !!item.paid : false, paidDate: item ? item.paidDate : '',
+      });
+      commit(); toast('Gespeichert');
+    },
+  });
+}
+
+function installmentForm(item) {
+  const today = todayISO();
+  const v = item || { name: '', provider: '', balance: '', payment: '', rate: 0, nextDue: fromDayNum(dayNum(today) + 14), allowPrepay: true };
+  const preview = api => {
+    const x = api.all();
+    if (!(x.balance > 0) || !(x.payment > 0)) { api.preview(''); return; }
+    const r = Number.isFinite(x.rate) ? x.rate : 0;
+    const am = amortize(x.balance, x.payment, r);
+    if (!am.ok) { api.preview('<p><b>Achtung:</b> Die Rate deckt die monatlichen Zinsen nicht. Die Schuld würde nie sinken.</p>'); return; }
+    const end = validISO(x.nextDue) ? fmtDate(addMonths(x.nextDue, am.months - 1)) : null;
+    api.preview(`<p>Laufzeit: <b>${am.months} Raten</b>${end ? ` bis ${esc(end)}` : ''}. Zinsen insgesamt ca. <b>${esc(fmtEUR(am.interest))}</b>.</p>`);
+  };
+  openForm({
+    title: item ? 'Ratenzahlung bearbeiten' : 'Ratenzahlung',
+    values: v,
+    fields: [
+      { key: 'name', label: 'Bezeichnung', type: 'text', required: true, placeholder: 'z. B. Waschmaschine' },
+      { key: 'provider', label: 'Anbieter', type: 'text', half: true, list: ['Klarna', 'PayPal', 'Händler', 'Bank'], placeholder: 'Klarna, Händler …' },
+      { key: 'balance', label: 'Restschuld heute', type: 'money', half: true, required: true, hint: 'Betrag, den du heute zur vollständigen Tilgung zahlen müsstest.' },
+      { key: 'payment', label: 'Monatliche Rate', type: 'money', half: true, required: true },
+      { key: 'rate', label: 'Zinssatz pro Jahr', type: 'percent', half: true, hint: '0 bei zinsfreier Ratenzahlung, sonst der effektive Jahreszins aus dem Vertrag.' },
+      { key: 'nextDue', label: 'Nächste Rate fällig am', type: 'date', required: true },
+      { key: 'allowPrepay', label: 'Sondertilgung ist erlaubt', type: 'checkbox', hint: 'Vorzeitig zurückzahlen, ohne dass der Anbieter dafür extra Gebühren verlangt. Im Zweifel in den Vertragsbedingungen nachsehen.' },
+    ],
+    onInput: (api) => preview(api),
+    onSubmit: x => {
+      if (!x.name) return 'Bitte eine Bezeichnung eingeben.';
+      if (!(x.balance > 0)) return 'Bitte die Restschuld eingeben.';
+      if (!(x.payment > 0)) return 'Bitte die monatliche Rate eingeben.';
+      const rate = Number.isFinite(x.rate) ? x.rate : 0;
+      if (rate < 0 || rate > 100) return 'Der Zinssatz muss zwischen 0 und 100 liegen.';
+      if (!validISO(x.nextDue)) return 'Bitte das Datum der nächsten Rate wählen.';
+      const keepAnchor = item && item.nextDue === x.nextDue && item.anchorDay;
+      upsert(App.state.installments, {
+        id: item ? item.id : uid(), name: x.name, provider: x.provider, balance: round2(x.balance), payment: round2(x.payment),
+        rate, nextDue: x.nextDue, anchorDay: keepAnchor ? item.anchorDay : parseISO(x.nextDue).d, allowPrepay: !!x.allowPrepay,
+      });
+      commit(); toast('Gespeichert');
+    },
+  });
+}
+
+function quickForm() {
+  const today = todayISO();
+  openForm({
+    title: 'Schnell-Erfassung', wide: true, submit: 'Gültige Zeilen übernehmen',
+    intro: `<p>Eine Zeile pro Posten, getrennt durch Semikolon.</p>
+      <p class="code"><b>R</b>; Name; Betrag; Fällig; Anbieter <span class="muted">(Rechnung)</span><br><b>Z</b>; Name; Restschuld; Rate; Zins %; Nächste Fälligkeit; Anbieter <span class="muted">(Ratenzahlung)</span></p>
+      <p class="muted">Datum als 24.11.2026, 24.11. oder +30 (in 30 Tagen). Ohne Jahr gilt das nächste Vorkommen.</p>`,
+    values: { text: '' },
+    fields: [{ key: 'text', label: 'Posten', type: 'textarea', rows: 7, placeholder: 'R; Sneaker; 89,90; 24.11.2026; Klarna\nR; Kopfhörer; 129; +30; PayPal\nZ; Waschmaschine; 540; 45; 0; 05.12.2026; Klarna\nZ; Sofa; 1200; 80; 9,9; 01.12.2026; Händler' }],
+    onInput: api => {
+      const rows = parseQuickLines(api.get('text'), today);
+      if (!rows.length) { api.preview(''); return; }
+      api.preview(`<ul class="qp">${rows.map(r => r.error
+        ? `<li class="bad"><b>Zeile ${r.line}:</b> ${esc(r.error)}</li>`
+        : r.kind === 'invoice'
+          ? `<li class="ok"><b>Rechnung</b> ${esc(r.item.name)}, ${esc(fmtEUR(r.item.amount))}, fällig ${esc(fmtDate(r.item.due))}${r.item.provider ? `, ${esc(r.item.provider)}` : ''}</li>`
+          : `<li class="ok"><b>Ratenzahlung</b> ${esc(r.item.name)}, Rest ${esc(fmtEUR(r.item.balance))}, Rate ${esc(fmtEUR(r.item.payment))}, ${esc(fmtPct(r.item.rate))}, ab ${esc(fmtDate(r.item.nextDue))}</li>`).join('')}</ul>`);
+    },
+    onSubmit: x => {
+      const rows = parseQuickLines(x.text, today);
+      const good = rows.filter(r => !r.error);
+      if (!good.length) return 'Keine gültige Zeile gefunden.';
+      for (const r of good) {
+        if (r.kind === 'invoice') App.state.invoices.push({ id: uid(), paid: false, paidDate: '', ...r.item });
+        else App.state.installments.push({ id: uid(), anchorDay: parseISO(r.item.nextDue).d, ...r.item });
+      }
+      commit();
+      toast(`${good.length} ${good.length === 1 ? 'Eintrag' : 'Einträge'} übernommen${rows.length > good.length ? `, ${rows.length - good.length} Zeile(n) übersprungen` : ''}`);
+    },
+  });
+}
+
+/* ---------- Beispieldaten ---------- */
+function demoData() {
+  const today = todayISO();
+  const t0 = dayNum(today);
+  const d = n => fromDayNum(t0 + n);
+  const monthDay = day => {
+    const { y, m } = parseISO(today);
+    let c = iso(y, m, Math.min(day, dim(y, m)));
+    if (dayNum(c) < t0) c = addMonthsAnchor(y, m, day, 1);
+    return c;
+  };
+  const R = (name, amount, type, category, interval, start) => ({ id: uid(), name, amount, type, category, interval, start, end: '' });
+  const { y: ty, m: tm } = parseISO(today);
+  const monthStart = iso(ty, tm, 1);
+  const dm = n => { const x = d(n); return x < monthStart ? monthStart : x; };
+  const L = (date, area, kind, title, amount, extra) => ({ id: uid(), date, area, kind, title, amount, cash: true, ref: null, note: '', balanceAdj: false, cat: '', createdAt: new Date(date + 'T09:30:00').toISOString(), void: false, ...(extra || {}) });
+  const bud = (name, amount) => ({ id: uid(), name, amount, history: [{ from: '0000-00', amount }] });
+  const bLeb = bud('Lebensmittel', 420), bShop = bud('Shopping', 100), bFrei = bud('Freizeit', 90), bMob = bud('Mobilität', 80), bSon = bud('Sonstiges', 40);
+  const X = (date, title, amount, b, provider) => L(date, 'own', 'expense', title, amount, { cat: b.name, budgetId: b.id, provider });
+  const l1 = L(dm(-12), 'oma', 'oma_order', 'Orthopädische Schuhe (Amazon)', -79.9);
+  const l2 = L(dm(-6), 'oma', 'oma_sale', 'Porzellan-Service (eBay Kleinanzeigen)', 140);
+  const l3 = L(dm(-1), 'oma', 'oma_order', 'Medikamente (Online-Apotheke)', -18.4);
+  const O = (o) => ({ id: uid(), party: '', note: '', delivery: 'ordered', bk: [], createdAt: new Date().toISOString(), ...o });
+  return {
+    settings: { balance: 1250, balanceDate: today, buffer: 200, trackStart: monthStart },
+    journal: [
+      L(monthStart, 'own', 'expense', 'Miete', -940, { note: 'Oktober', cat: 'Wohnen' }),
+      X(dm(-10), 'Wocheneinkauf', -87.45, bLeb, 'REWE'), X(dm(-4), 'Einkauf', -52.1, bLeb, 'Lidl'), X(dm(-5), 'Tanken', -52.3, bMob, 'Aral'),
+      X(dm(-7), 'Sneaker-Rabatt', -64.9, bShop, 'Zalando'), X(dm(-3), 'Kino', -28, bFrei, 'Cinemaxx'),
+      l1, l2, l3,
+    ],
+    budgets: [bLeb, bShop, bFrei, bMob, bSon],
+    oma: [
+      O({ kind: 'order', title: 'Orthopädische Schuhe', party: 'Amazon', amount: 79.9, date: dm(-12), pay: 'account', payDate: dm(-12), expectBack: d(10), delivery: 'delivered', bk: [{ leg: 'a', jid: l1.id }] }),
+      O({ kind: 'order', title: 'Wolle und Stricknadeln', party: 'Otto', amount: 34.5, date: dm(-3), pay: 'invoice', payDate: d(27), expectBack: d(14), delivery: 'shipped' }),
+      O({ kind: 'order', title: 'Medikamente (Online-Apotheke)', party: 'Apotheke', amount: 18.4, date: dm(-1), pay: 'account', payDate: dm(-1), delivery: 'shipped', bk: [{ leg: 'a', jid: l3.id }] }),
+      O({ kind: 'sale', title: 'Porzellan-Service', party: 'eBay Kleinanzeigen', amount: 140, date: dm(-9), via: 'account', expectIn: dm(-6), payoutDate: d(5), delivery: 'delivered', bk: [{ leg: 'a', jid: l2.id }] }),
+      O({ kind: 'sale', title: 'Strickjacke', party: 'Vinted', amount: 22, date: dm(-2), via: 'account', expectIn: d(3), payoutDate: '', delivery: 'shipped' }),
+    ],
+    recurring: [
+      R('Gehalt', 2350, 'income', 'Gehalt', 'monthly', monthDay(28)),
+      R('Miete', 940, 'expense', 'Wohnen', 'monthly', monthDay(1)),
+      R('Strom und Gas', 85, 'expense', 'Wohnen', 'monthly', monthDay(15)),
+      R('Internet', 39.99, 'expense', 'Wohnen', 'monthly', monthDay(10)),
+      R('Handyvertrag', 24.99, 'expense', 'Abos & Medien', 'monthly', monthDay(12)),
+      R('Streaming', 13.99, 'expense', 'Abos & Medien', 'monthly', monthDay(20)),
+      R('Fitnessstudio', 29.9, 'expense', 'Freizeit', 'monthly', monthDay(3)),
+      R('Haftpflicht und Hausrat', 312, 'expense', 'Versicherung', 'yearly', d(75)),
+      R('Kfz-Versicherung', 480, 'expense', 'Versicherung', 'halfyearly', d(50)),
+    ],
+    oneoffs: [{ id: uid(), name: 'Steuererstattung', amount: 420, type: 'income', category: 'Sonstige Einnahmen', date: d(40) }],
+    invoices: [
+      { id: uid(), name: 'Sneaker', provider: 'Klarna', amount: 89.9, purchaseDate: d(-19), termDays: 30, due: d(11), paid: false, paidDate: '' },
+      { id: uid(), name: 'Kopfhörer', provider: 'PayPal', amount: 129, purchaseDate: d(-6), termDays: 30, due: d(24), paid: false, paidDate: '' },
+      { id: uid(), name: 'Zahnarzt', provider: 'Praxis', amount: 215, purchaseDate: d(-8), termDays: 14, due: d(6), paid: false, paidDate: '' },
+    ],
+    installments: [
+      { id: uid(), name: 'Waschmaschine', provider: 'Klarna', balance: 540, payment: 45, rate: 0, nextDue: d(9), allowPrepay: true },
+      { id: uid(), name: 'Sofa', provider: 'Händler', balance: 1200, payment: 80, rate: 9.9, nextDue: d(14), allowPrepay: true },
+      { id: uid(), name: 'Laptop', provider: 'Bank', balance: 900, payment: 60, rate: 14.9, nextDue: d(4), allowPrepay: true },
+    ],
+  };
+}
+
+/* ---------- Backup ---------- */
+function chooseFile(cb) {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'application/json,.json';
+  inp.addEventListener('change', () => { if (inp.files && inp.files[0]) cb(inp.files[0]); });
+  inp.click();
+}
+
+async function exportBackup() {
+  App.state.settings.lastBackup = todayISO();
+  await persist();
+  const rec = Store.get();
+  if (!rec) { toast('Es gibt nichts zu exportieren.', 'bad'); return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([rec], { type: 'application/json' }));
+  a.download = `kassensturz-backup-${todayISO()}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  toast('Verschlüsseltes Backup gespeichert');
+  render();
+}
+
+function importBackup(file) {
+  file.text().then(text => {
+    let rec;
+    try { rec = JSON.parse(text); checkRecord(rec); } catch (e) { toast(e.message && !/JSON/.test(e.message) ? e.message : 'Das ist keine gültige Backup-Datei.', 'bad'); return; }
+    openForm({
+      title: 'Backup importieren', submit: 'Importieren',
+      intro: `<p>Gib das Passwort ein, mit dem das Backup verschlüsselt wurde.${App.state ? ' <b>Deine aktuellen Daten in diesem Browser werden ersetzt.</b>' : ''}</p>`,
+      fields: [{ key: 'pw', label: 'Passwort des Backups', type: 'password', auto: 'current-password', required: true }],
+      onSubmit: async x => {
+        const r = await openRecord(rec, x.pw);
+        Object.assign(App, { state: r.state, key: r.key, salt: r.salt, iter: r.iter, plan: null, tab: 'home' });
+        Store.set(JSON.stringify(rec));
+        armIdle(); render(); toast('Backup importiert');
+      },
+    });
+  }).catch(() => toast('Die Datei konnte nicht gelesen werden.', 'bad'));
+}
+
+/* ---------- Einstellungen ---------- */
+const SETTINGS_FIELDS = [
+  { key: 'buffer', label: 'Sicherheitspuffer', type: 'money', half: true, hint: 'Dieser Betrag bleibt immer auf dem Konto und wird nie für Sondertilgungen verwendet.' },
+  { key: 'payBufferDays', label: 'Rechnungen überweisen', type: 'number', half: true, hint: 'So viele Tage vor Fristende. 2 bis 3 Tage sind sicher, falls die Überweisung länger braucht.' },
+  { key: 'minPrepay', label: 'Kleinste Sondertilgung', type: 'money', half: true, hint: 'Kleinere Beträge werden nicht vorgeschlagen.' },
+  { key: 'horizonMonths', label: 'Planungszeitraum', type: 'select', half: true, options: [[12, '12 Monate'], [24, '24 Monate'], [36, '36 Monate']] },
+  { key: 'trackStart', label: 'Erfassungsstart', type: 'date', half: true, hint: 'Buchungen und Oma-Vorgänge werden ab diesem Datum geführt (Historie).' },
+  { key: 'lockMinutes', label: 'Automatisch sperren nach', type: 'select', half: true, options: [[2, '2 Minuten'], [5, '5 Minuten'], [10, '10 Minuten'], [30, '30 Minuten'], [60, '1 Stunde']] },
+];
+
+function bindSettings() {
+  const form = $('#settingsForm');
+  if (!form) return;
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const x = readFields(form, SETTINGS_FIELDS);
+    const err = $('#serr');
+    if (!(x.buffer >= 0)) { err.textContent = 'Der Sicherheitspuffer muss 0 oder mehr sein.'; return; }
+    if (!(x.payBufferDays >= 0 && x.payBufferDays <= 14)) { err.textContent = 'Die Überweisungs-Vorlaufzeit liegt zwischen 0 und 14 Tagen.'; return; }
+    if (!(x.minPrepay >= 1)) { err.textContent = 'Die kleinste Sondertilgung muss mindestens 1 € betragen.'; return; }
+    if (!validISO(x.trackStart)) { err.textContent = 'Bitte einen gültigen Erfassungsstart wählen.'; return; }
+    Object.assign(App.state.settings, { buffer: round2(x.buffer), payBufferDays: Math.round(x.payBufferDays), minPrepay: round2(x.minPrepay), horizonMonths: Number(x.horizonMonths), lockMinutes: Number(x.lockMinutes), trackStart: x.trackStart });
+    if (App.range > App.state.settings.horizonMonths) App.range = App.state.settings.horizonMonths;
+    armIdle(); commit(); toast('Einstellungen gespeichert');
+  });
+}
+
+function changePasswordForm() {
+  openForm({
+    title: 'Passwort ändern', submit: 'Passwort ändern',
+    fields: [
+      { key: 'old', label: 'Aktuelles Passwort', type: 'password', auto: 'current-password', required: true },
+      { key: 'pw', label: 'Neues Passwort', type: 'password', auto: 'new-password', required: true },
+      { key: 'pw2', label: 'Neues Passwort wiederholen', type: 'password', auto: 'new-password', required: true },
+    ],
+    onInput: api => { const p = api.get('pw'); api.preview(p ? `<p>Stärke: <b>${esc(passwordStrength(p).label)}</b></p>` : ''); },
+    onSubmit: async x => {
+      if (x.pw.length < 8) return 'Das neue Passwort braucht mindestens 8 Zeichen.';
+      if (x.pw !== x.pw2) return 'Die neuen Passwörter stimmen nicht überein.';
+      await saveChain;
+      try { await openRecord(JSON.parse(Store.get()), x.old); } catch (e) { return 'Das aktuelle Passwort stimmt nicht.'; }
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      App.key = await deriveKey(x.pw, salt, KDF_ITER); App.salt = salt; App.iter = KDF_ITER;
+      await persist();
+      toast('Passwort geändert. Alte Backups gelten weiter mit dem alten Passwort.');
+    },
+  });
+}
+
+function wipeForm() {
+  openForm({
+    title: 'Tresor löschen', submit: 'Endgültig löschen',
+    intro: '<p>Alle Daten werden aus diesem Browser entfernt. Wenn du kein Backup hast, sind sie verloren.</p><p>Tippe zur Bestätigung <b>LÖSCHEN</b>.</p>',
+    fields: [{ key: 'ok', label: 'Bestätigung', type: 'text' }],
+    onSubmit: x => {
+      if (x.ok !== 'LÖSCHEN') return 'Bitte tippe LÖSCHEN, um fortzufahren.';
+      Store.remove(); clearTimeout(App.idle);
+      App.state = null; App.key = null; App.plan = null;
+      render(); toast('Tresor gelöscht');
+    },
+  });
+}
+
+/* ---------- Aktionen ---------- */
+const Actions = {
+  nav(d) { App.tab = d.tab; render(); window.scrollTo(0, 0); const v = $('#view'); if (v) v.focus({ preventScroll: true }); },
+  range(d) { App.range = Number(d.m); render(); },
+  privacy() { App.privacy = !App.privacy; render(); },
+  lock() { lockVault(); },
+  theme(d) { memTheme = d.v; if (!App.preview) { try { localStorage.setItem(THEME_KEY, d.v); } catch (e) { /* ignorieren */ } } applyTheme(); render(); },
+  demo() { Object.assign(App.state, normalizeState(demoData())); commit(); toast('Beispieldaten geladen. Für die Demo beginnt die Erfassung am Monatsersten. Unter „Einstellungen“ entfernst du alles wieder.'); },
+  setBalance() {
+    openForm({
+      title: 'Kontostand aktualisieren', submit: 'Kontostand speichern',
+      intro: '<p>Dein aktueller Kontostand laut Banking-App. Heute fällige Buchungen gelten noch als offen.</p>',
+      values: { balance: App.state.settings.balance },
+      fields: [{ key: 'balance', label: 'Kontostand heute', type: 'money', required: true }],
+      onSubmit: x => {
+        if (!Number.isFinite(x.balance)) return 'Bitte einen Betrag eingeben.';
+        const diff = round2(x.balance - App.state.settings.balance);
+        setBalance(x.balance);
+        if (Math.abs(diff) > 0.004) journalToday({ kind: 'adjust', title: 'Kontostand-Abgleich', amount: diff, balanceAdj: true });
+        commit(); toast('Kontostand aktualisiert');
+      },
+    });
+  },
+  addRecurring() { recurringForm(null); },
+  editRecurring(d) { recurringForm(byId(App.state.recurring, d.id)); },
+  addOneoff() { oneoffForm(null); },
+  editOneoff(d) { oneoffForm(byId(App.state.oneoffs, d.id)); },
+  addInvoice() { invoiceForm(null); },
+  editInvoice(d) { invoiceForm(byId(App.state.invoices, d.id)); },
+  addInstallment() { installmentForm(null); },
+  editInstallment(d) { installmentForm(byId(App.state.installments, d.id)); },
+  quick() { quickForm(); },
+  async delRecurring(d) { const x = byId(App.state.recurring, d.id); if (x && (await askConfirm({ title: `„${x.name}“ löschen?`, text: 'Der Eintrag wird aus allen Prognosen entfernt.', ok: 'Löschen', danger: true })).ok) { App.state.recurring = App.state.recurring.filter(i => i.id !== d.id); commit(); toast('Gelöscht'); } },
+  async delOneoff(d) { const x = byId(App.state.oneoffs, d.id); if (x && (await askConfirm({ title: `„${x.name}“ löschen?`, ok: 'Löschen', danger: true })).ok) { App.state.oneoffs = App.state.oneoffs.filter(i => i.id !== d.id); commit(); toast('Gelöscht'); } },
+  async delInvoice(d) { const x = byId(App.state.invoices, d.id); if (x && (await askConfirm({ title: `„${x.name}“ löschen?`, ok: 'Löschen', danger: true })).ok) { App.state.invoices = App.state.invoices.filter(i => i.id !== d.id); commit(); toast('Gelöscht'); } },
+  async delInstallment(d) { const x = byId(App.state.installments, d.id); if (x && (await askConfirm({ title: `„${x.name}“ löschen?`, ok: 'Löschen', danger: true })).ok) { App.state.installments = App.state.installments.filter(i => i.id !== d.id); commit(); toast('Gelöscht'); } },
+  async payInvoice(d) {
+    const inv = byId(App.state.invoices, d.id); if (!inv) return;
+    const r = await askConfirm({ title: `„${inv.name}“ als bezahlt markieren?`, text: `Betrag: ${fmtEUR(inv.amount)}. Die Rechnung verschwindet aus dem Plan.`, ok: 'Als bezahlt markieren', check: { label: `Kontostand um ${fmtEUR(inv.amount)} verringern`, checked: true } });
+    if (!r.ok) return;
+    inv.paid = true; inv.paidDate = todayISO();
+    journalToday({ kind: 'invoice', title: `${inv.name}${inv.provider ? ` (${inv.provider})` : ''}`, amount: -inv.amount, ref: { type: 'invoice', id: inv.id }, balanceAdj: !!r.checked });
+    if (r.checked) setBalance(App.state.settings.balance - inv.amount);
+    commit(); toast('Als bezahlt markiert.' + startHint());
+  },
+  async payInstallment(d) {
+    const it = byId(App.state.installments, d.id); if (!it) return;
+    const interest = it.balance * (it.rate || 0) / 1200;
+    const amt = Math.min(it.payment, it.balance + interest);
+    const r = await askConfirm({ title: `Rate für „${it.name}“ als bezahlt buchen?`, text: `Rate: ${fmtEUR(amt)}${interest > 0 ? `, davon ca. ${fmtEUR(interest)} Zinsen` : ''}. Die Restschuld sinkt und die nächste Rate rückt einen Monat weiter.`, ok: 'Rate buchen', check: { label: `Kontostand um ${fmtEUR(amt)} verringern`, checked: true } });
+    if (!r.ok) return;
+    const oldBalance = it.balance, prevNextDue = it.nextDue;
+    it.balance = round2(Math.max(0, it.balance + interest - amt));
+    const anchor = it.anchorDay || parseISO(it.nextDue).d;
+    it.nextDue = fromDayNum(nextAnchorAfter(dayNum(it.nextDue), anchor));
+    journalToday({ kind: 'rate', title: `Rate: ${it.name}`, amount: -amt, ref: { type: 'installment', id: it.id, dBalance: round2(oldBalance - it.balance), prevNextDue }, balanceAdj: !!r.checked });
+    if (r.checked) setBalance(App.state.settings.balance - amt);
+    commit(); toast((it.balance <= 0.005 ? 'Abbezahlt. Glückwunsch!' : 'Rate gebucht.') + startHint());
+  },
+  prepayInstallment(d) {
+    const it = byId(App.state.installments, d.id); if (!it) return;
+    const P = getPlan();
+    const planned = P.opt.log.find(e => e.type === 'prepay' && e.id === it.id && e.i <= 31);
+    openForm({
+      title: `Sondertilgung für „${it.name}“`, submit: 'Sondertilgung buchen',
+      intro: `<p>Restschuld aktuell ${esc(fmtEUR(it.balance))}.${planned ? ` Die Strategie schlägt ${esc(fmtEUR(-planned.amount))} am ${esc(fmtDate(P.dateAt(planned.i)))} vor.` : ' Aktuell ist laut Plan keine Sondertilgung vorgesehen.'}</p>`,
+      values: { amount: planned ? -planned.amount : '', adjust: true },
+      fields: [{ key: 'amount', label: 'Betrag', type: 'money', required: true }, { key: 'adjust', label: 'Kontostand um diesen Betrag verringern', type: 'checkbox' }],
+      onSubmit: x => {
+        if (!(x.amount > 0)) return 'Bitte einen Betrag größer als 0 eingeben.';
+        if (x.amount > it.balance + 0.005) return `Der Betrag liegt über der Restschuld (${fmtEUR(it.balance)}).`;
+        it.balance = round2(Math.max(0, it.balance - x.amount));
+        journalToday({ kind: 'prepay', title: `Sondertilgung: ${it.name}`, amount: -x.amount, ref: { type: 'installment', id: it.id, dBalance: round2(x.amount) }, balanceAdj: !!x.adjust });
+        if (x.adjust) setBalance(App.state.settings.balance - x.amount);
+        commit(); toast('Sondertilgung gebucht.' + startHint());
+      },
+    });
+  },
+  async clearEntries() {
+    const r = await askConfirm({ title: 'Alle Einträge löschen?', text: 'Daueraufträge, Buchungen, Rechnungen, Raten, Budgets, Oma-Vorgänge, die komplette Historie und der Kontostand werden entfernt. Dein Passwort und die Einstellungen bleiben.', ok: 'Einträge löschen', danger: true });
+    if (!r.ok) return;
+    Object.assign(App.state, { recurring: [], oneoffs: [], invoices: [], installments: [], journal: [], oma: [], budgets: [] });
+    App.state.settings.balance = 0; App.state.settings.balanceDate = null; App.state.settings.trackStart = DEFAULT_SETTINGS.trackStart;
+    commit(); toast('Einträge gelöscht');
+  },
+  export() { if (App.preview) return toast('Im Vorschau-Modus gibt es kein Backup.'); exportBackup(); },
+  import() { if (App.preview) return toast('Im Vorschau-Modus gibt es keinen Import.'); chooseFile(importBackup); },
+  importBackup() { if (App.preview) return toast('Im Vorschau-Modus gibt es keinen Import.'); chooseFile(importBackup); },
+  changePw() { if (App.preview) return toast('Im Vorschau-Modus gibt es kein Passwort.'); changePasswordForm(); },
+  wipe() { if (App.preview) return toast('Im Vorschau-Modus gibt es keinen Tresor.'); wipeForm(); },
+  pvStart() { startPreview(); },
+  pvReset() { if (App.preview) { App.plan = null; App.state = normalizeState(demoData()); render(); toast('Beispieldaten zurückgesetzt'); } },
+};
+
+/* ---------- Start ---------- */
+function boot() {
+  Modal.init();
+  applyTheme();
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-act]');
+    if (!el) return;
+    const fn = Actions[el.dataset.act];
+    if (fn) { e.preventDefault(); fn(el.dataset, el); }
+  });
+  document.addEventListener('change', e => {
+    const el = e.target.closest('[data-change]');
+    if (el && Actions[el.dataset.change]) Actions[el.dataset.change](el.value, el);
+  });
+  ['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach(ev => document.addEventListener(ev, () => {
+    const now = Date.now();
+    if (App.state && now - App.lastActivity > 1000) { App.lastActivity = now; armIdle(); }
+  }, { passive: true }));
+  let rt;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (App.state && $('[data-chart]')) drawCharts(); }, 150); });
+
+  if (PREVIEW_BUILD) { startPreview(); return; }
+  const cryptoOk = !!(window.crypto && crypto.subtle);
+  if (!cryptoOk || !Store.ok()) {
+    /* Eingebettete Ansicht (z. B. Vorschau im Chat): Speicher ist gesperrt, also direkt die Vorschau zeigen. */
+    if (embedded()) { startPreview(); return; }
+    if (!cryptoOk) fatalScreen('Verschlüsselung nicht verfügbar', 'Dieser Browser oder diese Verbindung unterstützt keine Web-Crypto-Funktionen. Öffne die Seite über https:// oder in einem aktuellen Browser.', true);
+    else fatalScreen('Speicher nicht verfügbar', 'Der Browser blockiert das lokale Speichern (z. B. im privaten Modus). Öffne die Seite in einem normalen Browserfenster.', true);
+    return;
+  }
+  render();
+}
+
+/* =====================================================================
+   OMA (Bestellungen, Verkäufe, Eingänge) und HISTORIE (Buchungsjournal)
+   ===================================================================== */
+const trackStart = () => trackStartOf(App.state);
+const isTracking = () => trackStarted(App.state, todayISO());
+const startHint = () => (isTracking() ? '' : ` Die Historie startet am ${fmtDate(trackStart())}.`);
+const fmtStamp = s => { try { return new Date(s).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' Uhr'; } catch (e) { return ''; } };
+
+/* ---------- Journal: Buchungen werden angelegt und nur storniert, nie überschrieben ---------- */
+function journalAdd(e) {
+  const j = {
+    id: uid(), date: e.date, area: e.area || 'own', kind: e.kind, title: e.title, amount: round2(e.amount),
+    cash: e.cash !== false, ref: e.ref || null, note: e.note || '', balanceAdj: !!e.balanceAdj,
+    cat: e.cat || '', provider: e.provider || '', budgetId: e.budgetId || '', createdAt: new Date().toISOString(), void: false,
+  };
+  App.state.journal.push(j);
+  return j;
+}
+function journalToday(e) { return isTracking() ? journalAdd({ date: todayISO(), ...e }) : null; }
+
+function voidLine(j, reason, reverseBalance) {
+  j.void = true; j.voidAt = new Date().toISOString(); j.voidReason = reason;
+  if (reverseBalance && j.cash) setBalance(App.state.settings.balance - j.amount);
+  const r = j.ref;
+  if (!r) return;
+  if (r.type === 'invoice') {
+    const inv = byId(App.state.invoices, r.id);
+    if (inv) { inv.paid = false; inv.paidDate = ''; }
+  } else if (r.type === 'installment') {
+    const it = byId(App.state.installments, r.id);
+    if (it) { it.balance = round2(it.balance + (r.dBalance || 0)); if (r.prevNextDue) it.nextDue = r.prevNextDue; }
+  }
+}
+
+/* ---------- Oma: Texte und Hilfen ---------- */
+const DELIVERY = {
+  order: { ordered: 'Bestellt', shipped: 'Unterwegs', delivered: 'Geliefert' },
+  sale: { ordered: 'Noch zu versenden', shipped: 'Versendet', delivered: 'Zugestellt' },
+};
+const BOOK_LABEL = { oma_order: 'Bezahlung buchen', oma_reimb: 'Erstattung buchen', oma_sale: 'Eingang buchen', oma_payout: 'Auszahlung buchen' };
+
+function saldoInfo(saldo) {
+  if (saldo > 0.005) return { cls: 'pos', text: `Oma schuldet dir ${fmtEUR(saldo)}` };
+  if (saldo < -0.005) return { cls: 'owe', text: `Du schuldest Oma ${fmtEUR(-saldo)}` };
+  return { cls: '', text: 'Zwischen dir und Oma ist alles ausgeglichen' };
+}
+
+function omaHomePanel() {
+  const st = App.state;
+  if (!st.oma.length && !st.journal.some(j => j.area === 'oma' && !j.void)) return '';
+  const T = omaTotals(st.journal), info = saldoInfo(T.saldo);
+  const pend = omaPending(st, todayISO());
+  const late = pend.filter(p => p.overdue).length;
+  return `<section class="panel"><div class="panel-h"><h2>Oma</h2><button class="link" data-act="nav" data-tab="oma">Öffnen</button></div>
+    <p class="saldo ${info.cls}">${esc(info.text)}</p>
+    <p class="muted">${pend.length ? `${pend.length} offene ${pend.length === 1 ? 'Schritt' : 'Schritte'}${late ? `, davon ${late} überfällig` : ''}.` : 'Keine offenen Schritte.'}</p></section>`;
+}
+
+/* ---------- Ansicht: Oma ---------- */
+function omaCard(x, today) {
+  const { it, legs } = x;
+  const isOrder = it.kind === 'order';
+  const delivery = DELIVERY[it.kind][it.delivery] || '';
+  const legRows = legs.map((l, idx) => {
+    const ready = idx === 0 || legs[0].complete;
+    let status, cls = '';
+    if (l.complete) {
+      const d = l.lines.length ? l.lines[l.lines.length - 1].date : '';
+      status = `gebucht${d ? ` am ${fmtDate(d)}` : ''}`; cls = 'done';
+    } else {
+      const late = validISO(l.date) && l.date < today;
+      const part = l.done > 0 ? `Teilbetrag ${fmtEUR(l.done)} gebucht, Rest ${fmtEUR(l.remaining)}, ` : '';
+      status = `${part}${validISO(l.date) ? `${l.dir > 0 ? 'erwartet' : 'geplant'} ${fmtDate(l.date)}${late ? ', überfällig' : ''}` : 'kein Termin'}${l.cash ? '' : ', nicht über dein Konto'}`;
+      cls = late ? 'late' : '';
+    }
+    const btn = !l.complete && ready ? `<button class="btn sm primary" data-act="omaBook" data-id="${esc(it.id)}" data-leg="${l.key}">${esc(BOOK_LABEL[l.jkind])}</button>` : '';
+    return `<li class="leg ${cls}"><i class="ld"></i><span><b>${esc(l.label)}</b> <span class="l-s">${esc(status)}</span></span>${btn}</li>`;
+  }).join('');
+  return `<li class="item oma">
+    <div class="oma-h">
+      <div class="item-t"><b>${esc(it.title)}</b>${it.party ? `<span class="tag">${esc(it.party)}</span>` : ''}<span class="tag ${isOrder ? '' : 'acc'}">${isOrder ? 'Bestellung' : 'Verkauf'}</span>${delivery ? `<span class="tag ${it.delivery === 'delivered' ? 'ok' : 'warnt'}">${esc(delivery)}</span>` : ''}</div>
+      <div class="item-amt">${money(it.amount)}<small>${isOrder ? 'Bestellwert' : 'Erlös'}</small></div>
+    </div>
+    <div class="item-s">${isOrder ? 'Bestellt' : 'Verkauft'} am ${esc(fmtDate(it.date))}</div>
+    <ol class="legs">${legRows}</ol>
+    ${it.note ? `<div class="item-n">${esc(it.note)}</div>` : ''}
+    <div class="item-btns start">${it.delivery !== 'delivered' ? `<button class="btn sm" data-act="omaDelivered" data-id="${esc(it.id)}">${isOrder ? 'Geliefert' : 'Zugestellt'}</button>` : ''}<button class="btn sm" data-act="editOma" data-id="${esc(it.id)}">Bearbeiten</button><button class="btn sm ghost" data-act="delOma" data-id="${esc(it.id)}">Löschen</button></div>
+  </li>`;
+}
+
+function omaMonthRows(st) {
+  const months = new Map();
+  const m = key => { if (!months.has(key)) months.set(key, { key, ordered: 0, sold: 0, inflow: 0, outflow: 0, delta: 0 }); return months.get(key); };
+  for (const it of st.oma) if (validISO(it.date)) { const r = m(it.date.slice(0, 7)); if (it.kind === 'order') r.ordered += it.amount; else r.sold += it.amount; }
+  for (const j of st.journal) {
+    if (j.void || j.area !== 'oma') continue;
+    const r = m(j.date.slice(0, 7)), a = Math.abs(j.amount);
+    if (j.kind === 'oma_sale' || j.kind === 'oma_reimb') { r.inflow += a; r.delta -= a; } else { r.outflow += a; r.delta += a; }
+  }
+  let run = 0;
+  return [...months.values()].sort((a, b) => a.key.localeCompare(b.key)).map(r => { run = round2(run + r.delta); return { ...r, saldo: run }; });
+}
+
+function viewOma() {
+  const st = App.state, today = todayISO(), J = st.journal;
+  const T = omaTotals(J), info = saldoInfo(T.saldo);
+  const filter = App.omaFilter || 'all';
+  const all = st.oma.filter(i => filter === 'all' || i.kind === filter).map(it => ({ it, legs: omaLegs(it, J) }));
+  const open = all.filter(x => !x.legs.every(l => l.complete))
+    .sort((a, b) => ((a.legs.find(l => !l.complete).date) || '9999').localeCompare((b.legs.find(l => !l.complete).date) || '9999'));
+  const done = all.filter(x => x.legs.every(l => l.complete)).sort((a, b) => b.it.date.localeCompare(a.it.date));
+  const pending = omaPending(st, today);
+  const expected = pending.filter(p => p.leg.dir > 0 && validISO(p.leg.date)).slice(0, 8);
+  const received = J.filter(j => !j.void && j.area === 'oma' && j.amount > 0).sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)).slice(0, 5);
+  const transit = st.oma.filter(i => i.delivery === 'shipped').length;
+  const months = omaMonthRows(st);
+
+  const banner = isTracking() ? '' : `<div class="banner"><div><b>Die Erfassung startet am ${esc(fmtDate(trackStart()))}.</b> Vorgänge dürfen schon jetzt mit späterem Datum angelegt werden. Zahlungen buchen kannst du ab dem Start. Den Stichtag änderst du unter „Einstellungen“.</div></div>`;
+
+  const statement = `<dl class="kv">
+    <div><dt>Für Oma bezahlt (Bestellungen)</dt><dd>${money(T.order)}</dd></div>
+    <div><dt>An Oma ausgezahlt</dt><dd>${money(T.payout)}</dd></div>
+    <div><dt>Von Oma erstattet</dt><dd>${money(-T.reimb)}</dd></div>
+    <div><dt>Verkaufserlöse für Oma erhalten</dt><dd>${money(-T.sale)}</dd></div>
+    <div class="sum"><dt>Saldo</dt><dd class="${info.cls}">${money(T.saldo)}</dd></div></dl>`;
+
+  const expectedRows = expected.length ? `<ul class="evs">${expected.map(p => `<li class="ev"><span class="ev-d">${esc(fmtWd(p.leg.date))}</span><span class="ev-n"><b>${esc(p.item.title)}</b> <span class="tag">${esc(p.leg.label)}</span>${p.overdue ? '<span class="stamp">Überfällig</span>' : ''}</span><span class="ev-a pos">${money(p.leg.remaining)}</span></li>`).join('')}</ul>` : '<p class="empty">Keine Eingänge erwartet.</p>';
+  const receivedRows = received.length ? `<ul class="evs">${received.map(j => `<li class="ev"><span class="ev-d">${esc(fmtWd(j.date))}</span><span class="ev-n"><b>${esc(j.title)}</b> <span class="tag">${esc(JOURNAL_KINDS[j.kind])}</span></span><span class="ev-a pos">${money(j.amount)}</span></li>`).join('')}</ul>` : '<p class="empty">Noch nichts eingegangen.</p>';
+
+  const table = months.length ? `<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Monat</th><th>Bestellt</th><th>Verkauft</th><th>Eingänge</th><th>Ausgänge</th><th>Saldo Ende</th></tr></thead><tbody>${months.map(r => `<tr><th>${esc(fmtMonthKey(r.key))}</th><td>${r.ordered ? money(r.ordered) : '–'}</td><td>${r.sold ? money(r.sold) : '–'}</td><td>${r.inflow ? money(r.inflow) : '–'}</td><td>${r.outflow ? money(r.outflow) : '–'}</td><td>${money(r.saldo)}</td></tr>`).join('')}</tbody></table></div><p class="fine muted tbl-note">Bestellt und Verkauft zählen nach Vorgangsdatum. Eingänge und Ausgänge sind tatsächlich gebuchte Zahlungen. Saldo positiv: Oma schuldet dir, negativ: du schuldest Oma.</p>` : '<p class="empty">Noch keine Daten.</p>';
+
+  return `<header class="page-head"><div><h1>Oma</h1><p class="sub">Bestellungen und Verkäufe, die du für Oma erledigst, samt Zahlungseingängen. Getrennt von deinem eigenen Budget.</p></div>
+    <div class="actions"><button class="btn" data-act="addOmaSale">Verkauf für Oma</button><button class="btn primary" data-act="addOmaOrder">Bestellung für Oma</button></div></header>
+  ${banner}
+  <div class="cols wide-l">
+    <section class="panel"><div class="panel-h"><h2>Vorgänge</h2><div class="seg">${[['all', 'Alle'], ['order', 'Bestellungen'], ['sale', 'Verkäufe']].map(([v, l]) => `<button class="chip-btn ${filter === v ? 'on' : ''}" data-act="omaFilter" data-v="${v}">${l}</button>`).join('')}</div></div>
+      ${open.length ? `<ul class="items">${open.map(x => omaCard(x, today)).join('')}</ul>` : `<p class="empty">${st.oma.length ? 'Keine offenen Vorgänge in dieser Auswahl.' : 'Noch keine Vorgänge. Lege eine Bestellung oder einen Verkauf für Oma an.'}</p>`}
+      ${done.length ? `<details class="fold"><summary>Erledigt (${done.length})</summary><ul class="items quiet">${done.map(x => omaCard(x, today)).join('')}</ul></details>` : ''}
+    </section>
+    <div class="stack">
+      <section class="panel"><div class="panel-h"><h2>Saldo</h2></div><p class="saldo ${info.cls}">${esc(info.text)}</p>${statement}
+        ${T.held > 0.005 ? `<p class="fine muted tbl-note">Davon liegen ${esc(fmtEUR(T.held))} von Oma auf deinem Konto. Die Strategie nutzt sie nie für Sondertilgungen.</p>` : ''}
+        ${transit ? `<p class="fine muted tbl-note">${transit} ${transit === 1 ? 'Paket ist' : 'Pakete sind'} unterwegs.</p>` : ''}</section>
+      <section class="panel"><div class="panel-h"><h2>Eingänge</h2></div><h3 class="subh">Erwartet</h3>${expectedRows}<h3 class="subh">Zuletzt eingegangen</h3>${receivedRows}</section>
+    </div>
+  </div>
+  <section class="panel"><div class="panel-h"><h2>Monatsübersicht</h2></div>${table}</section>`;
+}
+
+/* ---------- Ansicht: Historie ---------- */
+function monthKeys(st, today) {
+  const keys = new Set();
+  const start = trackStartOf(st);
+  if (today >= start) {
+    let y = parseISO(start).y, m = parseISO(start).m;
+    const end = parseISO(today);
+    while (y < end.y || (y === end.y && m <= end.m)) { keys.add(`${y}-${pad(m)}`); m++; if (m > 12) { m = 1; y++; } }
+  }
+  for (const j of st.journal) keys.add(j.date.slice(0, 7));
+  return [...keys].sort().reverse();
+}
+
+function journalRow(j) {
+  return `<li class="jr ${j.void ? 'void' : ''}">
+    <span class="jr-d">${esc(fmtWd(j.date))}</span>
+    <div class="jr-m"><b class="jr-t">${esc(j.title)}</b> <span class="tag">${esc(JOURNAL_KINDS[j.kind] || j.kind)}</span>${(j.kind === 'expense' || j.kind === 'income') && j.cat ? `<span class="tag">${esc(j.cat)}</span>` : ''}${j.provider ? `<span class="tag plat">${esc(j.provider)}</span>` : ''}${j.area === 'oma' ? '<span class="tag acc">Oma</span>' : ''}${j.cash ? '' : '<span class="tag">nicht über Konto</span>'}${j.void ? '<span class="stamp">Storno</span>' : ''}
+      ${j.note ? `<div class="jr-meta">${esc(j.note)}</div>` : ''}
+      <div class="jr-meta">Erfasst ${esc(fmtStamp(j.createdAt))}${j.void ? `. Storniert ${esc(fmtStamp(j.voidAt))}: ${esc(j.voidReason || 'ohne Begründung')}` : ''}</div></div>
+    <span class="jr-a ${j.amount > 0 ? 'pos' : ''}">${money(j.amount)}</span>
+    <div class="jr-b">${j.void ? '' : `<button class="btn sm ghost" data-act="jNote" data-id="${esc(j.id)}">Notiz</button><button class="btn sm" data-act="jVoid" data-id="${esc(j.id)}">Stornieren</button>`}</div></li>`;
+}
+
+function viewJournal() {
+  const st = App.state, today = todayISO(), start = trackStart();
+  const head = `<header class="page-head"><div><h1>Historie</h1><p class="sub">Alle tatsächlichen Buchungen ab dem ${esc(fmtDate(start))}. Gebuchtes wird nie überschrieben, nur storniert. So bleibt jeder Stand nachvollziehbar.</p></div>
+    <div class="actions"><button class="btn primary" data-act="addBooking">Buchung erfassen</button></div></header>`;
+  if (!isTracking()) {
+    const days = dayNum(start) - dayNum(today);
+    return head + `<section class="panel"><div class="banner flat"><div><b>Die Historie startet am ${esc(fmtDate(start))}</b> (${days === 1 ? 'morgen' : `in ${days} Tagen`}). Bis dahin planst du nur: Kontostand, Daueraufträge, Rechnungen, Raten und Oma-Vorgänge kannst du schon jetzt eintragen.</div></div>
+      <p class="muted">Ab dem Start entsteht bei jeder Zahlung automatisch eine Buchung: wenn du eine Rechnung oder Rate als bezahlt markierst, eine Sondertilgung buchst, den Kontostand abgleichst oder bei Oma einen Zahlungsschritt buchst. Eigene Einnahmen und Ausgaben trägst du über „Buchung erfassen“ ein.</p>
+      <p class="muted">Den Stichtag änderst du unter „Einstellungen“.</p></section>`;
+  }
+  const keys = monthKeys(st, today);
+  const sel = keys.includes(App.jMonth) ? App.jMonth : today.slice(0, 7);
+  const area = App.jArea || 'all';
+  const inMonth = st.journal.filter(j => j.date.slice(0, 7) === sel);
+  const lines = inMonth.filter(j => area === 'all' || j.area === area)
+    .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt));
+  const live = inMonth.filter(j => !j.void);
+  const sum = (f) => live.filter(f).reduce((a, j) => a + j.amount, 0);
+  const own = j => j.area === 'own' && j.cash, oma = j => j.area === 'oma' && j.cash;
+  const voids = inMonth.filter(j => j.void).length;
+  const summary = `<dl class="kv">
+    <div><dt>Eigene Eingänge</dt><dd class="pos">${money(sum(j => own(j) && j.amount > 0))}</dd></div>
+    <div><dt>Eigene Ausgänge</dt><dd>${money(sum(j => own(j) && j.amount < 0))}</dd></div>
+    <div><dt>Oma: Eingänge</dt><dd class="pos">${money(sum(j => oma(j) && j.amount > 0))}</dd></div>
+    <div><dt>Oma: Ausgänge</dt><dd>${money(sum(j => oma(j) && j.amount < 0))}</dd></div>
+    <div class="sum"><dt>Veränderung Konto</dt><dd>${money(sum(j => j.cash))}</dd></div></dl>`;
+  return head + `<section class="panel">
+    <div class="ctl"><label class="inl"><span>Monat</span><select data-change="jMonth">${keys.map(k => `<option value="${k}" ${k === sel ? 'selected' : ''}>${esc(new Date(+k.slice(0, 4), +k.slice(5) - 1, 1).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' }))}</option>`).join('')}</select></label>
+      <div class="seg">${[['all', 'Alle'], ['own', 'Eigene'], ['oma', 'Oma']].map(([v, l]) => `<button class="chip-btn ${area === v ? 'on' : ''}" data-act="jArea" data-v="${v}">${l}</button>`).join('')}</div></div>
+    ${summary}
+    <p class="fine muted tbl-note">${live.length} ${live.length === 1 ? 'Buchung' : 'Buchungen'} in diesem Monat${voids ? `, ${voids} storniert` : ''}.</p>
+  </section>
+  <section class="panel"><div class="panel-h"><h2>Buchungen</h2></div>${lines.length ? `<ul class="jrs">${lines.map(journalRow).join('')}</ul>` : '<p class="empty">In diesem Monat gibt es keine Buchungen.</p>'}</section>`;
+}
+
+Object.assign(Views, { oma: viewOma, journal: viewJournal });
+
+/* ---------- Formulare: Oma-Vorgang ---------- */
+function omaForm(kind, item) {
+  const isOrder = kind === 'order';
+  const today = todayISO(), ts = trackStart();
+  const startDate = today < ts ? ts : today;
+  const base = isOrder
+    ? { title: '', party: '', amount: '', date: startDate, pay: 'account', payDate: startDate, expectBack: '', delivery: 'ordered', note: '' }
+    : { title: '', party: '', amount: '', date: startDate, via: 'account', expectIn: fromDayNum(dayNum(startDate) + 3), payoutDate: '', delivery: 'ordered', note: '' };
+  const v = item || base;
+  const locked = !!item && omaLegs(item, App.state.journal).some(l => l.lines.length);
+  const lockHint = locked ? 'Gesperrt, weil schon gebucht. Storniere die Buchung in der Historie, um den Betrag zu ändern.' : '';
+  const deliveryOpts = Object.entries(DELIVERY[kind]);
+  const fields = isOrder ? [
+    { key: 'title', label: 'Was wurde bestellt?', type: 'text', required: true, placeholder: 'z. B. Orthopädische Schuhe' },
+    { key: 'party', label: 'Shop', type: 'text', half: true, list: ['Amazon', 'Otto', 'Zalando', 'Apotheke', 'eBay', 'Sonstige'] },
+    { key: 'amount', label: 'Betrag', type: 'money', half: true, required: true, disabled: locked, hint: lockHint },
+    { key: 'date', label: 'Bestelldatum', type: 'date', half: true, required: true, min: ts },
+    { key: 'delivery', label: 'Lieferstatus', type: 'select', half: true, options: deliveryOpts },
+    { key: 'pay', label: 'Bezahlt über', type: 'select', options: [['account', 'Mein Girokonto oder meine Karte'], ['invoice', 'Kauf auf Rechnung (PayPal, Klarna): Zahlung zur Fälligkeit'], ['other', 'Anders bezahlt (PayPal-Guthaben, bar)']] },
+    { key: 'payDate', label: 'Abbuchung oder Fälligkeit am', type: 'date', half: true, required: true, min: ts },
+    { key: 'expectBack', label: 'Erstattung von Oma erwartet am', type: 'date', half: true, hint: 'Optional.' },
+    { key: 'note', label: 'Notiz (optional)', type: 'text' },
+  ] : [
+    { key: 'title', label: 'Was wurde verkauft?', type: 'text', required: true, placeholder: 'z. B. Porzellan-Service' },
+    { key: 'party', label: 'Plattform oder Käufer', type: 'text', half: true, list: ['eBay Kleinanzeigen', 'eBay', 'Vinted', 'Facebook Marktplatz', 'Flohmarkt'] },
+    { key: 'amount', label: 'Erlös nach Gebühren', type: 'money', half: true, required: true, disabled: locked, hint: lockHint },
+    { key: 'date', label: 'Verkaufsdatum', type: 'date', half: true, required: true, min: ts },
+    { key: 'delivery', label: 'Versandstatus', type: 'select', half: true, options: deliveryOpts },
+    { key: 'via', label: 'Zahlung kommt an auf', type: 'select', options: [['account', 'Meinem Girokonto'], ['other', 'Anderswo (PayPal-Guthaben, bar)']] },
+    { key: 'expectIn', label: 'Zahlungseingang erwartet am', type: 'date', half: true, required: true },
+    { key: 'payoutDate', label: 'Auszahlung an Oma geplant am', type: 'date', half: true, hint: 'Optional.' },
+    { key: 'note', label: 'Notiz (optional)', type: 'text' },
+  ];
+  openForm({
+    title: item ? (isOrder ? 'Bestellung bearbeiten' : 'Verkauf bearbeiten') : (isOrder ? 'Bestellung für Oma' : 'Verkauf für Oma'),
+    intro: isOrder ? '<p>Du bestellst für Oma und gehst in Vorleistung. Die App verfolgt Bezahlung, Lieferung und Erstattung.</p>' : '<p>Du verkaufst für Oma. Der Erlös kommt bei dir an und gehört Oma. Die App merkt ihn dir vor und rührt ihn nie für Sondertilgungen an.</p>',
+    values: v, fields,
+    onInput: (api, key) => {
+      if (isOrder && (key === 'date' || key === 'pay') && api.get('pay') === 'account') api.set('payDate', api.get('date'));
+    },
+    onSubmit: x => {
+      if (!x.title) return 'Bitte eine Beschreibung eingeben.';
+      if (!(x.amount > 0)) return 'Bitte einen Betrag größer als 0 eingeben.';
+      if (!validISO(x.date)) return 'Bitte das Datum wählen.';
+      if (x.date < ts) return `Vorgänge werden ab dem ${fmtDate(ts)} erfasst (Erfassungsstart). Den Stichtag änderst du unter „Einstellungen“.`;
+      const it = { id: item ? item.id : uid(), kind, title: x.title, party: x.party, amount: round2(x.amount), date: x.date, delivery: x.delivery, note: x.note, bk: item ? item.bk || [] : [], createdAt: item ? item.createdAt : new Date().toISOString() };
+      if (isOrder) {
+        if (!validISO(x.payDate)) return 'Bitte das Zahlungsdatum wählen.';
+        Object.assign(it, { pay: x.pay, payDate: x.payDate, expectBack: validISO(x.expectBack) ? x.expectBack : '' });
+      } else {
+        if (!validISO(x.expectIn)) return 'Bitte das erwartete Eingangsdatum wählen.';
+        Object.assign(it, { via: x.via, expectIn: x.expectIn, payoutDate: validISO(x.payoutDate) ? x.payoutDate : '' });
+      }
+      upsert(App.state.oma, it);
+      commit(); toast('Gespeichert');
+    },
+  });
+}
+
+function omaBookForm(itemId, legKey) {
+  const it = byId(App.state.oma, itemId); if (!it) return;
+  if (!isTracking()) { toast(`Buchungen sind ab dem ${fmtDate(trackStart())} möglich (Erfassungsstart).`, 'bad'); return; }
+  const leg = omaLegs(it, App.state.journal).find(l => l.key === legKey); if (!leg) return;
+  const today = todayISO();
+  openForm({
+    title: `${leg.label}: ${it.title}`, submit: 'Buchen',
+    intro: `<p>Offen: <b>${esc(fmtEUR(leg.remaining))}</b>. Die Buchung erscheint in der Historie und lässt sich dort bei Bedarf stornieren.</p>`,
+    values: { date: today, amount: leg.remaining, cash: leg.cash, adjust: leg.cash },
+    fields: [
+      { key: 'date', label: 'Datum der Zahlung', type: 'date', half: true, required: true, min: trackStart(), max: today },
+      { key: 'amount', label: 'Betrag', type: 'money', half: true, required: true, hint: 'Weniger als offen ist möglich (Teilzahlung).' },
+      { key: 'cash', label: 'Die Zahlung läuft über dein Girokonto', type: 'checkbox' },
+      { key: 'adjust', label: 'Kontostand entsprechend anpassen', type: 'checkbox', hint: 'Hast du den Kontostand schon aus deiner Banking-App aktualisiert, lass das Häkchen weg.' },
+    ],
+    onInput: (api, key) => { if (key === 'cash' && !api.get('cash')) api.set('adjust', false); },
+    onSubmit: x => {
+      if (!validISO(x.date) || x.date < trackStart()) return `Das Datum muss ab dem ${fmtDate(trackStart())} liegen.`;
+      if (x.date > today) return 'Das Datum liegt in der Zukunft. Gebucht wird nur, was schon passiert ist.';
+      if (!(x.amount > 0)) return 'Bitte einen Betrag größer als 0 eingeben.';
+      if (x.amount > leg.remaining + 0.005) return `Der Betrag liegt über dem offenen Rest (${fmtEUR(leg.remaining)}).`;
+      const line = journalAdd({ date: x.date, area: 'oma', kind: leg.jkind, title: `${it.title}${it.party ? ` (${it.party})` : ''}`, amount: leg.dir * x.amount, cash: x.cash, ref: { type: 'oma', id: it.id, leg: leg.key }, balanceAdj: x.cash && x.adjust });
+      (it.bk || (it.bk = [])).push({ leg: leg.key, jid: line.id });
+      if (x.cash && x.adjust) setBalance(App.state.settings.balance + line.amount);
+      commit(); toast('Gebucht');
+    },
+  });
+}
+
+/* ---------- Formulare: Historie ---------- */
+function bookingForm(opts) {
+  opts = opts || {};
+  if (!isTracking()) { toast(`Buchungen sind ab dem ${fmtDate(trackStart())} möglich (Erfassungsstart).`, 'bad'); return; }
+  const today = todayISO();
+  const cat0 = opts.cat || budgetNames()[0] || 'Sonstiges';
+  openForm({
+    title: opts.cat ? `Ausgabe erfassen: ${opts.cat}` : 'Ausgabe oder Einnahme erfassen', submit: 'Buchen',
+    intro: '<p>Etwas, das schon passiert ist. Ausgaben mit einer Budget-Kategorie zählen auf dein Monatsbudget, die Prognose rechnet dann nur noch mit dem Rest.</p>',
+    values: { type: 'expense', title: '', amount: '', date: today, cat: cat0, provider: '', adjust: true, note: '' },
+    fields: [
+      { key: 'type', label: 'Art', type: 'select', half: true, options: [['expense', 'Ausgabe'], ['income', 'Einnahme']] },
+      { key: 'amount', label: 'Betrag', type: 'money', half: true, required: true },
+      { key: 'cat', label: 'Kategorie', type: 'select', half: true, options: catOptions('expense', cat0) },
+      { key: 'date', label: 'Datum', type: 'date', half: true, required: true, min: trackStart(), max: today },
+      { key: 'provider', label: 'Geschäft oder Plattform (optional)', type: 'text', half: true, list: ['REWE', 'Lidl', 'Aldi', 'Edeka', 'dm', 'Amazon', 'Zalando', 'Otto', 'Tankstelle'], placeholder: 'z. B. REWE, Amazon' },
+      { key: 'title', label: 'Wofür (optional)', type: 'text', half: true, placeholder: 'z. B. Wocheneinkauf' },
+      { key: 'note', label: 'Notiz (optional)', type: 'text' },
+      { key: 'adjust', label: 'Kontostand entsprechend anpassen', type: 'checkbox', hint: 'Hast du den Kontostand schon aus deiner Banking-App aktualisiert, lass das Häkchen weg.' },
+    ],
+    onInput: (api, key) => { if (key === 'type') api.options('cat', catOptions(api.get('type')), api.get('type') === 'income' ? 'Sonstige Einnahmen' : cat0); },
+    onSubmit: x => {
+      if (!(x.amount > 0)) return 'Bitte einen Betrag größer als 0 eingeben.';
+      if (!validISO(x.date) || x.date < trackStart()) return `Das Datum muss ab dem ${fmtDate(trackStart())} liegen.`;
+      if (x.date > today) return 'Das Datum liegt in der Zukunft. Geplantes trägst du unter „Daueraufträge“ ein.';
+      const amt = x.type === 'income' ? x.amount : -x.amount;
+      const bud = x.type === 'expense' ? App.state.budgets.find(b => b.name === x.cat) : null;
+      journalAdd({ date: x.date, kind: x.type, title: x.title || x.provider || x.cat, amount: amt, cat: x.cat, provider: x.provider, budgetId: bud ? bud.id : '', note: x.note, balanceAdj: x.adjust });
+      if (x.adjust) setBalance(App.state.settings.balance + amt);
+      commit();
+      toast(bud && x.type === 'expense' ? `Gebucht. ${bud.name}: noch ${fmtEUR(budgetAmount(bud, x.date.slice(0, 7)) - budgetSpent(App.state, bud, x.date.slice(0, 7)))} übrig.` : 'Gebucht');
+    },
+  });
+}
+
+function voidForm(id) {
+  const j = byId(App.state.journal, id); if (!j || j.void) return;
+  const undo = j.ref && j.ref.type === 'invoice' ? 'Die Rechnung gilt danach wieder als offen.'
+    : j.ref && j.ref.type === 'installment' ? 'Restschuld und nächste Fälligkeit der Rate werden zurückgesetzt.'
+      : j.ref && j.ref.type === 'oma' ? 'Der Zahlungsschritt beim Oma-Vorgang ist danach wieder offen.' : '';
+  openForm({
+    title: 'Buchung stornieren', submit: 'Stornieren',
+    intro: `<p><b>${esc(j.title)}</b> vom ${esc(fmtDate(j.date))}, ${esc(fmtEUR(j.amount))}.</p><p>Die Buchung wird nicht gelöscht, sondern in der Historie als storniert markiert. ${esc(undo)}</p>`,
+    values: { reason: '', rev: j.balanceAdj && j.cash },
+    fields: [
+      { key: 'reason', label: 'Grund', type: 'text', required: true, placeholder: 'z. B. falscher Betrag' },
+      ...(j.cash ? [{ key: 'rev', label: `Kontostand um ${fmtEUR(-j.amount)} zurückrechnen`, type: 'checkbox', hint: j.balanceAdj ? 'Die Buchung hatte den Kontostand verändert.' : 'Die Buchung hatte den Kontostand nicht verändert. Nur ankreuzen, wenn du das nachholen willst.' }] : []),
+    ],
+    onSubmit: x => {
+      if (!x.reason) return 'Bitte einen Grund angeben.';
+      voidLine(j, x.reason, !!x.rev);
+      commit(); toast('Storniert');
+    },
+  });
+}
+
+function noteForm(id) {
+  const j = byId(App.state.journal, id); if (!j) return;
+  openForm({
+    title: 'Notiz ändern', values: { note: j.note || '' },
+    intro: '<p>Betrag, Datum und Bezeichnung einer Buchung bleiben unverändert. Um sie zu korrigieren, stornierst du die Buchung und erfasst sie neu.</p>',
+    fields: [{ key: 'note', label: 'Notiz', type: 'text' }],
+    onSubmit: x => { j.note = x.note; commit(); toast('Gespeichert'); },
+  });
+}
+
+/* ---------- Aktionen ---------- */
+Object.assign(Actions, {
+  addOmaOrder() { omaForm('order', null); },
+  addOmaSale() { omaForm('sale', null); },
+  editOma(d) { const it = byId(App.state.oma, d.id); if (it) omaForm(it.kind, it); },
+  omaBook(d) { omaBookForm(d.id, d.leg); },
+  omaFilter(d) { App.omaFilter = d.v; render(); },
+  omaDelivered(d) { const it = byId(App.state.oma, d.id); if (it) { it.delivery = 'delivered'; commit(); toast(it.kind === 'order' ? 'Als geliefert markiert' : 'Als zugestellt markiert'); } },
+  async delOma(d) {
+    const it = byId(App.state.oma, d.id); if (!it) return;
+    if (omaLegs(it, App.state.journal).some(l => l.lines.length)) { toast('Dieser Vorgang hat Buchungen. Storniere sie zuerst in der Historie.', 'bad'); return; }
+    if ((await askConfirm({ title: `„${it.title}“ löschen?`, ok: 'Löschen', danger: true })).ok) { App.state.oma = App.state.oma.filter(i => i.id !== d.id); commit(); toast('Gelöscht'); }
+  },
+  addBooking() { bookingForm(); },
+  addExpense(d) { bookingForm({ cat: d && d.cat }); },
+  jVoid(d) { voidForm(d.id); },
+  jNote(d) { noteForm(d.id); },
+  jArea(d) { App.jArea = d.v; render(); },
+  jMonth(v) { App.jMonth = v; render(); },
+});
+
+/* =====================================================================
+   BUDGETS – flexible Ausgaben (Einkauf, Shopping, Freizeit, …)
+   Monatsbudget pro Kategorie. Du erfasst nur, was du ausgibst. Die Prognose
+   rechnet im laufenden Monat mit dem Rest und danach mit dem vollen Budget.
+   ===================================================================== */
+const monthLabel = key => new Date(+key.slice(0, 4), +key.slice(5) - 1, 1).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+
+function budgetRows(st, mk) {
+  return st.budgets.map(b => {
+    const amt = budgetAmount(b, mk), spent = budgetSpent(st, b, mk);
+    return { b, amt, spent, left: round2(amt - spent) };
+  });
+}
+const barClass = (spent, amt) => { const r = amt > 0 ? spent / amt : 0; return r > 1 ? 'over' : r >= 0.8 ? 'warn' : ''; };
+const barPct = (spent, amt) => Math.min(100, amt > 0 ? (spent / amt) * 100 : 0).toFixed(1);
+const daysLeftInMonth = today => { const { y, m, d } = parseISO(today); return dim(y, m) - d + 1; };
+
+function expensesThisMonthWithoutBudget(st, mk) {
+  return round2(st.journal.filter(j => !j.void && j.area === 'own' && j.kind === 'expense' && j.date.slice(0, 7) === mk && !st.budgets.some(b => budgetMatches(j, b)))
+    .reduce((a, j) => a - j.amount, 0));
+}
+
+/* ---------- Übersicht: Panel ---------- */
+function budgetHomePanel() {
+  const st = App.state;
+  if (!st.budgets.length) {
+    return `<section class="panel"><div class="panel-h"><h2>Flexible Ausgaben</h2></div>
+      <p class="muted">Einkauf, Shopping, Freizeit: Lege ein Monatsbudget fest und erfasse nur, was du ausgibst. Die Prognose rechnet dann mit dem Rest.</p>
+      <div class="row-actions"><button class="btn primary" data-act="nav" data-tab="budgets">Budgets einrichten</button></div></section>`;
+  }
+  const mk = todayISO().slice(0, 7);
+  const rows = budgetRows(st, mk);
+  const tot = rows.reduce((a, r) => a + r.amt, 0), spent = rows.reduce((a, r) => a + r.spent, 0);
+  const shown = [...rows].sort((a, b) => b.amt - a.amt).slice(0, 5);
+  return `<section class="panel"><div class="panel-h"><h2>Flexible Ausgaben</h2><button class="link" data-act="nav" data-tab="budgets">Alle Budgets</button></div>
+    <p class="bud-sum">${money(Math.max(0, tot - spent))} <span class="muted" style="font:500 14px var(--sans)">noch übrig von ${esc(fmtEUR(tot))}</span></p>
+    <ul class="bars" style="margin-top:12px">${shown.map(r => `<li><span class="b-l">${esc(r.b.name)}</span><span class="b-t ${barClass(r.spent, r.amt)}"><i style="width:${barPct(r.spent, r.amt)}%"></i></span><span class="b-v">${money(r.left)}</span></li>`).join('')}</ul>
+    <div class="row-actions"><button class="btn sm primary" data-act="addExpense">Ausgabe erfassen</button></div></section>`;
+}
+
+/* ---------- Ansicht: Budgets ---------- */
+function budgetCard(r, daysLeft) {
+  const { b, amt, spent, left } = r;
+  const over = left < -0.005, tracking = isTracking();
+  const perDay = left > 0 && daysLeft > 0 ? left / daysLeft : 0;
+  const note = !tracking
+    ? `Budget ${fmtEUR(amt)} pro Monat. Bis zum Erfassungsstart rechnet die Prognose mit dem anteiligen Betrag.`
+    : `Ausgegeben ${fmtEUR(spent)} von ${fmtEUR(amt)}${over ? `, Budget um ${fmtEUR(-left)} überzogen.` : `. Noch ${daysLeft} ${daysLeft === 1 ? 'Tag' : 'Tage'}: ca. ${fmtEUR(perDay)} pro Tag.`}`;
+  return `<li class="item bud">
+    <div class="oma-h"><div class="item-t"><b>${esc(b.name)}</b><span class="tag">${esc(fmtEUR(amt))} pro Monat</span></div>
+      <div class="item-amt ${over ? 'neg' : ''}">${money(left)}<small>${over ? 'überzogen' : 'noch übrig'}</small></div></div>
+    <div class="bar ${barClass(spent, amt)}"><i style="width:${barPct(spent, amt)}%"></i></div>
+    <div class="item-n">${esc(note)}</div>
+    <div class="item-btns start"><button class="btn sm primary" data-act="addExpense" data-cat="${esc(b.name)}">Ausgabe erfassen</button><button class="btn sm" data-act="editBudget" data-id="${esc(b.id)}">Bearbeiten</button><button class="btn sm ghost" data-act="delBudget" data-id="${esc(b.id)}">Löschen</button></div>
+  </li>`;
+}
+
+function viewBudgets() {
+  const st = App.state, today = todayISO(), mk = today.slice(0, 7), tracking = isTracking();
+  const daysLeft = daysLeftInMonth(today);
+  const head = `<header class="page-head"><div><h1>Budgets</h1><p class="sub">Für alles, was nicht fest ist: Einkauf, Shopping, Freizeit. Du legst ein Monatsbudget fest und erfasst nur, was du ausgibst. Die Prognose rechnet mit dem Rest.</p></div>
+    <div class="actions"><button class="btn" data-act="quickBudgets">Mehrere anlegen</button><button class="btn" data-act="addBudget">Budget</button><button class="btn primary" data-act="addExpense">Ausgabe erfassen</button></div></header>`;
+  const banner = tracking ? '' : `<div class="banner"><div><b>Die Erfassung startet am ${esc(fmtDate(trackStart()))}.</b> Budgets kannst du schon jetzt anlegen, die Prognose verteilt sie auf die Tage. Ausgaben buchst du ab dem Start.</div></div>`;
+
+  if (!st.budgets.length) {
+    return head + banner + `<section class="panel start"><h2>So funktioniert es</h2>
+      <ol class="steps">
+        <li><b>Budget festlegen.</b> Zum Beispiel Lebensmittel 400 €, Shopping 100 €, Freizeit 90 € pro Monat. Schau dafür in deinen Kontoauszug der letzten Monate.</li>
+        <li><b>Ausgaben erfassen.</b> Nach dem Einkauf oder Shopping genügt Betrag und Kategorie, optional das Geschäft. Das dauert wenige Sekunden.</li>
+        <li><b>Den Rest im Blick behalten.</b> Die Seite zeigt, wie viel pro Tag noch übrig ist. Die Prognose und die Strategie rechnen automatisch mit dem Rest des Monats.</li>
+      </ol>
+      <p class="muted">Gleichmäßig wiederkehrende Beträge wie Miete oder Abos gehören weiter unter „Daueraufträge“. Ein Budget ersetzt keinen Dauerauftrag.</p>
+      <div class="row-actions"><button class="btn primary" data-act="quickBudgets">Budgets anlegen</button><button class="btn" data-act="addBudget">Einzelnes Budget</button></div></section>`;
+  }
+
+  const rows = budgetRows(st, mk);
+  const tot = rows.reduce((a, r) => a + r.amt, 0), spent = rows.reduce((a, r) => a + r.spent, 0);
+  const noBud = expensesThisMonthWithoutBudget(st, mk);
+  const recent = st.journal.filter(j => !j.void && j.area === 'own' && j.kind === 'expense')
+    .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt)).slice(0, 8);
+
+  const summary = `<section class="panel"><div class="panel-h"><h2>${esc(monthLabel(mk))}</h2></div>
+    <p class="bud-sum">${money(Math.max(0, tot - spent))}</p><p class="muted">${tot - spent < -0.005 ? `Gesamtbudget um ${esc(fmtEUR(spent - tot))} überzogen.` : `noch übrig von ${esc(fmtEUR(tot))}${daysLeft > 0 && tracking ? `, ca. ${esc(fmtEUR(Math.max(0, tot - spent) / daysLeft))} pro Tag` : ''}`}</p>
+    <div class="bar ${barClass(spent, tot)}"><i style="width:${barPct(spent, tot)}%"></i></div>
+    <dl class="kv"><div><dt>Ausgegeben</dt><dd>${money(spent)}</dd></div><div><dt>Budget gesamt</dt><dd>${money(tot)}</dd></div>${noBud > 0.005 ? `<div><dt>Weitere Ausgaben</dt><dd>${money(noBud)}</dd></div>` : ''}</dl></section>`;
+
+  const recentHTML = recent.length ? `<ul class="evs">${recent.map(j => `<li class="ev"><span class="ev-d">${esc(fmtWd(j.date))}</span><span class="ev-n"><b>${esc(j.title)}</b>${j.cat ? `<span class="tag">${esc(j.cat)}</span>` : ''}${j.provider ? `<span class="tag plat">${esc(j.provider)}</span>` : ''}</span><span class="ev-a">${money(j.amount)}</span></li>`).join('')}</ul>` : `<p class="empty">${tracking ? 'Noch keine Ausgaben erfasst.' : 'Ausgaben lassen sich ab dem Erfassungsstart erfassen.'}</p>`;
+
+  /* Verlauf: pro Monat Budget des damaligen Monats gegen tatsächliche Ausgaben */
+  const months = [...new Set(st.journal.filter(j => !j.void && j.area === 'own' && j.kind === 'expense').map(j => j.date.slice(0, 7)))].sort().reverse().slice(0, 12);
+  const hist = months.length ? `<section class="panel"><div class="panel-h"><h2>Verlauf</h2></div><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Monat</th><th>Budget</th><th>Ausgegeben</th><th>Weitere Ausgaben</th><th>Differenz</th></tr></thead><tbody>${months.map(m => {
+    const rs = budgetRows(st, m), bt = rs.reduce((a, r) => a + r.amt, 0), sp = rs.reduce((a, r) => a + r.spent, 0), nb = expensesThisMonthWithoutBudget(st, m), diff = round2(bt - sp);
+    return `<tr><th>${esc(fmtMonthKey(m))}${m === mk ? '<span class="tag">läuft</span>' : ''}</th><td>${money(bt)}</td><td>${money(sp)}</td><td>${nb > 0.005 ? money(nb) : '–'}</td><td class="${diff < 0 ? 'neg' : 'pos'}">${money(diff)}</td></tr>`;
+  }).join('')}</tbody></table></div><p class="fine muted tbl-note">Verglichen wird mit dem Budget, das in dem jeweiligen Monat galt. Positive Differenz: Geld gespart (im laufenden Monat: noch übrig), negative: überzogen. Weitere Ausgaben sind Buchungen ohne Budget-Kategorie, zum Beispiel Fixkosten.</p></section>` : '';
+
+  return head + banner + `<div class="cols wide-l">
+    <section class="panel"><div class="panel-h"><h2>Budgets</h2><span class="muted">noch ${daysLeft} ${daysLeft === 1 ? 'Tag' : 'Tage'} im Monat</span></div><ul class="items">${rows.map(r => budgetCard(r, daysLeft)).join('')}</ul></section>
+    <div class="stack">${summary}<section class="panel"><div class="panel-h"><h2>Letzte Ausgaben</h2><button class="link" data-act="nav" data-tab="journal">Historie</button></div>${recentHTML}</section></div>
+  </div>${hist}`;
+}
+Object.assign(Views, { budgets: viewBudgets });
+
+/* ---------- Formulare ---------- */
+function budgetNameTaken(name, exceptId) {
+  return App.state.budgets.some(b => b.id !== exceptId && b.name.toLowerCase() === name.toLowerCase());
+}
+
+function budgetForm(item) {
+  openForm({
+    title: item ? 'Budget bearbeiten' : 'Budget anlegen',
+    intro: '<p>Der Betrag gilt pro Monat und wird gleichmäßig auf die Tage verteilt. Für bereits vergangene Monate bleibt der damalige Betrag erhalten.</p>',
+    values: item || { name: '', amount: '' },
+    fields: [
+      { key: 'name', label: 'Kategorie', type: 'text', half: true, required: true, placeholder: 'z. B. Lebensmittel', list: ['Lebensmittel', 'Shopping', 'Freizeit', 'Mobilität', 'Kleidung', 'Gesundheit', 'Sonstiges'] },
+      { key: 'amount', label: 'Budget pro Monat', type: 'money', half: true, required: true },
+    ],
+    onSubmit: x => {
+      if (!x.name) return 'Bitte einen Namen eingeben.';
+      if (!(x.amount > 0)) return 'Bitte einen Betrag größer als 0 eingeben.';
+      if (budgetNameTaken(x.name, item && item.id)) return `Ein Budget „${x.name}“ gibt es schon.`;
+      const amount = round2(x.amount), curKey = todayISO().slice(0, 7);
+      if (item) {
+        if (Math.abs(item.amount - amount) > 0.004) {
+          const h = (item.history || [{ from: '0000-00', amount: item.amount }]).filter(e => e.from !== curKey);
+          h.push({ from: curKey, amount }); h.sort((a, b) => a.from.localeCompare(b.from));
+          item.history = h;
+        }
+        item.name = x.name; item.amount = amount;
+      } else {
+        App.state.budgets.push({ id: uid(), name: x.name, amount, history: [{ from: '0000-00', amount }] });
+      }
+      commit(); toast('Gespeichert');
+    },
+  });
+}
+
+function quickBudgetForm() {
+  openForm({
+    title: 'Mehrere Budgets anlegen', wide: true, submit: 'Gültige Zeilen übernehmen',
+    intro: '<p>Eine Zeile pro Budget: <b>Name; Betrag pro Monat</b></p><p class="muted">Orientiere dich an deinen Ausgaben der letzten Monate. Du kannst alles später anpassen.</p>',
+    values: { text: '' },
+    fields: [{ key: 'text', label: 'Budgets', type: 'textarea', rows: 6, placeholder: 'Lebensmittel; 400\nShopping; 100\nFreizeit; 90\nMobilität; 80' }],
+    onInput: api => {
+      const rows = parseBudgetLines(api.get('text'), budgetNames());
+      api.preview(rows.length ? `<ul class="qp">${rows.map(r => r.error ? `<li class="bad"><b>Zeile ${r.line}:</b> ${esc(r.error)}</li>` : `<li class="ok"><b>${esc(r.item.name)}</b> ${esc(fmtEUR(r.item.amount))} pro Monat</li>`).join('')}</ul>` : '');
+    },
+    onSubmit: x => {
+      const good = parseBudgetLines(x.text, budgetNames()).filter(r => !r.error);
+      if (!good.length) return 'Keine gültige Zeile gefunden.';
+      for (const r of good) App.state.budgets.push({ id: uid(), name: r.item.name, amount: r.item.amount, history: [{ from: '0000-00', amount: r.item.amount }] });
+      commit(); toast(`${good.length} ${good.length === 1 ? 'Budget' : 'Budgets'} angelegt`);
+    },
+  });
+}
+
+Object.assign(Actions, {
+  addBudget() { budgetForm(null); },
+  editBudget(d) { const b = byId(App.state.budgets, d.id); if (b) budgetForm(b); },
+  quickBudgets() { quickBudgetForm(); },
+  async delBudget(d) {
+    const b = byId(App.state.budgets, d.id); if (!b) return;
+    const r = await askConfirm({ title: `Budget „${b.name}“ löschen?`, text: 'Bereits erfasste Ausgaben bleiben in der Historie. Die Prognose rechnet danach nicht mehr mit diesem Budget.', ok: 'Löschen', danger: true });
+    if (r.ok) { App.state.budgets = App.state.budgets.filter(x => x.id !== d.id); commit(); toast('Gelöscht'); }
+  },
+});
+
+boot();
+</script>
+</body>
+</html>
